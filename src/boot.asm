@@ -1,3 +1,5 @@
+extern kernel_main
+
 SECTION .multiboot
 align 4
 
@@ -29,6 +31,9 @@ _start:
 
     mov [0xb8011], byte 'a' ; color red
     mov [0xb8013], byte 'a' ; color red
+
+    cli
+    call kernel_main
 
 halt:
     cli
