@@ -24,6 +24,7 @@ stack_top:
 SECTION .text
 
 %include "./src/gdt/gdt.asm"
+%include "./src/idt/load_idt.asm"
 
 global _start
 _start:
@@ -38,6 +39,8 @@ _start:
 
     mov [0xb8011], byte 'a' ; color red
     mov [0xb8013], byte 'a' ; color red
+
+    call load_idt
 
     cli
     call kernel_main

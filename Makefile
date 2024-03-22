@@ -15,11 +15,16 @@ AS_flags=-f elf32
 
 $(OUT)/boot.o: $(SRC)/boot.asm
 	$(AS) $(AS_flags) $< -o $@
+$(OUT)/idt.o: $(SRC)/idt/idt.c
+	$(CC) $(CC_flags) -c $< -o $@
+$(OUT)/interrupts.o: $(SRC)/idt/interrupts.c
+	$(CC) $(CC_flags) -mgeneral-regs-only -c $< -o $@
+
 $(OUT)/kernel.o: $(SRC)/kernel/kernel.c
 	$(CC) -c $< -o $@ $(CC_flags)
 
 OS=OS.flp
-$(OUT)/$(OS): $(OUT)/boot.o $(OUT)/kernel.o
+$(OUT)/$(OS): $(OUT)/boot.o $(OUT)/idt.o $(OUT)/interrupts.o $(OUT)/kernel.o
 	$(CC) -T $(SRC)/linker.ld -o $@ $^ -ffreestanding -nostdlib
 
 clean:
