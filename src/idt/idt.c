@@ -36,5 +36,10 @@ void prepare_idt() {
     idtr.limit = 0x0FFF;
     idtr.ptr = IDT;
 
+    IDTDescEntry* int_page_fault = &idtr.ptr[0xE];
+    idt_set_offset(int_page_fault, (uint32_t)page_fault_handler);
+    int_page_fault->type_attr = TA_INTERRUPT;
+    int_page_fault->selector = 0x08;
+
     asm ("lidt %0" : : "m" (idtr));
 }

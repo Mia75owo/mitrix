@@ -42,6 +42,8 @@ _start:
 
     call load_idt
 
+    int 0x0e                ; trigger "page fault" to test IDT
+
     cli
     call kernel_main
 
