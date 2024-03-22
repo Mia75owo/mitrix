@@ -23,9 +23,16 @@ stack_top:
 
 SECTION .text
 
+%include "./src/gdt/gdt.asm"
+
 global _start
 _start:
     mov esp, stack_top
+
+    ; Load global descriptor table
+    lgdt [gdtr]
+    call reload_segments
+
     mov [0xb8010], byte 'H'
     mov [0xb8012], byte 'i'
 
