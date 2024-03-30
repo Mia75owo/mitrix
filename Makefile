@@ -22,11 +22,14 @@ $(OUT)/idt.o: $(SRC)/idt/idt.c
 $(OUT)/interrupts.o: $(SRC)/idt/interrupts.c
 	$(CC) $(CC_flags) -mgeneral-regs-only -c $< -o $@
 
+$(OUT)/serial.o: $(SRC)/util/serial.c
+	$(CC) $(CC_flags) -c $< -o $@
+
 $(OUT)/kernel.o: $(SRC)/kernel/kernel.c
 	$(CC) -c $< -o $@ $(CC_flags)
 
 OS=OS.flp
-$(OUT)/$(OS): $(OUT)/boot.o $(OUT)/idt.o $(OUT)/interrupts.o $(OUT)/kernel.o
+$(OUT)/$(OS): $(OUT)/boot.o $(OUT)/idt.o $(OUT)/interrupts.o $(OUT)/kernel.o $(OUT)/serial.o
 	$(CC) -T $(SRC)/linker.ld -o $@ $^ -ffreestanding -nostdlib
 
 gen_cc_json: clean
@@ -37,4 +40,4 @@ clean:
 
 VM=qemu-system-i386
 run: $(OUT)/$(OS)
-	$(VM) -kernel $<
+	$(VM) -serial stdio -kernel $<
