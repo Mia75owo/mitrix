@@ -25,6 +25,7 @@ SECTION .text
 
 %include "./src/gdt/gdt.asm"
 %include "./src/idt/load_idt.asm"
+%include "./src/idt/interrupts_defines.asm"
 
 global _start
 _start:
@@ -40,11 +41,12 @@ _start:
     mov [0xb8011], byte 'a' ; color red
     mov [0xb8013], byte 'a' ; color red
 
-    call load_idt
-
-    int 0x0e                ; trigger "page fault" to test IDT
-
     cli
+    call load_idt
+    sti
+
+    ;int 0x0e                ; trigger "page fault" to test IDT
+
     call kernel_main
 
 halt:

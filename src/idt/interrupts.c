@@ -18,7 +18,7 @@ __attribute__((no_caller_saved_registers)) void screen_print(char* text) {
     }
 }
 
-__attribute__((interrupt)) void page_fault_handler(struct interrupt_frame* frame) {
+__attribute__((interrupt)) void page_fault_handler(InterruptFrame* frame) {
     (void)frame;
 
     screen_clear();
