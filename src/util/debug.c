@@ -1,4 +1,5 @@
 #include "debug.h"
+#include <stdarg.h>
 
 #include "util/mem.h"
 #include "util/serial.h"
@@ -17,24 +18,20 @@ void klog_num(u64 num, u16 base) {
     klog(buf);
 }
 
-void kassert(u32 cond, const char* file, u32 line, const char* err) {
-    if (cond) return;
-
+void kpanic_(const char* first, ...) {
     tty_clear();
     tty_set_cursor(0);
     tty_color(2000, 0x40);
 
-    tty_puts((char*)file);
-    tty_puts(":");
-    tty_put_num(line, 10);
-    tty_puts(" assert failed: ");
-    tty_puts((char*)err);
+    va_list va;
+    va_start(va, first);
 
-    serial_puts((char*)file);
-    serial_puts(":");
-    serial_put_num(line, 10);
-    serial_puts(" assert failed: ");
-    serial_puts((char*)err);
+    for (const char* arg = first; arg != (char*)0; arg = va_arg(va, const char*)) {
+        tty_puts((char*)arg);
+        serial_puts((char*)arg);
+    }
+
+    va_end(va);
 
     abort();
 }
