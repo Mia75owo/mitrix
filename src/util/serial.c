@@ -1,5 +1,6 @@
 #include "util/types.h"
 #include "util/port.h"
+#include "util/mem.h"
 
 #define PORT 0x3F8 // COM1
 
@@ -31,4 +32,13 @@ void serial_write(char c) {
         return;
     
     port_write(c);
+}
+
+void serial_puts(char* str) {
+    while (*str != '\0') serial_write(*str++);
+}
+void serial_put_num(u64 num, u16 base) {
+    static char buf[32];
+    itoa(buf, num, 32, base);
+    serial_puts(buf);
 }
