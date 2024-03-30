@@ -2,6 +2,7 @@
 #include "util/serial.h"
 #include "tty/tty.h"
 #include "fpu/fpu.h"
+#include "util/debug.h"
 
 void kernel_main() {
     tty_clear();
@@ -33,6 +34,9 @@ void kernel_main() {
     }
 
     fpu_enable();
+
+    assert_msg('o' == 'o', "yay");
+    assert_msg('o' == 'x', "ohnu");
 
     for (;;)
         ;
