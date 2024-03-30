@@ -1,4 +1,5 @@
 #include "util/types.h"
+#include "fpu/fpu.h"
 
 static char* screen = (char*)0xB8000;
 
@@ -11,6 +12,8 @@ void print(char* text) {
 
 void kernel_main() {
     print("Hello from kernel!");
+
+    fpu_enable();
 
     for (;;)
         ;
