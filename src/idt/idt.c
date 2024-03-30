@@ -11,22 +11,18 @@ typedef struct {
     u8 _;          // reserved
     u8 type_attr;
     u16 offset1;
-} __attribute__((packed)) IDTDescEntry ;
+} __attribute__((packed)) IDTDescEntry;
 
 typedef struct {
     u16 limit;
     IDTDescEntry* ptr;
 } __attribute__((packed)) IDTR;
 
-void idt_set_offset(IDTDescEntry* idt, u32 offset) {
-    idt->offset0 = (u16)((offset & 0x0000ffff) >> 0);
-    idt->offset1 = (u16)((offset & 0xffff0000) >> 16);
-}
-u32 idt_get_offset(IDTDescEntry* idt) {
-    u32 offset = 0;
-    offset |= (u32)idt->offset0 << 0;
-    offset |= (u32)idt->offset1 << 16;
-    return offset;
+void idt_set_entry(IDTDescEntry* idt, u8 index, void* isr, u8 attributes) {
+    idt[index].offset0 = (u16)(((u32)isr & 0x0000ffff) >> 0);
+    idt[index].offset1 = (u16)(((u32)isr & 0xffff0000) >> 16);
+    idt[index].type_attr = attributes;
+    idt[index].selector = 0x08;
 }
 
 IDTR idtr;
@@ -36,10 +32,7 @@ void prepare_idt() {
     idtr.limit = 0x0FFF;
     idtr.ptr = IDT;
 
-    IDTDescEntry* int_page_fault = &idtr.ptr[0xE];
-    idt_set_offset(int_page_fault, (u32)page_fault_handler);
-    int_page_fault->type_attr = TA_INTERRUPT;
-    int_page_fault->selector = 0x08;
+    idt_set_entry(idtr.ptr, 0xE, page_fault_handler, TA_INTERRUPT);
 
     asm ("lidt %0" : : "m" (idtr));
 }
