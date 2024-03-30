@@ -10,6 +10,8 @@ CC_flags += -nostdlib
 CC_flags += -Wall
 CC_flags += -Wextra
 
+CC_flags += -I$(SRC)
+
 AS=nasm
 AS_flags=-f elf32
 
@@ -26,6 +28,9 @@ $(OUT)/kernel.o: $(SRC)/kernel/kernel.c
 OS=OS.flp
 $(OUT)/$(OS): $(OUT)/boot.o $(OUT)/idt.o $(OUT)/interrupts.o $(OUT)/kernel.o
 	$(CC) -T $(SRC)/linker.ld -o $@ $^ -ffreestanding -nostdlib
+
+gen_cc_json: clean
+	bear -- make $(OUT)/$(OS)
 
 clean:
 	rm -rf $(OUT)/*
