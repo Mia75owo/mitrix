@@ -1,17 +1,36 @@
 #include "util/types.h"
+#include "util/serial.h"
+#include "tty/tty.h"
 #include "fpu/fpu.h"
 
-static char* screen = (char*)0xB8000;
-
-void print(char* text) {
-    for (u16 i = 0; *text != '\0'; i += 2, text++) {
-        screen[i] = *text;
-        screen[i + 1] = 4;
-    }
-}
-
 void kernel_main() {
-    print("Hello from kernel!");
+    tty_clear();
+    tty_set_cursor(0);
+
+    tty_color(18, 0x04);
+    tty_puts("Hello from kernel!\n");
+    serial_init();
+
+    u64 nums[] = {
+        0, 9, 123, 987654321
+    };
+
+    for (u16 i = 0; i < sizeof(nums) / sizeof(nums[0]); i++) {
+        tty_color(32, 0x03);
+        tty_put_num(nums[i], 10);
+        tty_puts("\n");
+    }
+
+    u64 nums_hex[] = {
+        0x0, 0x123, 0xdeadbeef, 0xffffffffffffffff
+    };
+
+    for (u16 i = 0; i < sizeof(nums_hex) / sizeof(nums_hex[0]); i++) {
+        tty_color(32, 0x03);
+        tty_puts("0x");
+        tty_put_num(nums_hex[i], 16);
+        tty_puts("\n");
+    }
 
     fpu_enable();
 

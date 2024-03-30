@@ -19,6 +19,8 @@ $(OUT)/boot.o: $(SRC)/boot.asm
 	$(AS) $(AS_flags) $< -o $@
 $(OUT)/idt.o: $(SRC)/idt/idt.c
 	$(CC) $(CC_flags) -c $< -o $@
+$(OUT)/tty.o: $(SRC)/tty/tty.c
+	$(CC) $(CC_flags) -c $< -o $@
 $(OUT)/fpu.o: $(SRC)/fpu/fpu.c
 	$(CC) $(CC_flags) -c $< -o $@
 
@@ -31,7 +33,7 @@ $(OUT)/kernel.o: $(SRC)/kernel/kernel.c
 	$(CC) -c $< -o $@ $(CC_flags)
 
 OS=OS.flp
-$(OUT)/$(OS): $(OUT)/boot.o $(OUT)/idt.o $(OUT)/kernel.o $(OUT)/fpu.o $(OUT)/serial.o $(OUT)/mem.o
+$(OUT)/$(OS): $(OUT)/boot.o $(OUT)/idt.o $(OUT)/kernel.o $(OUT)/tty.o $(OUT)/fpu.o $(OUT)/serial.o $(OUT)/mem.o
 	$(CC) -T $(SRC)/linker.ld -o $@ $^ -ffreestanding -nostdlib -lgcc
 
 gen_cc_json: clean
