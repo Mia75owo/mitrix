@@ -2,7 +2,6 @@
 #define IDT_H_
 
 #include "util/types.h"
-#include "interrupts.h"
 
 #define TA_INTERRUPT 0b10001110
 #define TA_CALL      0b10001100
@@ -20,6 +19,14 @@ typedef struct {
     u16 limit;
     IDTDescEntry* ptr;
 } __attribute__((packed)) IDTR;
+
+typedef struct {
+    u32 gs, fs, es, ds;
+    u32 edi, esi, ebp, esp, ebx, edx, ecx, eax;
+    u32 interrupt, error;
+
+    u32 eip, cs, eflags, usermode_esp, usermode_ss;
+} InterruptFrame;
 
 typedef void (*ISRFunction)(InterruptFrame*);
 

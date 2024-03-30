@@ -1,5 +1,4 @@
 #include "idt.h"
-#include "interrupts.h"
 #include "util/port.h"
 
 IDTR idtr;
@@ -63,8 +62,6 @@ void prepare_idt() {
     for (int i = 0; i < 48; i++) {
         idt_set_entry(idtr.ptr, i, isr_redirect_table[i], TA_INTERRUPT);
     }
-
-    /*idt_set_entry(idtr.ptr, 0xE, page_fault_handler, TA_INTERRUPT);*/
 
     asm ("lidt %0" : : "m" (idtr));
 }
