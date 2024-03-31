@@ -12,20 +12,24 @@
 extern void gdt_load();
 extern void idt_load();
 
-void kernel_main() {
-    gdt_load();
-    idt_load();
+#define kinit(call, name) \
+    klog("%0F[ %0BINFO %0F] %07Loading %s\n", name); \
+    (call);                                          \
+    klog("%0F[  %0AOK  %0F] %07%s Success\n", name);
 
-    serial_init();
-    fpu_init();
-    keyboard_init();
-    pit_init(1000);
+void kernel_main() {
+    tty_reset();
+
+    kinit(gdt_load(), "GDT");
+    kinit(idt_load(), "IDT");
+    kinit(serial_init(), "Serial");
+    kinit(fpu_init(), "FPU");
+    kinit(keyboard_init(), "Keyboard");
+    kinit(pit_init(1000), "PIT");
 
     asm volatile ("sti");
 
-    debug_tests();
-
-    tty_reset();
+    /*debug_tests();*/
 
     klog("_: %%\n_: a\ns: %s\n_: c\ns: %s\nn: %n\nc: %c\nx: %x", "b", "d", 123ll, 'e', 0xdeadbeefull);
     klog("\n%n", atoi("123456789", 10));
