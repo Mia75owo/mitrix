@@ -45,6 +45,8 @@ void keyboard_handler(InterruptFrame* frame) {
 
     if (!press && k_alt && c == 'd') {
         tty_debug();
+    } else if (!press && k_alt && c == 'e') {
+        asm volatile ("int $1");
     } else if (!press && c != 0) {
         klog("%03%c", c);
     }
