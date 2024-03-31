@@ -24,6 +24,5 @@ void kernel_main() {
     tty_printf("\n%n", atoi("123456789", 10));
     tty_printf("\n%x", atoi("deadbeef", 16));
 
-    for (;;)
-        ;
+    for(;;);
 }

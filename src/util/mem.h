@@ -16,4 +16,6 @@ void itoa(char* dest, u64 val, u32 len, u16 base);
 u8 ctoi(char c);
 u64 atoi(char* str, u16 base);
 
+bool cishex(char c);
+
 #endif
