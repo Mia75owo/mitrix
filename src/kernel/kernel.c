@@ -9,7 +9,7 @@
 
 void kernel_main() {
     serial_init();
-    fpu_enable();
+    fpu_init();
     keyboard_init();
 
     asm volatile ("sti");

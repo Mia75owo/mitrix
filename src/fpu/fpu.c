@@ -1,7 +1,7 @@
 #include "fpu.h"
 #include "util/types.h"
 
-void fpu_enable() {
+void fpu_init() {
     u32 cr4;
     asm volatile ("mov %%cr4, %0" : "=r"(cr4));
     cr4 |= 0x200;
