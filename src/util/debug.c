@@ -30,9 +30,13 @@ void kpanic(const char* format, ...) {
     abort();
 }
 
-void abort() {
+void halt() {
     asm volatile("cli");
     while (1) {
         asm volatile("hlt");
     }
+}
+
+void abort() {
+    halt();
 }

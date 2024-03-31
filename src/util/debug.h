@@ -12,6 +12,7 @@ void kpanic(const char* format, ...);
 #define assert(x) if (!(x)) { kpanic(__FILE__, ":", STRINGIZE(__LINE__), " assert failed"); }
 #define assert_msg(x, msg) if (!(x)) { kpanic("%s:%s assert failed: %s", __FILE__, STRINGIZE(__LINE__), (msg)); }
 
+void halt();
 void abort();
 
 #endif
