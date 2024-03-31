@@ -55,14 +55,11 @@ void setup_irq() {
     outb(PIC2_DATA, a2);
 }
 
-void handle_timer(InterruptFrame* frame) { (void)frame; }
-
 void idt_init() {
     idtr.limit = 0x0FFF;
     idtr.ptr = IDT;
 
     memset(isr_functions, 0, sizeof(isr_functions));
-    set_isr_function(32, handle_timer);
 
     setup_irq();
 

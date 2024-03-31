@@ -3,6 +3,7 @@
 #include "serial/serial.h"
 #include "tty/tty.h"
 #include "fpu/fpu.h"
+#include "pit/pit.h"
 #include "util/debug.h"
 #include "keyboard/keyboard.h"
 #include "util/mem.h"
@@ -11,6 +12,7 @@ void kernel_main() {
     serial_init();
     fpu_init();
     keyboard_init();
+    pit_init(1000);
 
     asm volatile ("sti");
 
