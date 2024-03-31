@@ -158,6 +158,12 @@ void tty_printf(const char* format, ...) {
 
                 format += 2;
                 continue;
+            } else if (cishex(format[1]) && !(format[1] >= 'a' && format[1] <= 'f')) {
+                color =  (ctoi(format[1]) & 0xf) << 4;
+                color |= (ctoi(format[2]) & 0xf) << 0;
+
+                format += 3;
+                continue;
             }
         }
 
