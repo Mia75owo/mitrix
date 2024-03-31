@@ -20,11 +20,9 @@ void keyboard_init() {
 void keyboard_handler(InterruptFrame* frame) {
     (void)frame;
 
-    char scan_code = inb(0x60) & 0x7F;
-    char press = inb(0x60) & 0x80;
+    u8 scan_code = inb(0x60) & 0x7F;
+    u8 press = inb(0x60) & 0x80;
 
-    (void)scan_code;
-    (void)press;
 
     if (scan_code == 29) {
         k_ctrl = !press;
@@ -45,7 +43,9 @@ void keyboard_handler(InterruptFrame* frame) {
         c = scancode_map[(u32)scan_code];
     }
 
-    if (!press && c != 0) {
+    if (!press && k_alt && c == 'd') {
+        tty_debug();
+    } else if (!press && c != 0) {
         klog("%03%c", c);
     }
 }
