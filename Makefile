@@ -33,11 +33,14 @@ $(OUT)/mem.o: $(SRC)/util/mem.c
 $(OUT)/debug.o: $(SRC)/util/debug.c
 	$(CC) $(CC_flags) -c $< -o $@
 
+$(OUT)/tests.o: $(SRC)/tests/tests.c
+	$(CC) -c $< -o $@ $(CC_flags)
+
 $(OUT)/kernel.o: $(SRC)/kernel/kernel.c
 	$(CC) -c $< -o $@ $(CC_flags)
 
 OS=OS.flp
-$(OUT)/$(OS): $(OUT)/boot.o $(OUT)/idt.o $(OUT)/kernel.o $(OUT)/tty.o $(OUT)/fpu.o $(OUT)/serial.o $(OUT)/mem.o $(OUT)/debug.o $(OUT)/keyboard.o
+$(OUT)/$(OS): $(OUT)/boot.o $(OUT)/idt.o $(OUT)/kernel.o $(OUT)/tty.o $(OUT)/fpu.o $(OUT)/serial.o $(OUT)/mem.o $(OUT)/debug.o $(OUT)/keyboard.o $(OUT)/tests.o
 	$(CC) -T $(SRC)/linker.ld -o $@ $^ -ffreestanding -nostdlib -lgcc
 
 gen_cc_json: clean
