@@ -100,3 +100,9 @@ void tty_put_num(u64 num, u16 base) {
     itoa(buf, num, 32, base);
     tty_puts(buf);
 }
+
+void tty_getstr(char* dest, u32 src, u32 len) {
+    while (len != 0 && src < TTY_X * TTY_Y) {
+        *dest++ = screen[src++ * 2];
+    }
+}
