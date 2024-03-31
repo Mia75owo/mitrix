@@ -70,6 +70,8 @@ void idt_init() {
     asm ("lidt %0" : : "m" (idtr));
 }
 
+static char* exception_names[];
+
 void handle_interrupt(InterruptFrame* frame) {
     if (frame->interrupt >= 32 && frame->interrupt <= 47) {
         if (frame->interrupt >= 40) {
@@ -80,8 +82,46 @@ void handle_interrupt(InterruptFrame* frame) {
 
     ISRFunction isr = isr_functions[frame->interrupt];
     if (isr == 0) {
-        kpanic("ERROR: unhandled interrupt %n!", (u64)frame->interrupt);
+        if (frame->interrupt < 32) {
+            kpanic("ERROR: Exception (%s)!", exception_names[frame->interrupt]);
+        } else {
+            kpanic("ERROR: unhandled interrupt %n!", (u64)frame->interrupt);
+        }
     }
     isr(frame);
-
 }
+
+static char* exception_names[] = {
+    "Division Error",
+    "Debug",
+    "Non-maskable Interrupt",
+    "Breakpoint",
+    "Overflow",
+    "Bound Range Exceeded",
+    "Invalid Opcode",
+    "Device Not Available",
+    "Double Fault",
+    "Coprocessor Segment Overrun",
+    "Invalid TSS",
+    "Segment Not Present",
+    "Stack-Segment Fault",
+    "General Protection Fault",
+    "Page Fault",
+    "Reserved",
+    "x87 Floating-Point Exception",
+    "Alignment Check",
+    "Machine Check",
+    "SIMD Floating-Point Exception",
+    "Virtualization Exception",
+    "Control Protection Exception",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Hypervisor Injection Exception",
+    "VMM Communication Exception",
+    "Security Exception",
+    "Reserved",
+};
