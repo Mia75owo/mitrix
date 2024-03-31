@@ -3,6 +3,8 @@
 #include "util/port.h"
 #include "util/mem.h"
 
+#include <stdarg.h>
+
 #define TTY_X 80
 #define TTY_Y 25
 
@@ -99,6 +101,70 @@ void tty_put_num(u64 num, u16 base) {
     static char buf[32];
     itoa(buf, num, 32, base);
     tty_puts(buf);
+}
+
+void tty_printf(const char* format, ...) {
+    u8 color = 0x03;
+
+    static char buf[32];
+
+    va_list va;
+    va_start(va, format);
+
+    while (*format != '\0') {
+        if (*format == '%' && format[1] != '%') {
+            if (format[1] == 's') {
+                const char* str = va_arg(va, const char*);
+
+                while (*str != '\0') {
+                    tty_putcol(color);
+                    tty_putchar(*str++);
+                }
+
+                format += 2;
+                continue;
+            } else if (format[1] == 'n') {
+                const u64 num = va_arg(va, const u64);
+                itoa(buf, num, 32, 10);
+                char* str = buf;
+
+                while (*str != '\0') {
+                    tty_putcol(color);
+                    tty_putchar(*str++);
+                }
+
+                format += 2;
+                continue;
+            } else if (format[1] == 'x') {
+                const u64 num = va_arg(va, const u64);
+                itoa(buf, num, 32, 16);
+                char* str = buf;
+
+                tty_color(2, color);
+                tty_puts("0x");
+
+                while (*str != '\0') {
+                    tty_putcol(color);
+                    tty_putchar(*str++);
+                }
+
+                format += 2;
+                continue;
+            } else if (format[1] == 'c') {
+                const char c = va_arg(va, const u32);
+
+                tty_putcol(color);
+                tty_putchar(c);
+
+                format += 2;
+                continue;
+            }
+        }
+
+        tty_putcol(color);
+        tty_putchar(*format);
+        format++;
+    }
 }
 
 void tty_getstr(char* dest, u32 src, u32 len) {

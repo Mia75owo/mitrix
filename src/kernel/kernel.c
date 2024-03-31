@@ -46,6 +46,10 @@ void kernel_main() {
     tty_set_cursor(0);
     tty_clear();
 
+    tty_printf("_: %%\n_: a\ns: %s\n_: c\ns: %s\nn: %n\nc: %c\nx: %x", "b", "d", 123ll, 'e', 0xdeadbeefull);
+    tty_printf("\n%n", atoi("123456789", 10));
+    tty_printf("\n%x", atoi("deadbeef", 16));
+
     for (;;)
         ;
 }
