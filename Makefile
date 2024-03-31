@@ -58,3 +58,10 @@ clean:
 VM=qemu-system-i386
 run: $(OUT)/$(OS)
 	$(VM) -serial stdio -kernel $<
+
+$(OUT)/mitrix.iso: $(OUT)/$(OS)
+	cp $(OUT)/$(OS) mitrix/boot/kernel
+	grub-mkrescue -o $@ mitrix
+
+bochs: $(OUT)/mitrix.iso
+	bochs -f bochsrc.txt
