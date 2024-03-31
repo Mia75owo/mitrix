@@ -80,7 +80,10 @@ void tty_putchar(char c) {
     u16 pos = y * TTY_X + x;
 
     tty_set_cursor(pos);
-    screen[(pos - 1) * 2] = c;
+
+    if (c != '\n' && c != '\0') {
+        screen[(pos - 1) * 2] = c;
+    }
 }
 
 void tty_putcol(char c) {
@@ -188,5 +191,5 @@ void tty_getstr(char* dest, u32 src, u32 len) {
 void tty_reset() {
     tty_set_cursor(0);
     tty_clear();
-    tty_color(TTY_X * TTY_Y, 0x0e);
+    tty_color(TTY_X * TTY_Y, 0x03);
 }
