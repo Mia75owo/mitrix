@@ -57,7 +57,7 @@ void setup_irq() {
 
 void handle_timer(InterruptFrame* frame) { (void)frame; }
 
-void prepare_idt() {
+void idt_init() {
     idtr.limit = 0x0FFF;
     idtr.ptr = IDT;
 

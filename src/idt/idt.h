@@ -33,6 +33,6 @@ typedef void (*ISRFunction)(InterruptFrame*);
 
 void set_isr_function(u8 index, ISRFunction func);
 void idt_set_entry(IDTDescEntry* idt, u8 index, void* isr, u8 attributes);
-void prepare_idt();
+void idt_init();
 
 #endif
