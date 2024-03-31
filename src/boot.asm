@@ -31,19 +31,6 @@ global _start
 _start:
     mov esp, stack_top
 
-    ; Load global descriptor table
-    lgdt [gdtr]
-    call reload_segments
-
-    mov [0xb8010], byte 'H'
-    mov [0xb8012], byte 'i'
-
-    mov [0xb8011], byte 'a' ; color red
-    mov [0xb8013], byte 'a' ; color red
-
-    cli
-    call load_idt
-
     ;int 0x0e                ; trigger "page fault" to test IDT
 
     cli

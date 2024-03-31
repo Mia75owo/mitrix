@@ -9,7 +9,13 @@
 #include "keyboard/keyboard.h"
 #include "util/mem.h"
 
+extern void gdt_load();
+extern void idt_load();
+
 void kernel_main() {
+    gdt_load();
+    idt_load();
+
     serial_init();
     fpu_init();
     keyboard_init();

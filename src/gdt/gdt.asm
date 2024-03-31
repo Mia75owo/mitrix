@@ -40,3 +40,8 @@ reload_segments:
     mov ss, ax
 
     ret
+
+global gdt_load
+gdt_load:
+    lgdt [gdtr]
+    call reload_segments

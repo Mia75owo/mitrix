@@ -1,6 +1,7 @@
 extern idt_init
 
-load_idt:
+global idt_load
+idt_load:
     push ebp          ; save old call frame
     mov ebp, esp      ; set stack base to current stack pointer
 
