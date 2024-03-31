@@ -23,5 +23,5 @@ void kernel_main() {
     klog("\n%x", atoi("deadbeef", 16));
     klog("\n%40aaaa%03bbbb");
 
-    halt();
+    while(1);
 }

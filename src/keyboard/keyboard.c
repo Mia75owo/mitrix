@@ -46,18 +46,8 @@ void keyboard_handler(InterruptFrame* frame) {
     }
 
     if (!press && c != 0) {
-        tty_color(80, 0x03);
-        tty_putchar(c);
+        klog("%03%c", c);
     }
-
-    /*if (!press) {*/
-        /*static char buf[32];*/
-        /*itoa(buf, scan_code, 32, 10);*/
-
-        /*tty_color(80, 0x03);*/
-        /*tty_puts(buf);*/
-        /*tty_puts("\n");*/
-    /*}*/
 }
 
 static char scancode_map[128] = {
