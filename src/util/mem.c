@@ -12,6 +12,14 @@ void* memcpy(void* dest, const void* src, u32 len) {
     for (; len != 0; len--) *dp++ = *sp++;
     return dest;
 }
+bool memcmp(void* a, void* b, u32 len) {
+    while (len-- > 0) {
+        if (*((u8*)a++) != *((u8*)b++)) {
+            return false;
+        }
+    }
+    return true;
+}
 
 u32 strlen(const char* str) {
     const char* ss = str;
