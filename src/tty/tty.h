@@ -28,4 +28,6 @@ void tty_printf(const char* format, ...);
 
 void tty_getstr(char* dest, u32 src, u32 len);
 
+void tty_reset();
+
 #endif

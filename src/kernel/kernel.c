@@ -16,9 +16,7 @@ void kernel_main() {
 
     debug_tests();
 
-
-    tty_set_cursor(0);
-    tty_clear();
+    tty_reset();
 
     klog("_: %%\n_: a\ns: %s\n_: c\ns: %s\nn: %n\nc: %c\nx: %x", "b", "d", 123ll, 'e', 0xdeadbeefull);
     klog("\n%n", atoi("123456789", 10));

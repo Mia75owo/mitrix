@@ -184,3 +184,9 @@ void tty_getstr(char* dest, u32 src, u32 len) {
         *dest++ = screen[src++ * 2];
     }
 }
+
+void tty_reset() {
+    tty_set_cursor(0);
+    tty_clear();
+    tty_color(TTY_X * TTY_Y, 0x0e);
+}
