@@ -29,6 +29,8 @@ $(OUT)/keyboard.o: $(SRC)/keyboard/keyboard.c
 	$(CC) $(CC_flags) -c $< -o $@
 $(OUT)/pit.o: $(SRC)/pit/pit.c
 	$(CC) $(CC_flags) -c $< -o $@
+$(OUT)/memory.o: $(SRC)/memory/memory.c
+	$(CC) $(CC_flags) -c $< -o $@
 
 $(OUT)/mem.o: $(SRC)/util/mem.c
 	$(CC) $(CC_flags) -c $< -o $@
@@ -44,7 +46,7 @@ $(OUT)/kernel.o: $(SRC)/kernel/kernel.c
 	$(CC) -c $< -o $@ $(CC_flags)
 
 OS=OS.flp
-$(OUT)/$(OS): $(OUT)/boot.o $(OUT)/idt.o $(OUT)/kernel.o $(OUT)/tty.o $(OUT)/fpu.o $(OUT)/serial.o $(OUT)/mem.o $(OUT)/debug.o $(OUT)/keyboard.o $(OUT)/tests.o $(OUT)/pit.o $(OUT)/sys.o
+$(OUT)/$(OS): $(OUT)/boot.o $(OUT)/idt.o $(OUT)/kernel.o $(OUT)/tty.o $(OUT)/fpu.o $(OUT)/serial.o $(OUT)/mem.o $(OUT)/debug.o $(OUT)/keyboard.o $(OUT)/tests.o $(OUT)/pit.o $(OUT)/sys.o $(OUT)/memory.o
 	$(CC) -T $(SRC)/linker.ld -o $@ $^ -ffreestanding -nostdlib -lgcc
 
 gen_cc_json: clean

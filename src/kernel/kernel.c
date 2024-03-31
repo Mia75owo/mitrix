@@ -8,6 +8,8 @@
 #include "util/debug.h"
 #include "keyboard/keyboard.h"
 #include "util/mem.h"
+#include "multiboot.h"
+#include "memory/memory.h"
 
 extern void gdt_load();
 extern void idt_load();
@@ -17,7 +19,10 @@ extern void idt_load();
     (call);                                          \
     klog("%0F[  %0AOK  %0F] %07%s Success\n", name);
 
-void kernel_main() {
+void kernel_main(u32 magic, struct multiboot_info* boot_info) {
+    (void)magic;
+    (void)boot_info;
+
     tty_reset();
 
     kinit(gdt_load(), "GDT");
@@ -26,6 +31,7 @@ void kernel_main() {
     kinit(fpu_init(), "FPU");
     kinit(keyboard_init(), "Keyboard");
     kinit(pit_init(1000), "PIT");
+    kinit(memory_init(boot_info), "Memory");
 
     asm volatile ("sti");
 

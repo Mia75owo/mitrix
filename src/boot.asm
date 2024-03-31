@@ -33,6 +33,9 @@ _start:
 
     ;int 0x0e                ; trigger "page fault" to test IDT
 
+    push ebx
+    push eax
+
     cli
     call kernel_main
 
