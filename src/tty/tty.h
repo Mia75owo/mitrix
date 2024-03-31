@@ -23,7 +23,6 @@ void tty_color(u16 len, char c);
 void tty_backspace(u32 times);
 
 void tty_puts(char* str);
-void tty_put_num(u64 num, u16 base);
 
 void tty_vprintf(const char* format, va_list va);
 void tty_printf(const char* format, ...);

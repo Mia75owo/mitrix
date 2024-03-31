@@ -116,11 +116,6 @@ void tty_backspace(u32 times) {
 void tty_puts(char* str) {
     while (*str != '\0') tty_putchar(*str++);
 }
-void tty_put_num(u64 num, u16 base) {
-    static char buf[32];
-    itoa(buf, num, 32, base);
-    tty_puts(buf);
-}
 
 void tty_printf(const char* format, ...) {
     va_list va;
