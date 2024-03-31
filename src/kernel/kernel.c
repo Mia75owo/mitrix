@@ -3,6 +3,7 @@
 #include "tty/tty.h"
 #include "fpu/fpu.h"
 #include "util/debug.h"
+#include "keyboard/keyboard.h"
 
 void kernel_main() {
     tty_clear();
@@ -14,7 +15,10 @@ void kernel_main() {
 
     fpu_enable();
 
+    keyboard_init();
+
     asm volatile ("sti");
+
     u64 nums[] = {
         0, 9, 123, 987654321
     };
