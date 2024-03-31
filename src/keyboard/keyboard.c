@@ -1,6 +1,7 @@
 #include "keyboard.h"
 #include "util/mem.h"
 #include "util/port.h"
+#include "util/sys.h"
 #include "util/types.h"
 #include "util/debug.h"
 #include "tty/tty.h"
@@ -47,6 +48,8 @@ void keyboard_handler(InterruptFrame* frame) {
         tty_debug();
     } else if (!press && k_alt && c == 'e') {
         asm volatile ("int $1");
+    } else if (!press && k_alt && c == 'r') {
+        reboot();
     } else if (!press && c != 0) {
         klog("%03%c", c);
     }

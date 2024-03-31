@@ -1,4 +1,5 @@
 #include "tests/tests.h"
+#include "util/sys.h"
 #include "util/types.h"
 #include "serial/serial.h"
 #include "tty/tty.h"
@@ -25,5 +26,5 @@ void kernel_main() {
     klog("\n%x", atoi("deadbeef", 16));
     klog("\n%40aaaa%03bbbb");
 
-    while(1);
+    spin_halt();
 }

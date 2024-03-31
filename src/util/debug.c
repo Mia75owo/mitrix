@@ -1,6 +1,7 @@
 #include "debug.h"
 #include <stdarg.h>
 
+#include "util/sys.h"
 #include "serial/serial.h"
 #include "tty/tty.h"
 
@@ -28,15 +29,4 @@ void kpanic(const char* format, ...) {
     va_end(va);
 
     abort();
-}
-
-void halt() {
-    asm volatile("cli");
-    while (1) {
-        asm volatile("hlt");
-    }
-}
-
-void abort() {
-    halt();
 }
