@@ -1,6 +1,8 @@
 #ifndef TTY_H_
 #define TTY_H_
 
+#include <stdarg.h>
+
 #include "util/types.h"
 
 void tty_set_cursor(u16 pos);
@@ -21,6 +23,7 @@ void tty_color(u16 len, char c);
 void tty_puts(char* str);
 void tty_put_num(u64 num, u16 base);
 
+void tty_vprintf(const char* format, va_list va);
 void tty_printf(const char* format, ...);
 
 void tty_getstr(char* dest, u32 src, u32 len);

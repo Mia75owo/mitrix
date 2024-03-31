@@ -20,10 +20,9 @@ void kernel_main() {
     tty_set_cursor(0);
     tty_clear();
 
-    tty_printf("_: %%\n_: a\ns: %s\n_: c\ns: %s\nn: %n\nc: %c\nx: %x", "b", "d", 123ll, 'e', 0xdeadbeefull);
-    tty_printf("\n%n", atoi("123456789", 10));
-    tty_printf("\n%x", atoi("deadbeef", 16));
-    tty_printf("\n%40aaaa%03bbbb");
-
+    klog("_: %%\n_: a\ns: %s\n_: c\ns: %s\nn: %n\nc: %c\nx: %x", "b", "d", 123ll, 'e', 0xdeadbeefull);
+    klog("\n%n", atoi("123456789", 10));
+    klog("\n%x", atoi("deadbeef", 16));
+    klog("\n%40aaaa%03bbbb");
     for(;;);
 }

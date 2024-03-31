@@ -104,12 +104,18 @@ void tty_put_num(u64 num, u16 base) {
 }
 
 void tty_printf(const char* format, ...) {
+    va_list va;
+    va_start(va, format);
+
+    tty_vprintf(format, va);
+
+    va_end(va);
+}
+
+void tty_vprintf(const char* format, va_list va) {
     u8 color = 0x03;
 
     static char buf[32];
-
-    va_list va;
-    va_start(va, format);
 
     while (*format != '\0') {
         if (*format == '%' && format[1] != '%') {

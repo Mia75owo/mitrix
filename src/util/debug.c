@@ -8,8 +8,10 @@ void klog(char* format, ...) {
     va_list va;
     va_start(va, format);
 
-    tty_printf(format, va);
     // TODO: serial_printf
+    tty_vprintf(format, va);
+
+    va_end(va);
 }
 
 void kpanic(const char* format, ...) {
@@ -20,8 +22,8 @@ void kpanic(const char* format, ...) {
     va_list va;
     va_start(va, format);
 
-    tty_printf(format, va);
     // TODO: serial_printf
+    tty_vprintf(format, va);
 
     va_end(va);
 
