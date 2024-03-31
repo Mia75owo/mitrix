@@ -33,7 +33,13 @@ void serial_putchar(char c) {
     if (!serial_initialized)
         return;
     
-    port_write(c);
+    if (c == '\b') {
+        port_write('\b');
+        port_write(' ');
+        port_write('\b');
+    } else {
+        port_write(c);
+    }
 }
 
 void serial_puts(char* str) {

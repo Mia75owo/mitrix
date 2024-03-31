@@ -20,6 +20,8 @@ void tty_putcol(char c);
 
 void tty_color(u16 len, char c);
 
+void tty_backspace(u32 times);
+
 void tty_puts(char* str);
 void tty_put_num(u64 num, u16 base);
 

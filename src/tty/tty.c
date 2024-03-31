@@ -64,6 +64,9 @@ void tty_putchar(char c) {
     if (c == '\n') {
         x = 0;
         y++;
+    } else if (c == '\b') {
+        tty_backspace(1);
+        return;
     } else {
         x++;
         if (x >= TTY_X) {
@@ -81,7 +84,7 @@ void tty_putchar(char c) {
 
     tty_set_cursor(pos);
 
-    if (c != '\n' && c != '\0') {
+    if (c != '\n' && c != '\0' && c != '\b') {
         screen[(pos - 1) * 2] = c;
     }
 }
@@ -94,6 +97,19 @@ void tty_color(u16 len, char c) {
     u16 to = tty_get_cursor() + len;
     for (u16 i = tty_get_cursor(); (i < to) && (i < TTY_X * TTY_Y); i++) {
         screen[i * 2 + 1] = c;
+    }
+}
+
+void tty_backspace(u32 times) {
+    u16 pos = tty_get_cursor();
+
+    while((pos > 0) && (times-- > 0)) {
+        screen[(pos - 1) * 2] = 0;
+        do {
+            pos--;
+        } while (screen[(pos - 1) * 2] == 0 && pos % TTY_X != 0);
+
+        tty_set_cursor(pos);
     }
 }
 
