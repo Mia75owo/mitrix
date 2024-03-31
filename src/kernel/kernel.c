@@ -12,6 +12,9 @@ void kernel_main() {
     tty_puts("Hello from kernel!\n");
     serial_init();
 
+    fpu_enable();
+
+    asm volatile ("sti");
     u64 nums[] = {
         0, 9, 123, 987654321
     };
@@ -33,10 +36,11 @@ void kernel_main() {
         tty_puts("\n");
     }
 
-    fpu_enable();
-
     assert_msg('o' == 'o', "yay");
-    assert_msg('o' == 'x', "ohnu");
+    /*assert_msg('o' == 'x', "ohnu");*/
+
+    tty_set_cursor(0);
+    tty_clear();
 
     for (;;)
         ;

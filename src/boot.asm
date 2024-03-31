@@ -43,10 +43,10 @@ _start:
 
     cli
     call load_idt
-    sti
 
     ;int 0x0e                ; trigger "page fault" to test IDT
 
+    cli
     call kernel_main
 
 halt:

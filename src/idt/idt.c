@@ -1,5 +1,8 @@
 #include "idt.h"
 #include "util/port.h"
+#include "util/serial.h"
+#include "util/mem.h"
+#include "util/debug.h"
 
 IDTR idtr;
 IDTDescEntry IDT[256];
@@ -53,9 +56,14 @@ void setup_irq() {
     outb(PIC2_DATA, a2);
 }
 
+void handle_timer(InterruptFrame* frame) { (void)frame; }
+
 void prepare_idt() {
     idtr.limit = 0x0FFF;
     idtr.ptr = IDT;
+
+    memset(isr_functions, 0, sizeof(isr_functions));
+    set_isr_function(32, handle_timer);
 
     setup_irq();
 
@@ -73,4 +81,14 @@ void handle_interrupt(InterruptFrame* frame) {
         }
         outb(PIC1, PIC_EOI);
     }
+
+    ISRFunction isr = isr_functions[frame->interrupt];
+    if (isr == 0) {
+        static char buf[32];
+        itoa(buf, frame->interrupt, 32, 10);
+
+        kpanic("ERROR: unhandled interrupt ", buf, "!");
+    }
+    isr(frame);
+
 }
