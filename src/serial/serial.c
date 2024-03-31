@@ -1,3 +1,5 @@
+#include <stdarg.h>
+#include "serial/serial.h"
 #include "util/types.h"
 #include "util/port.h"
 #include "util/mem.h"
@@ -27,7 +29,7 @@ static void port_write(char a) {
    outb(PORT,a);
 }
 
-void serial_write(char c) {
+void serial_putchar(char c) {
     if (!serial_initialized)
         return;
     
@@ -35,10 +37,64 @@ void serial_write(char c) {
 }
 
 void serial_puts(char* str) {
-    while (*str != '\0') serial_write(*str++);
+    while (*str != '\0') serial_putchar(*str++);
 }
-void serial_put_num(u64 num, u16 base) {
+
+void serial_printf(const char* format, ...) {
+    va_list va;
+    va_start(va, format);
+
+    serial_vprintf(format, va);
+
+    va_end(va);
+}
+
+void serial_vprintf(const char* format, va_list va) {
     static char buf[32];
-    itoa(buf, num, 32, base);
-    serial_puts(buf);
+
+    while (*format != '\0') {
+        if (*format == '%' && format[1] != '%') {
+            if (format[1] == 's') {
+                const char* str = va_arg(va, const char*);
+
+                serial_puts((char*)str);
+
+                format += 2;
+                continue;
+            } else if (format[1] == 'n') {
+                const u64 num = va_arg(va, const u64);
+                itoa(buf, num, 32, 10);
+                char* str = buf;
+
+                serial_puts((char*)str);
+
+                format += 2;
+                continue;
+            } else if (format[1] == 'x') {
+                const u64 num = va_arg(va, const u64);
+                itoa(buf, num, 32, 16);
+                char* str = buf;
+
+                serial_puts("0x");
+                serial_puts((char*)str);
+
+                format += 2;
+                continue;
+            } else if (format[1] == 'c') {
+                const char c = va_arg(va, const u32);
+
+                serial_putchar(c);
+
+                format += 2;
+                continue;
+            } else if (cishex(format[1]) && !(format[1] >= 'a' && format[1] <= 'f')) {
+                // Ignore color format option
+                format += 3;
+                continue;
+            }
+        }
+
+        serial_putchar(*format);
+        format++;
+    }
 }
