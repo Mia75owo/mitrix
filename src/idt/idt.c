@@ -37,7 +37,7 @@ void set_isr_function(u8 index, ISRFunction func) {
 
 #define ICW4_8086      0x01
 
-void setup_irq() {
+static void setup_irq() {
     u8 a1, a2;
     a1 = inb(PIC1_DATA);
     a2 = inb(PIC2_DATA);
@@ -80,10 +80,7 @@ void handle_interrupt(InterruptFrame* frame) {
 
     ISRFunction isr = isr_functions[frame->interrupt];
     if (isr == 0) {
-        static char buf[32];
-        itoa(buf, frame->interrupt, 32, 10);
-
-        kpanic("ERROR: unhandled interrupt ", buf, "!");
+        kpanic("ERROR: unhandled interrupt %n!", (u64)frame->interrupt);
     }
     isr(frame);
 
