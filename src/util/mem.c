@@ -65,3 +65,31 @@ void itoa(char* dest, u64 val, u32 len, u16 base) {
 
     memrev(dest, i);
 }
+
+u8 ctoi(char c) {
+    if (c >= '0' && c <= '9') {
+        return c - '0';
+    }
+    if (c >= 'a' && c <= 'f') {
+        return c - 'a' + 10;
+    }
+    if (c >= 'A' && c <= 'F') {
+        return c - 'A' + 10;
+    }
+    return 0;
+}
+
+u64 atoi(char* str, u16 base) {
+    u64 num = 0;
+
+    while (1) {
+        num += ctoi(*str);
+
+        if (*++str == '\0') {
+            break;
+        }
+        num *= base;
+    }
+
+    return num;
+}
