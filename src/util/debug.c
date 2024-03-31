@@ -1,7 +1,7 @@
 #include "debug.h"
 #include <stdarg.h>
 
-#include "util/serial.h"
+#include "serial/serial.h"
 #include "tty/tty.h"
 
 void klog(char* format, ...) {

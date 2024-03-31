@@ -21,13 +21,13 @@ $(OUT)/idt.o: $(SRC)/idt/idt.c
 	$(CC) $(CC_flags) -c $< -o $@
 $(OUT)/tty.o: $(SRC)/tty/tty.c
 	$(CC) $(CC_flags) -c $< -o $@
+$(OUT)/serial.o: $(SRC)/serial/serial.c
+	$(CC) $(CC_flags) -c $< -o $@
 $(OUT)/fpu.o: $(SRC)/fpu/fpu.c
 	$(CC) $(CC_flags) -c $< -o $@
 $(OUT)/keyboard.o: $(SRC)/keyboard/keyboard.c
 	$(CC) $(CC_flags) -c $< -o $@
 
-$(OUT)/serial.o: $(SRC)/util/serial.c
-	$(CC) $(CC_flags) -c $< -o $@
 $(OUT)/mem.o: $(SRC)/util/mem.c
 	$(CC) $(CC_flags) -c $< -o $@
 $(OUT)/debug.o: $(SRC)/util/debug.c

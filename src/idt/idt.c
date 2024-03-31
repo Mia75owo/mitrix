@@ -1,6 +1,5 @@
 #include "idt.h"
 #include "util/port.h"
-#include "util/serial.h"
 #include "util/mem.h"
 #include "util/debug.h"
 

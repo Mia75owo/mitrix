@@ -1,6 +1,6 @@
 #include "tests/tests.h"
 #include "util/types.h"
-#include "util/serial.h"
+#include "serial/serial.h"
 #include "tty/tty.h"
 #include "fpu/fpu.h"
 #include "util/debug.h"
