@@ -1,11 +1,12 @@
 #include "keyboard.h"
+
+#include "memory/memory.h"
+#include "tty/tty.h"
+#include "util/debug.h"
 #include "util/mem.h"
 #include "util/port.h"
 #include "util/sys.h"
 #include "util/types.h"
-#include "util/debug.h"
-#include "memory/memory.h"
-#include "tty/tty.h"
 
 static bool k_shift = false;
 static bool k_ctrl = false;
@@ -15,16 +16,13 @@ static char scancode_map[128];
 static char scancode_map_shift[128];
 static char scancode_map_alt[128];
 
-void keyboard_init() {
-    set_isr_function(33, keyboard_handler);
-}
+void keyboard_init() { set_isr_function(33, keyboard_handler); }
 
 void keyboard_handler(InterruptFrame* frame) {
     (void)frame;
 
     u8 scan_code = inb(0x60) & 0x7F;
     u8 press = inb(0x60) & 0x80;
-
 
     if (scan_code == 29) {
         k_ctrl = !press;
@@ -33,7 +31,6 @@ void keyboard_handler(InterruptFrame* frame) {
     } else if (scan_code == 56) {
         k_alt = !press;
     }
-
 
     char c;
 
@@ -48,7 +45,7 @@ void keyboard_handler(InterruptFrame* frame) {
     if (!press && k_alt && c == 'd') {
         tty_debug();
     } else if (!press && k_alt && c == 'e') {
-        asm volatile ("int $1");
+        asm volatile("int $1");
     } else if (!press && k_alt && c == 'r') {
         reboot();
     } else if (!press && k_alt && c == 'm') {
@@ -58,6 +55,7 @@ void keyboard_handler(InterruptFrame* frame) {
     }
 }
 
+// clang-format off
 static char scancode_map[128] = {
     0,        27,/*esc*/'1',      '2',      '3',      '4',      '5',      '6',
     '7',      '8',      '9',      '0',      '.',/*ß*/ '.',/*´*/ '\b',     '\t',
@@ -117,3 +115,4 @@ static char scancode_map_alt[128] = {
     0,        0,        0,        0,        0,        0,        0,        0,
 //  .         .         .         .         .         .         .         .
 };
+// clang-format on

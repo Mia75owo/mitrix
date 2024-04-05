@@ -1,10 +1,12 @@
-#include <stdarg.h>
 #include "serial/serial.h"
-#include "util/types.h"
-#include "util/port.h"
-#include "util/mem.h"
 
-#define PORT 0x3F8 // COM1
+#include <stdarg.h>
+
+#include "util/mem.h"
+#include "util/port.h"
+#include "util/types.h"
+
+#define PORT 0x3F8  // COM1
 
 static u8 serial_initialized = 0;
 
@@ -20,19 +22,17 @@ void serial_init() {
     serial_initialized = 1;
 }
 
-static int port_is_transmit_empty() {
-   return inb(PORT + 5) & 0x20;
-}
+static int port_is_transmit_empty() { return inb(PORT + 5) & 0x20; }
 
 static void port_write(char a) {
-   while (port_is_transmit_empty() == 0);
-   outb(PORT,a);
+    while (port_is_transmit_empty() == 0)
+        ;
+    outb(PORT, a);
 }
 
 void serial_putchar(char c) {
-    if (!serial_initialized)
-        return;
-    
+    if (!serial_initialized) return;
+
     if (c == '\b') {
         port_write('\b');
         port_write(' ');
@@ -93,7 +93,8 @@ void serial_vprintf(const char* format, va_list va) {
 
                 format += 2;
                 continue;
-            } else if (cishex(format[1]) && !(format[1] >= 'a' && format[1] <= 'f')) {
+            } else if (cishex(format[1]) &&
+                       !(format[1] >= 'a' && format[1] <= 'f')) {
                 // Ignore color format option
                 format += 3;
                 continue;

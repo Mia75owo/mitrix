@@ -58,11 +58,13 @@ typedef struct {
     u32 len_low;
     u32 len_high;
 
+    // clang-format off
 #define MULTIBOOT_MEMORY_AVAILABLE        1
 #define MULTIBOOT_MEMORY_RESERVED         2
 #define MULTIBOOT_MEMORY_ACPI_RECLAIMABLE 3
 #define MULTIBOOT_MEMORY_NVC              4
 #define MULTIBOOT_MEMORY_BADRAM           5
+    // clang-format on
     u32 type;
 } __attribute__((packed)) multiboot_mmap_entry;
 

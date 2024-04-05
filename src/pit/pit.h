@@ -1,8 +1,8 @@
 #ifndef PIC_H_
 #define PIC_H_
 
-#include "util/types.h"
 #include "idt/idt.h"
+#include "util/types.h"
 
 typedef struct {
     u64 tics;

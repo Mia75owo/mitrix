@@ -1,8 +1,9 @@
 #include "pit.h"
+
 #include "tty/tty.h"
 #include "util/port.h"
 
-static PIT pit = { 0, 0, 1 };
+static PIT pit = {0, 0, 1};
 
 void pit_init(u32 freq) {
     pit.freq = freq;

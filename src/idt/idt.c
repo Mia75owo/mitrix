@@ -1,7 +1,8 @@
 #include "idt.h"
-#include "util/port.h"
-#include "util/mem.h"
+
 #include "util/debug.h"
+#include "util/mem.h"
+#include "util/port.h"
 
 IDTR idtr;
 IDTDescEntry IDT[256];
@@ -20,6 +21,7 @@ void set_isr_function(u8 index, ISRFunction func) {
     isr_functions[index] = func;
 }
 
+// clang-format off
 #define PIC1           0x20
 #define PIC2           0xA0
 #define PIC1_COMMAND   PIC1
@@ -36,21 +38,22 @@ void set_isr_function(u8 index, ISRFunction func) {
 #define ICW1_INIT      0x10
 
 #define ICW4_8086      0x01
+// clang-format on
 
 static void setup_irq() {
     u8 a1, a2;
     a1 = inb(PIC1_DATA);
     a2 = inb(PIC2_DATA);
 
-    outb(PIC1_COMMAND, ICW1_INIT | ICW1_ICW4); // 0x11
-    outb(PIC1_DATA, 32);                       // offset
-    outb(PIC1_DATA, 0x04);                     // slave PIC at IRQ2
+    outb(PIC1_COMMAND, ICW1_INIT | ICW1_ICW4);  // 0x11
+    outb(PIC1_DATA, 32);                        // offset
+    outb(PIC1_DATA, 0x04);                      // slave PIC at IRQ2
     outb(PIC1_DATA, ICW4_8086);
     outb(PIC1_DATA, a1);
 
-    outb(PIC2_COMMAND, ICW1_INIT | ICW1_ICW4); // 0x11
-    outb(PIC2_DATA, 40);                       // offset
-    outb(PIC2_DATA, 0x02);                     // slave
+    outb(PIC2_COMMAND, ICW1_INIT | ICW1_ICW4);  // 0x11
+    outb(PIC2_DATA, 40);                        // offset
+    outb(PIC2_DATA, 0x02);                      // slave
     outb(PIC2_DATA, ICW4_8086);
     outb(PIC2_DATA, a2);
 }
@@ -70,7 +73,7 @@ void idt_init() {
         idt_set_entry(idtr.ptr, i, isr_redirect_table[i], TA_INTERRUPT);
     }
 
-    asm ("lidt %0" : : "m" (idtr));
+    asm("lidt %0" : : "m"(idtr));
 }
 
 static char* exception_names[];

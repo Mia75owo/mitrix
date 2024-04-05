@@ -3,14 +3,16 @@
 
 #include "util/types.h"
 
+// clang-format off
 #define TA_INTERRUPT 0b10001110
 #define TA_CALL      0b10001100
 #define TA_TRAP      0b10001111
+// clang-format on
 
 typedef struct {
     u16 offset0;
     u16 selector;
-    u8 _;          // reserved
+    u8 _;  // reserved
     u8 type_attr;
     u16 offset1;
 } __attribute__((packed)) IDTDescEntry;
@@ -29,7 +31,6 @@ typedef struct {
 } InterruptFrame;
 
 typedef void (*ISRFunction)(InterruptFrame*);
-
 
 void set_isr_function(u8 index, ISRFunction func);
 void idt_set_entry(IDTDescEntry* idt, u8 index, void* isr, u8 attributes);

@@ -28,8 +28,8 @@ u32 strlen(const char* str) {
 }
 
 void memrev(void* dest, u32 len) {
-    u8 *lo = dest;
-    u8 *hi = dest + len - 1;
+    u8* lo = dest;
+    u8* hi = dest + len - 1;
     u8 swap;
     while (lo < hi) {
         swap = *lo;
@@ -57,9 +57,9 @@ void itoa(char* dest, u64 val, u32 len, u16 base) {
         char num = val % base;
 
         if (num >= 10) {
-            dest[i++] = num - 10 + 65; // A-...
+            dest[i++] = num - 10 + 65;  // A-...
         } else {
-            dest[i++] = num + 48; // 0-9
+            dest[i++] = num + 48;  // 0-9
         }
 
         val /= base;
@@ -103,8 +103,6 @@ u64 atoi(char* str, u16 base) {
 }
 
 bool cishex(char c) {
-    return
-        (c >= '0' && c <= '9') ||
-        (c >= 'a' && c <= 'f') ||
-        (c >= 'A' && c <= 'F');
+    return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') ||
+           (c >= 'A' && c <= 'F');
 }

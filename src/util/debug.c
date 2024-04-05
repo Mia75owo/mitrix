@@ -1,9 +1,10 @@
 #include "debug.h"
+
 #include <stdarg.h>
 
-#include "util/sys.h"
 #include "serial/serial.h"
 #include "tty/tty.h"
+#include "util/sys.h"
 
 void klog(char* format, ...) {
     va_list va;

@@ -1,10 +1,11 @@
 #include "tty.h"
-#include "memory/memory.h"
-#include "util/types.h"
-#include "util/port.h"
-#include "util/mem.h"
 
 #include <stdarg.h>
+
+#include "memory/memory.h"
+#include "util/mem.h"
+#include "util/port.h"
+#include "util/types.h"
 
 #define TTY_X 80
 #define TTY_Y 25
@@ -41,16 +42,14 @@ u16 tty_get_cursor_y() {
 }
 
 void tty_scroll(u16 lines) {
-    if (lines >= TTY_Y)
-        return;
+    if (lines >= TTY_Y) return;
 
     memcpy(screen, &screen[TTY_X * lines * 2], TTY_X * (TTY_Y - lines) * 2);
-    memset(&screen[(TTY_X * TTY_Y * 2) - (lines * TTY_X * 2)], 0, TTY_X * TTY_Y * 2);
+    memset(&screen[(TTY_X * TTY_Y * 2) - (lines * TTY_X * 2)], 0,
+           TTY_X * TTY_Y * 2);
 }
 
-void tty_clear() {
-    memset(screen, 0, TTY_X * TTY_Y * 2);
-}
+void tty_clear() { memset(screen, 0, TTY_X * TTY_Y * 2); }
 
 void tty_debug() {
     for (u16 i = 0; i < TTY_X * TTY_Y * 2; i++) {
@@ -104,7 +103,7 @@ void tty_color(u16 len, char c) {
 void tty_backspace(u32 times) {
     u16 pos = tty_get_cursor();
 
-    while((pos > 0) && (times-- > 0)) {
+    while ((pos > 0) && (times-- > 0)) {
         screen[(pos - 1) * 2] = 0;
         do {
             pos--;
@@ -179,8 +178,9 @@ void tty_vprintf(const char* format, va_list va) {
 
                 format += 2;
                 continue;
-            } else if (cishex(format[1]) && !(format[1] >= 'a' && format[1] <= 'f')) {
-                color =  (ctoi(format[1]) & 0xf) << 4;
+            } else if (cishex(format[1]) &&
+                       !(format[1] >= 'a' && format[1] <= 'f')) {
+                color = (ctoi(format[1]) & 0xf) << 4;
                 color |= (ctoi(format[2]) & 0xf) << 0;
 
                 format += 3;

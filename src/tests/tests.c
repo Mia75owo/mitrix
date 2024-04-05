@@ -5,6 +5,7 @@
 #include "util/debug.h"
 #include "tty/tty.h"
 
+// clang-format off
 void debug_tests() {
     // ================================================================
     // ASSERT
@@ -82,3 +83,4 @@ void debug_tests() {
     tty_getstr(tmpbuf, 0, 8);
     assert_msg(memcmp(tmpbuf, "aaaaaaaa", 8), "TEST: tty_getstr");
 }
+// clang-format on
