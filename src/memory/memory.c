@@ -29,7 +29,6 @@ void pmm_init(u32 mem_low, u32 mem_high) {
 }
 
 void memory_init(u32 mem_high, u32 physical_alloc_start) {
-    /*boot_info = in_boot_info;*/
     initial_page_dir[0] = 0;
     invalidate(0);
     initial_page_dir[1023] = ((u32)initial_page_dir - KERNEL_START) | PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE;

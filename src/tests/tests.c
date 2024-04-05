@@ -1,4 +1,5 @@
 #include "tests.h"
+#include "memory/memory.h"
 #include "util/mem.h"
 #include "util/types.h"
 #include "util/debug.h"
@@ -74,7 +75,7 @@ void debug_tests() {
 
     // ================================================================
     // TTY_GETSTR
-    memset((void*)0xb8000, 'a', 16);
+    memset(KMEM(0xb8000), 'a', 16);
     static char tmpbuf[8];
     memset(tmpbuf, 0xff, 8);
 
