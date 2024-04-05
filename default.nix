@@ -14,6 +14,7 @@ stdenv.mkDerivation {
   buildInputs = [
     pkgs.qemu
     pkgs.bear
+    pkgs.glibc_multi
   ];
 
   buildPhase = ''
