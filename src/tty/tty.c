@@ -1,4 +1,5 @@
 #include "tty.h"
+#include "memory/memory.h"
 #include "util/types.h"
 #include "util/port.h"
 #include "util/mem.h"
@@ -11,7 +12,7 @@
 #define TTY_CTRL 0x3D4
 #define TTY_DATA 0x3D5
 
-static char* screen = (char*)0xb8000;
+static char* screen = KMEM(0xB8000);
 
 void tty_set_cursor(u16 pos) {
     outb(TTY_CTRL, 14);

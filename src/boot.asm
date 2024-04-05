@@ -39,12 +39,8 @@ SECTION .boot
 
 global _start
 _start:
-    ; save multiboot info
-    mov [multiboot_info], ebx
-    mov [multiboot_magic], eax
-
-    mov eax, (initial_page_dir - 0xC0000000)
-    mov cr3, eax
+    mov ecx, (initial_page_dir - 0xC0000000)
+    mov cr3, ecx
 
     ; turn on physical address extension
     ; cr4 |= 0x10
@@ -69,9 +65,7 @@ higher_half:
 
     xor ebp, ebp
 
-    mov eax, [multiboot_info]
-    push eax
-    mov eax, [multiboot_magic]
+    push ebx
     push eax
 
     cli
@@ -103,6 +97,3 @@ initial_page_dir:
     dd (3 << 22) | 10000011b
 
     times 256-4 dd 0
-
-multiboot_info: dd 0
-multiboot_magic: dd 0
