@@ -1,7 +1,10 @@
 SRC=src
 OUT=build
 
-CC=i686-elf-gcc
+PROVIDED_CC?=i686-elf-gcc
+PROVIDED_AS?=nasm
+
+CC=$(PROVIDED_CC)
 CC_flags =
 CC_flags += -ffreestanding
 CC_flags += -fno-builtin
@@ -12,7 +15,7 @@ CC_flags += -Wextra
 
 CC_flags += -I$(SRC)
 
-AS=nasm
+AS=$(PROVIDED_AS)
 AS_flags=-f elf32
 
 $(OUT)/boot.o: $(SRC)/boot.asm
