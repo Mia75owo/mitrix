@@ -31,7 +31,10 @@ void kernel_main(u32 magic, struct multiboot_info* boot_info) {
     kinit(fpu_init(), "FPU");
     kinit(keyboard_init(), "Keyboard");
     kinit(pit_init(1000), "PIT");
-    /*kinit(memory_init(boot_info), "Memory");*/
+    u32 mod1 = *(u32*)(boot_info->mods_addr + 4);
+    u32 physical_alloc_start = (mod1 + 0xFFF) & ~0xFFF;
+
+    kinit(memory_init(boot_info->mem_upper * 1024, physical_alloc_start), "Memory");
 
     asm volatile ("sti");
 
@@ -41,13 +44,6 @@ void kernel_main(u32 magic, struct multiboot_info* boot_info) {
     klog("\n%n", atoi("123456789", 10));
     klog("\n%x", atoi("deadbeef", 16));
     klog("\n%40aaaa%03bbbb\n");
-
-    u32 mod1 = *(u32*)(boot_info->mods_addr + 4);
-    u32 physical_alloc_start = (mod1 + 0xFFF) & ~0xFFF;
-
-    memory_init(boot_info->mem_upper * 1024, physical_alloc_start);
-
-    klog("mem allocation done");
 
     memory_set_boot_info(boot_info);
 
