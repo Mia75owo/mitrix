@@ -6,6 +6,7 @@
 void* memset(void* dest, u8 val, u32 len);
 void* memcpy(void* dest, const void* src, u32 len);
 bool memcmp(void* a, void* b, u32 len);
+char* strchr(const char* str, char c);
 
 u32 strlen(const char* str);
 

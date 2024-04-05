@@ -20,6 +20,13 @@ bool memcmp(void* a, void* b, u32 len) {
     }
     return true;
 }
+char* strchr(const char* str, char c) {
+    while (*str != c) {
+        if (!*str) return NULL;
+        str++;
+    }
+    return (char*)str;
+}
 
 u32 strlen(const char* str) {
     const char* ss = str;
