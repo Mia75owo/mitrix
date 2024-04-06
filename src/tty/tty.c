@@ -185,6 +185,38 @@ void tty_vprintf(const char* format, va_list va) {
 
                 format += 3;
                 continue;
+            } else if (format[1] == '[') {
+                // %[123|a]
+                // TODO: this doesn't support printing ']' for now
+
+                char* end_num = strchr(format, '|');
+                if (end_num == NULL || end_num == &format[2]) {
+                    format += 1;
+                    continue;
+                }
+
+                *end_num = '\0';
+                u32 val = atoi((char*)&format[2], 10);
+                *end_num = '|';
+
+                char* end = strchr(format, ']');
+                if (end == NULL || end == end_num + 1) {
+                    format += 1;
+                    continue;
+                }
+
+                for (u32 i = 0; i < val; i++) {
+                    char* str = end_num + 1;
+                    while (str != end) {
+                        tty_putcol(color);
+                        tty_putchar(*str);
+
+                        str++;
+                    }
+                }
+
+                format = end + 1;
+                continue;
             }
         }
 

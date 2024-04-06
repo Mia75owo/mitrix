@@ -98,7 +98,39 @@ void serial_vprintf(const char* format, va_list va) {
                 // Ignore color format option
                 format += 3;
                 continue;
+            } else if (format[1] == '[') {
+                // %[123|a]
+                // TODO: this doesn't support printing ']' for now
+
+                char* end_num = strchr(format, '|');
+                if (end_num == NULL || end_num == &format[2]) {
+                    format += 1;
+                    continue;
+                }
+
+                *end_num = '\0';
+                u32 val = atoi((char*)&format[2], 10);
+                *end_num = '|';
+
+                char* end = strchr(format, ']');
+                if (end == NULL || end == end_num + 1) {
+                    format += 1;
+                    continue;
+                }
+
+                *end = '\0';
+
+                char* str = end_num + 1;
+                for (u32 i = 0; i < val; i++) {
+                    serial_puts(str);
+                }
+
+                *end = ']';
+
+                format = end + 1;
+                continue;
             }
+
         }
 
         serial_putchar(*format);
