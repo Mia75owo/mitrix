@@ -8,9 +8,6 @@ static u32 page_frame_min;
 static u32 page_frame_max;
 static u32 total_alloc;
 
-#define NUM_PAGE_DIRS 256
-#define NUM_PAGE_FRAMES (0x100000000 / 0x1000 / 8)
-
 u8 physical_memory_bitmap[NUM_PAGE_DIRS / 8];
 
 static u32 page_dirs[NUM_PAGE_DIRS][1024] __attribute__((aligned(4096)));
@@ -32,7 +29,7 @@ void memory_init(u32 mem_high, u32 physical_alloc_start) {
     initial_page_dir[0] = 0;
     invalidate(0);
     initial_page_dir[1023] = ((u32)initial_page_dir - KERNEL_START) |
-                             PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE;
+                             PTE_PRESENT | PTE_READ_WRITE;
     invalidate(0xFFFFF000);
 
     pmm_init(physical_alloc_start, mem_high);
@@ -41,6 +38,7 @@ void memory_init(u32 mem_high, u32 physical_alloc_start) {
     memset(page_dirs_used, 0, NUM_PAGE_DIRS);
 }
 
+// Remove from Translate Lookaside Buffer
 void invalidate(u32 vaddr) { asm volatile("invlpg %0" ::"m"(vaddr)); }
 
 void memory_set_boot_info(struct multiboot_info* in_boot_info) {
