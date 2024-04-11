@@ -2,17 +2,19 @@
 
 #include "tty/tty.h"
 #include "util/port.h"
+#include "util/mem.h"
 
 static PIT pit = {0, 0, 1};
 
 void pit_init(u32 freq) {
     pit.freq = freq;
 
-    u32 divisor = 1193180 / freq;
+    DWord divisor;
+    divisor.val = 1193180 / freq;
 
     outb(0x43, 0x36);
-    outb(0x40, (u8)(divisor >> 0 & 0xFF));
-    outb(0x40, (u8)(divisor >> 8 & 0xFF));
+    outb(0x40, divisor.lower.lower);
+    outb(0x40, divisor.lower.higher);
 
     set_isr_function(32, pit_handle_int);
 }

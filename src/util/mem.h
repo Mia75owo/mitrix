@@ -3,6 +3,21 @@
 
 #include "util/types.h"
 
+typedef union {
+    struct {
+        u8 lower;
+        u8 higher;
+    };
+    u16 val;
+} Word;
+typedef union {
+    struct {
+        Word lower;
+        Word higher;
+    };
+    u32 val;
+} DWord;
+
 void* memset(void* dest, u8 val, u32 len);
 void* memcpy(void* dest, const void* src, u32 len);
 bool memcmp(void* a, void* b, u32 len);

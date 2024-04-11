@@ -11,8 +11,11 @@ ISRFunction isr_functions[256];
 extern void* isr_redirect_table[];
 
 void idt_set_entry(IDTDescEntry* idt, u8 index, void* isr, u8 attributes) {
-    idt[index].offset0 = (u16)(((u32)isr & 0x0000ffff) >> 0);
-    idt[index].offset1 = (u16)(((u32)isr & 0xffff0000) >> 16);
+    DWord offset;
+    offset.val = (u32)isr;
+    idt[index].offset0 = offset.lower.val;
+    idt[index].offset1 = offset.higher.val;
+
     idt[index].type_attr = attributes;
     idt[index].selector = 0x08;
 }
