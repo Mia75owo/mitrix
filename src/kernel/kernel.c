@@ -34,6 +34,13 @@ void kernel_main(u32 magic, struct multiboot_info* boot_info) {
     u32 mod1 = *(u32*)(boot_info->mods_addr + 4);
     u32 physical_alloc_start = (mod1 + 0xFFF) & ~0xFFF;
 
+    // bool graphics_enabled = boot_info->framebuffer_type == MULTIBOOT_FRAMEBUFFER_TYPE_RGB;
+    klog("\n%n\n", (u64)boot_info->framebuffer_type);
+    klog("\n%n\n", (u64)boot_info->framebuffer_width);
+    klog("\n%n\n", (u64)boot_info->framebuffer_height);
+    klog("\n%n\n", (u64)boot_info->framebuffer_bpp);
+    klog("\n%n\n", (u64)boot_info->framebuffer_pitch);
+
     kinit(memory_init(boot_info->mem_upper * 1024, physical_alloc_start),
           "Memory");
 

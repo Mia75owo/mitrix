@@ -45,10 +45,38 @@ struct multiboot_info {
 
     u32 vbe_control_info;
     u32 vbe_mode_info;
-    u32 vbe_mode;
-    u32 vbe_interface_seg;
-    u32 vbe_interface_off;
-    u32 vbe_interface_len;
+    u16 vbe_mode;
+    u16 vbe_interface_seg;
+    u16 vbe_interface_off;
+    u16 vbe_interface_len;
+
+    u64 framebuffer_addr;
+    u32 framebuffer_pitch;
+    u32 framebuffer_width;
+    u32 framebuffer_height;
+    u8 framebuffer_bpp;
+
+    // clang-format off
+#define MULTIBOOT_FRAMEBUFFER_TYPE_INDEXED  0
+#define MULTIBOOT_FRAMEBUFFER_TYPE_RGB      1
+#define MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT 1
+    // clang-format on
+    u8 framebuffer_type;
+
+    union {
+        struct {
+            u32 framebuffer_palette_addr;
+            u16 framebuffer_palette_num_colors;
+        };
+        struct {
+            u8 framebuffer_red_field_position;
+            u8 framebuffer_red_mask_size;
+            u8 framebuffer_green_field_position;
+            u8 framebuffer_green_mask_size;
+            u8 framebuffer_blue_field_position;
+            u8 framebuffer_blue_mask_size;
+        };
+    };
 };
 
 typedef struct {

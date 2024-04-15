@@ -9,6 +9,7 @@ stdenv.mkDerivation {
 
   nativeBuildInputs = [
     pkgs.nasm
+    pkgs.xorriso
   ];
 
   buildInputs = [

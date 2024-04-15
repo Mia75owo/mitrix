@@ -7,7 +7,7 @@ align 4
 
 %define MBOOT_PAGE_ALIGN (1 << 0)
 %define MBOOT_MEMINFO    (1 << 1)
-%define MBOOT_USE_GFX    (0)
+%define MBOOT_USE_GFX    (1 << 2)
 
 %define MAGIC 0x1badb002
 %define FLAGS (MBOOT_PAGE_ALIGN | MBOOT_MEMINFO | MBOOT_USE_GFX)

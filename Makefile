@@ -59,8 +59,10 @@ clean:
 	rm -rf $(OUT)/*
 
 VM=qemu-system-i386
-run: $(OUT)/$(OS)
-	$(VM) -serial stdio -kernel $<
+# run: $(OUT)/$(OS)
+# 	$(VM) -serial stdio -kernel $<
+run: $(OUT)/mitrix.iso
+	$(VM) -serial stdio $<
 
 $(OUT)/mitrix.iso: $(OUT)/$(OS)
 	cp $(OUT)/$(OS) mitrix/boot/kernel
