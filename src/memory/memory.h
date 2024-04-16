@@ -5,7 +5,11 @@
 
 extern u32 initial_page_dir[1024];
 
+// clang-format off
 #define KERNEL_START 0xC0000000
+#define KERNEL_GFX   0xC8000000
+// clang-format on
+
 #define KMEM(a) ((void*)((u32)KERNEL_START + (u32)(a)))
 
 #define PD_INDEX(address) ((address) >> 22)
@@ -16,10 +20,16 @@ extern u32 initial_page_dir[1024];
 #define TEST_ATTRIBUTES(entry, attr) (*(entry) & (attr))
 #define SET_FRAME(entry, attr) (*(entry) = (*(entry) & ~0x7FFFF000) | (address))
 
+#define REC_PAGEDIR ((u32*)0xFFFFF000)
+#define REC_PAGETABLE(i) ((u32*)(0xFFC00000 + ((i) << 12)))
+#define P_PHYS_ADDR(x) ((x) & ~0xFFF)
+
 typedef u32 pt_entry;
 typedef u32 pd_entry;
 typedef u32 physical_address;
 typedef u32 virtual_address;
+
+extern u32 memory_num_vpages;
 
 // clang-format off
 typedef enum {
@@ -32,6 +42,7 @@ typedef enum {
     PTE_DIRTY         = 0x40,
     PTE_PAT           = 0x80,
     PTE_GLOBAL        = 0x100,
+    PTE_OWNER         = 0x200,
     PTE_FRAME         = 0x7FFFF000,
 } PAGE_TABLE_FLAGS;
 // clang-format on
@@ -52,11 +63,6 @@ typedef enum {
 } PAGE_DIR_FLAGS;
 // clang-format on
 
-#define NUM_PAGE_DIRS 256
-#define NUM_PAGE_FRAMES (0x100000000 / 0x1000 / 8)
-
-void pmm_init(u32 mem_low, u32 mem_high);
-
 void memory_init(u32 mem_high, u32 physical_alloc_start);
 
 void memory_set_boot_info(struct multiboot_info* in_boot_info);
@@ -65,10 +71,16 @@ void memory_print_info();
 u32* memory_alloc_page_dir();
 void memory_free_page_dir(u32* page_dir);
 
+void memory_map_page(u32 virt_addr, u32 phys_addr, u32 flags);
 u32 memory_unmap_page(u32 virt_addr);
+
+u32* memory_get_current_page_dir();
+void memory_change_page_dir(u32* pd);
 
 bool memory_is_valid_vaddr(u32 addr);
 
 void invalidate(u32 vaddr);
+
+void sync_page_dirs();
 
 #endif

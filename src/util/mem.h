@@ -3,6 +3,8 @@
 
 #include "util/types.h"
 
+#define CEIL_DIV(a, b) (((a + b) - 1) / b)
+
 typedef union {
     struct {
         u8 lower;
