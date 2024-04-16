@@ -1,4 +1,5 @@
 #include "fpu/fpu.h"
+#include "gfx/gfx.h"
 #include "keyboard/keyboard.h"
 #include "memory/memory.h"
 #include "multiboot.h"
@@ -31,18 +32,25 @@ void kernel_main(u32 magic, struct multiboot_info* boot_info) {
     kinit(fpu_init(), "FPU");
     kinit(keyboard_init(), "Keyboard");
     kinit(pit_init(1000), "PIT");
-    u32 mod1 = *(u32*)(boot_info->mods_addr + 4);
-    u32 physical_alloc_start = (mod1 + 0xFFF) & ~0xFFF;
 
-    // bool graphics_enabled = boot_info->framebuffer_type == MULTIBOOT_FRAMEBUFFER_TYPE_RGB;
-    klog("\n%n\n", (u64)boot_info->framebuffer_type);
-    klog("\n%n\n", (u64)boot_info->framebuffer_width);
-    klog("\n%n\n", (u64)boot_info->framebuffer_height);
-    klog("\n%n\n", (u64)boot_info->framebuffer_bpp);
-    klog("\n%n\n", (u64)boot_info->framebuffer_pitch);
+    gfx_info gfx_data = {
+        .width = boot_info->framebuffer_width,
+        .height = boot_info->framebuffer_height,
+        .bpp = boot_info->framebuffer_bpp,
+        .pitch = boot_info->framebuffer_pitch,
+        .addr = (u32*)boot_info->framebuffer_addr,
+    };
 
-    kinit(memory_init(boot_info->mem_upper * 1024, physical_alloc_start),
-          "Memory");
+    {
+        u32 mem_high = boot_info->mem_upper * 1024;
+        u32 physical_alloc_start = 0x100000 * 16;
+        kinit(memory_init(mem_high, physical_alloc_start), "Memory");
+    }
+
+    kinit(gfx_init(gfx_data), "GFX");
+
+    gfx_fill(0x111111);
+    gfx_debug(GFX_DEBUG_FONT_FILL);
 
     asm volatile("sti");
 
