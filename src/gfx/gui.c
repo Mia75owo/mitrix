@@ -11,6 +11,8 @@
 
 static GUI gui;
 
+static void gui_check_command();
+
 void gui_init_early_tty() { vtty_init(); }
 
 void gui_init(u32 width, u32 height) {
@@ -42,6 +44,8 @@ void gui_key_input(char c) {
     } else if (c == '\n') {
         klog("\n%s", gui.prompt_buffer);
 
+        gui_check_command();
+
         memset(gui.prompt_buffer, 0, GUI_PROMPT_SIZE);
         gui.prompt_cursor = 0;
         return;
@@ -53,4 +57,23 @@ void gui_key_input(char c) {
     if (gui.prompt_cursor >= GUI_PROMPT_SIZE) {
         gui.prompt_cursor = GUI_PROMPT_SIZE - 1;
     }
+}
+
+static void gui_check_command() {
+    if (strcmp(gui.prompt_buffer, "clear") == 0) {
+        tty_clear();
+    } else if (strcmp(gui.prompt_buffer, "reboot") == 0) {
+        reboot();
+    } else if (strcmp(gui.prompt_buffer, "meminfo") == 0) {
+        memory_print_info();
+    } else if (strcmp(gui.prompt_buffer, "tics") == 0) {
+        klog("\n%n", (u64)pit_get_tics());
+    } else if (strcmp(gui.prompt_buffer, "debuggfx") == 0) {
+        gfx_debug(GFX_DEBUG_FONT_FILL);
+        sleep(1000);
+        gfx_fill(0xFF000000);
+    } else if (strcmp(gui.prompt_buffer, "debugint") == 0) {
+        asm volatile("int $2");
+    }
+
 }
