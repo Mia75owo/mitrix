@@ -25,8 +25,10 @@ void pit_handle_int(InterruptFrame* frame) {
     pit.tics++;
 
     u16 cursor = tty_get_cursor();
-    tty_set_cursor(2000 - 11);
+    tty_set_cursor(tty_get_size() - 11);
+
     tty_color(11, 0xa0);
     tty_printf("%A0T: %n", (u64)pit.tics);
+
     tty_set_cursor(cursor);
 }

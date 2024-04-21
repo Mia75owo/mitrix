@@ -1,5 +1,6 @@
 #include "fpu/fpu.h"
 #include "gfx/gfx.h"
+#include "gfx/vtty.h"
 #include "keyboard/keyboard.h"
 #include "memory/memory.h"
 #include "multiboot.h"
@@ -24,6 +25,12 @@ void kernel_main(u32 magic, struct multiboot_info* boot_info) {
     assert_msg(magic == 0x2badb002, "Kernel magic parameter wrong!");
     (void)boot_info;
 
+    bool is_graphical =
+        boot_info->framebuffer_type == MULTIBOOT_FRAMEBUFFER_TYPE_RGB;
+
+    if (is_graphical) {
+        vtty_init();
+    }
     tty_reset();
 
     kinit(gdt_load(), "GDT");
@@ -47,10 +54,14 @@ void kernel_main(u32 magic, struct multiboot_info* boot_info) {
         kinit(memory_init(mem_high, physical_alloc_start), "Memory");
     }
 
-    kinit(gfx_init(gfx_data), "GFX");
+    if (is_graphical) {
+        kinit(gfx_init(gfx_data), "GFX");
+        gfx_fill(0x111111);
 
-    gfx_fill(0x111111);
-    gfx_debug(GFX_DEBUG_FONT_FILL);
+        vtty_set_ready(true);
+        // gfx_debug(GFX_DEBUG_FONT_FILL);
+    }
+
 
     asm volatile("sti");
 
@@ -61,6 +72,8 @@ void kernel_main(u32 magic, struct multiboot_info* boot_info) {
     klog("\n%n", atoi("123456789", 10));
     klog("\n%x", atoi("deadbeef", 16));
     klog("\n%40aaaa%03bbbb\n");
+
+    klog("%00 %10 %20 %30 %40 %50 %60 %70 %80 %90 %A0 %B0 %C0 %D0 %E0 %F0 ");
 
     memory_set_boot_info(boot_info);
 

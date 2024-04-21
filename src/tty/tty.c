@@ -2,33 +2,54 @@
 
 #include <stdarg.h>
 
+#include "gfx/vtty.h"
 #include "memory/memory.h"
 #include "util/mem.h"
 #include "util/port.h"
 #include "util/types.h"
 
-#define TTY_X 80
-#define TTY_Y 25
+static bool is_graphical = false;
+static u32 cursor = 0;
+
+static u32 TTY_X = 80;
+static u32 TTY_Y = 25;
+static char* screen = KMEM(0xB8000);
+
+void tty_init(char* screen_addr, u32 width, u32 height, bool graphical) {
+    cursor = 0;
+    screen = screen_addr;
+    TTY_X = width;
+    TTY_Y = height;
+    is_graphical = graphical;
+}
 
 #define TTY_CTRL 0x3D4
 #define TTY_DATA 0x3D5
 
-static char* screen = KMEM(0xB8000);
+void tty_set_screen_addr(char* scr) { screen = scr; }
 
 void tty_set_cursor(u16 pos) {
-    outb(TTY_CTRL, 14);
-    outb(TTY_DATA, (u8)(pos >> 8));
-    outb(TTY_CTRL, 15);
-    outb(TTY_DATA, (u8)(pos & 0xFF));
+    if (!is_graphical) {
+        outb(TTY_CTRL, 14);
+        outb(TTY_DATA, (u8)(pos >> 8));
+        outb(TTY_CTRL, 15);
+        outb(TTY_DATA, (u8)(pos & 0xFF));
+    } else {
+        cursor = pos;
+    }
 }
 
 u16 tty_get_cursor() {
     u16 pos = 0;
 
-    outb(TTY_CTRL, 14);
-    pos += inb(TTY_DATA) << 8;
-    outb(TTY_CTRL, 15);
-    pos += inb(TTY_DATA);
+    if (!is_graphical) {
+        outb(TTY_CTRL, 14);
+        pos += inb(TTY_DATA) << 8;
+        outb(TTY_CTRL, 15);
+        pos += inb(TTY_DATA);
+    } else {
+        pos = cursor;
+    }
 
     return pos;
 }
@@ -39,6 +60,10 @@ u16 tty_get_cursor_x() {
 u16 tty_get_cursor_y() {
     u16 pos = tty_get_cursor();
     return pos / TTY_X;
+}
+
+u16 tty_get_size() {
+    return TTY_X * TTY_Y;
 }
 
 void tty_scroll(u16 lines) {
@@ -224,6 +249,8 @@ void tty_vprintf(const char* format, va_list va) {
         tty_putchar(*format);
         format++;
     }
+
+    tty_flush();
 }
 
 void tty_getstr(char* dest, u32 src, u32 len) {
@@ -236,4 +263,10 @@ void tty_reset() {
     tty_set_cursor(0);
     tty_clear();
     tty_color(TTY_X * TTY_Y, 0x03);
+}
+
+void tty_flush() {
+    if (is_graphical) {
+        vtty_render();
+    }
 }

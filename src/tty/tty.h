@@ -5,11 +5,16 @@
 
 #include "util/types.h"
 
+void tty_init(char* screen_addr, u32 width, u32 height, bool graphical);
+
 void tty_set_cursor(u16 pos);
 u16 tty_get_cursor();
 u16 tty_get_cursor_x();
 u16 tty_get_cursor_y();
 
+u16 tty_get_size();
+
+void tty_set_screen_addr(char* scr);
 void tty_scroll(u16 lines);
 
 void tty_clear();
@@ -30,5 +35,6 @@ void tty_printf(const char* format, ...);
 void tty_getstr(char* dest, u32 src, u32 len);
 
 void tty_reset();
+void tty_flush();
 
 #endif
