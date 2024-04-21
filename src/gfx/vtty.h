@@ -5,6 +5,6 @@
 
 void vtty_init();
 void vtty_render();
-void vtty_set_ready(bool ready);
+void vtty_render_last_line(u32 from);
 
 #endif

@@ -12,5 +12,6 @@ typedef struct {
 
 void pit_init(u32 freq);
 void pit_handle_int(InterruptFrame* frame);
+u64 pit_get_tics();
 
 #endif

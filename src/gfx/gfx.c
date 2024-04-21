@@ -5,6 +5,8 @@
 
 #include "font.inc"
 
+bool gfx_ready = false;
+
 static gfx_info gfx;
 u32* screen = (u32*)KERNEL_GFX;
 
@@ -19,19 +21,23 @@ void gfx_init(gfx_info info) {
         memory_map_page((u32)(KERNEL_GFX + offset), ((u32)gfx.addr) + offset, 0);
     }
 
+    gfx_ready = true;
 }
 
 void gfx_pixel(u32 x, u32 y, Color color) {
+    if (!gfx_ready) return;
     screen[y * gfx.width + x] = color;
 }
 
 void gfx_fill(Color color) {
+    if (!gfx_ready) return;
     for (u32 i = 0; i < gfx.width * gfx.height; i++) {
         screen[i] = color;
     }
 }
 
 void gfx_rect(u32 x, u32 y, u32 width, u32 height, Color color) {
+    if (!gfx_ready) return;
     for (u32 i = x; i < x + width; i++) {
         for (u32 j = y; j < y + height; j++) {
             screen[j * gfx.width + i] = color;
@@ -39,7 +45,17 @@ void gfx_rect(u32 x, u32 y, u32 width, u32 height, Color color) {
     }
 }
 
+void gfx_box(u32 x, u32 y, u32 width, u32 height, u32 border, Color color) {
+    if (!gfx_ready) return;
+    gfx_rect(x, y, width, border, color);
+    gfx_rect(x, y + height - border, width, border, color);
+
+    gfx_rect(x, y, border, height, color);
+    gfx_rect(x + width - border, y, border, height, color);
+}
+
 void gfx_char(u32 x, u32 y, unsigned char c, Color fg, Color bg) {
+    if (!gfx_ready) return;
     u32 local_offset_x = (c % 16);
     u32 local_offset_y = (c / 16);
 
@@ -60,6 +76,7 @@ void gfx_char(u32 x, u32 y, unsigned char c, Color fg, Color bg) {
 }
 
 void gfx_debug(GFX_DEBUG_TYPE kind) {
+    if (!gfx_ready) return;
     if (kind == GFX_DEBUG_GRADIENT) {
         u8* screen = (u8*)KERNEL_GFX;
         for (u32 i = 0; i < gfx.width; i++) {
@@ -84,4 +101,3 @@ void gfx_debug(GFX_DEBUG_TYPE kind) {
         }
     }
 }
-

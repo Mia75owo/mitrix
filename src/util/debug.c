@@ -3,7 +3,7 @@
 #include <stdarg.h>
 
 #include "serial/serial.h"
-#include "tty/tty.h"
+#include "gfx/tty.h"
 #include "util/sys.h"
 
 void klog(char* format, ...) {
@@ -16,10 +16,9 @@ void klog(char* format, ...) {
     va_end(va);
 }
 
+// TODO: rewrite to GFX
 void kpanic(const char* format, ...) {
     tty_clear();
-    tty_set_cursor(0);
-    tty_color(2000, 0x40);
 
     va_list va;
     va_start(va, format);

@@ -1,6 +1,5 @@
 #include "pit.h"
 
-#include "tty/tty.h"
 #include "util/port.h"
 #include "util/mem.h"
 
@@ -21,14 +20,9 @@ void pit_init(u32 freq) {
 
 void pit_handle_int(InterruptFrame* frame) {
     (void)frame;
-
     pit.tics++;
+}
 
-    u16 cursor = tty_get_cursor();
-    tty_set_cursor(tty_get_size() - 11);
-
-    tty_color(11, 0xa0);
-    tty_printf("%A0T: %n", (u64)pit.tics);
-
-    tty_set_cursor(cursor);
+u64 pit_get_tics() {
+    return pit.tics;
 }

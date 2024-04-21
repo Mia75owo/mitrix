@@ -1,7 +1,8 @@
 #include "keyboard.h"
 
+#include "gfx/gfx.h"
+#include "gfx/gui.h"
 #include "memory/memory.h"
-#include "tty/tty.h"
 #include "util/debug.h"
 #include "util/mem.h"
 #include "util/port.h"
@@ -43,7 +44,7 @@ void keyboard_handler(InterruptFrame* frame) {
     }
 
     if (!press && k_alt && c == 'd') {
-        tty_debug();
+        gfx_debug(GFX_DEBUG_FONT_FILL);
     } else if (!press && k_alt && c == 'e') {
         asm volatile("int $1");
     } else if (!press && k_alt && c == 'r') {
@@ -51,7 +52,7 @@ void keyboard_handler(InterruptFrame* frame) {
     } else if (!press && k_alt && c == 'm') {
         memory_print_info();
     } else if (!press && c != 0) {
-        klog("%03%c", c);
+        gui_key_input(c);
     }
 }
 

@@ -3,6 +3,8 @@
 
 #include "util/types.h"
 
+extern bool gfx_ready;
+
 typedef u32 Color;
 
 typedef struct {
@@ -18,6 +20,7 @@ void gfx_init(gfx_info info);
 void gfx_fill(Color color);
 void gfx_pixel(u32 x, u32 y, Color color);
 void gfx_rect(u32 x, u32 y, u32 width, u32 height, Color color);
+void gfx_box(u32 x, u32 y, u32 width, u32 height, u32 border, Color color);
 void gfx_char(u32 x, u32 y, unsigned char c, Color fg, Color bg);
 
 typedef enum {

@@ -22,8 +22,6 @@ $(OUT)/boot.o: $(SRC)/boot.asm
 	$(AS) $(AS_flags) $< -o $@
 $(OUT)/idt.o: $(SRC)/idt/idt.c
 	$(CC) $(CC_flags) -c $< -o $@
-$(OUT)/tty.o: $(SRC)/tty/tty.c
-	$(CC) $(CC_flags) -c $< -o $@
 $(OUT)/serial.o: $(SRC)/serial/serial.c
 	$(CC) $(CC_flags) -c $< -o $@
 $(OUT)/fpu.o: $(SRC)/fpu/fpu.c
@@ -40,6 +38,10 @@ $(OUT)/gfx.o: $(SRC)/gfx/gfx.c
 	$(CC) $(CC_flags) -c $< -o $@
 $(OUT)/vtty.o: $(SRC)/gfx/vtty.c
 	$(CC) $(CC_flags) -c $< -o $@
+$(OUT)/gui.o: $(SRC)/gfx/gui.c
+	$(CC) $(CC_flags) -c $< -o $@
+$(OUT)/tty.o: $(SRC)/gfx/tty.c
+	$(CC) $(CC_flags) -c $< -o $@
 
 $(OUT)/mem.o: $(SRC)/util/mem.c
 	$(CC) $(CC_flags) -c $< -o $@
@@ -55,7 +57,7 @@ $(OUT)/kernel.o: $(SRC)/kernel/kernel.c
 	$(CC) -c $< -o $@ $(CC_flags)
 
 OS=OS.flp
-$(OUT)/$(OS): $(OUT)/boot.o $(OUT)/idt.o $(OUT)/kernel.o $(OUT)/tty.o $(OUT)/fpu.o $(OUT)/serial.o $(OUT)/mem.o $(OUT)/debug.o $(OUT)/keyboard.o $(OUT)/tests.o $(OUT)/pit.o $(OUT)/sys.o $(OUT)/memory.o $(OUT)/pmm.o $(OUT)/gfx.o $(OUT)/vtty.o
+$(OUT)/$(OS): $(OUT)/boot.o $(OUT)/idt.o $(OUT)/kernel.o $(OUT)/fpu.o $(OUT)/serial.o $(OUT)/mem.o $(OUT)/debug.o $(OUT)/keyboard.o $(OUT)/tests.o $(OUT)/pit.o $(OUT)/sys.o $(OUT)/memory.o $(OUT)/pmm.o $(OUT)/gfx.o $(OUT)/vtty.o $(OUT)/gui.o $(OUT)/tty.o
 	$(CC) -T $(SRC)/linker.ld -o $@ $^ -ffreestanding -nostdlib -lgcc
 
 gen_cc_json: clean

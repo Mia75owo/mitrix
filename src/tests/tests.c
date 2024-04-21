@@ -3,7 +3,6 @@
 #include "util/mem.h"
 #include "util/types.h"
 #include "util/debug.h"
-#include "tty/tty.h"
 
 // clang-format off
 void debug_tests() {
@@ -73,14 +72,5 @@ void debug_tests() {
 
     memrev(buf8, 8);
     assert_msg(memcmp(buf7, buf8, 8) == true, "TEST: memrev");
-
-    // ================================================================
-    // TTY_GETSTR
-    memset(KMEM(0xb8000), 'a', 16);
-    static char tmpbuf[8];
-    memset(tmpbuf, 0xff, 8);
-
-    tty_getstr(tmpbuf, 0, 8);
-    assert_msg(memcmp(tmpbuf, "aaaaaaaa", 8), "TEST: tty_getstr");
 }
 // clang-format on

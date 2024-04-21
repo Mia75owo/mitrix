@@ -1,14 +1,13 @@
 #include "vtty.h"
 
+#include "gfx/tty.h"
 #include "gfx/gfx.h"
 #include "memory/memory.h"
 #include "serial/serial.h"
-#include "tty/tty.h"
-#include "util/debug.h"
 #include "util/mem.h"
 
 #define WIDTH 50
-#define HEIGHT 37
+#define HEIGHT 35
 
 static u16 screen[WIDTH * HEIGHT];
 // clang-format off
@@ -32,16 +31,12 @@ static u32 color_map[] = {
 };
 // clang-format on
 
-static bool vtty_ready = false;
-void vtty_set_ready(bool ready) { vtty_ready = ready; }
-
 void vtty_init() {
-    tty_init((char*)screen, WIDTH, HEIGHT, true);
+    tty_init((char*)screen, WIDTH, HEIGHT);
     memset(screen, 0, sizeof(screen));
 }
 
 void vtty_render() {
-    if (!vtty_ready) return;
     for (u32 y = 0; y < HEIGHT; y++) {
         for (u32 x = 0; x < WIDTH; x++) {
             u16 chunk = screen[y * WIDTH + x];
@@ -53,5 +48,18 @@ void vtty_render() {
 
             gfx_char(x * 16, y * 16, c, color_map[(u32)fg], color_map[(u32)bg] | 0xFF000000);
         }
+    }
+}
+
+void vtty_render_last_line(u32 from) {
+    for (u32 x = from; x < WIDTH; x++) {
+        u16 chunk = screen[(HEIGHT - 1) * WIDTH + x];
+        char c = chunk;
+        char col = (chunk >> 8) & 0xFF;
+
+        char fg = col & 0xF;
+        char bg = (col >> 4) & 0xF;
+
+        gfx_char(x * 16, (HEIGHT - 1) * 16, c, color_map[(u32)fg], color_map[(u32)bg] | 0xFF000000);
     }
 }
