@@ -232,7 +232,7 @@ void memory_print_info() {
         multiboot_mmap_entry* mmmt =
             (multiboot_mmap_entry*)KMEM(boot_info->mmap_addr + i);
 
-        klog("%[80|=]");
+        klog("%[50|=]");
         klog(
             "%0fAddr: (%0C%x%0f|%0C%x%0f) | Len: (%0C%x%0f|%0C%x%0f)\nSize: "
             "%0C%x %0f| Type: ",
@@ -258,6 +258,6 @@ void memory_print_info() {
         }
     }
 
-    klog("%[80|=]");
+    klog("%[50|=]");
     klog("%40MEMINFO_END\n");
 }
