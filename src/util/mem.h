@@ -23,6 +23,7 @@ typedef union {
 void* memset(void* dest, u8 val, u32 len);
 void* memcpy(void* dest, const void* src, u32 len);
 bool memcmp(void* a, void* b, u32 len);
+u32 strcmp(const char* s1, const char* s2);
 char* strchr(const char* str, char c);
 
 u32 strlen(const char* str);

@@ -33,6 +33,13 @@ u32 strlen(const char* str) {
     while (*ss) ss++;
     return ss - str;
 }
+u32 strcmp(const char* s1, const char* s2) {
+    while (*s1 != '\0' && *s2 != '\0' && *s1 == *s2) {
+        s1++;
+        s2++;
+    }
+    return *s1 - *s2;
+}
 
 void memrev(void* dest, u32 len) {
     u8* lo = dest;
