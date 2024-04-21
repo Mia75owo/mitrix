@@ -35,6 +35,7 @@ void tty_scroll(u32 lines) {
 
 void tty_clear() {
     memset(tty_buffer, 0, TTY_X * TTY_Y * 2);
+    cursor = 0;
     should_redraw = true;
 }
 
@@ -159,6 +160,13 @@ void tty_vprintf(const char* format, va_list va) {
 void tty_reset() {
     cursor = 0;
     tty_clear();
+}
+
+void tty_set_color(u8 color) {
+    for (u32 i = 0; i < TTY_X * TTY_Y; i++) {
+        tty_buffer[i * 2 + 1] = color;
+    }
+    should_redraw = true;
 }
 
 bool tty_should_redraw() { return should_redraw; }

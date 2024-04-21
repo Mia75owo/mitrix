@@ -72,8 +72,11 @@ static void gui_check_command() {
         gfx_debug(GFX_DEBUG_FONT_FILL);
         sleep(1000);
         gfx_fill(0xFF000000);
+    } else if (strcmp(gui.prompt_buffer, "debuggfx2") == 0) {
+        gfx_debug(GFX_DEBUG_GRADIENT);
+        sleep(1000);
+        gfx_fill(0xFF000000);
     } else if (strcmp(gui.prompt_buffer, "debugint") == 0) {
-        asm volatile("int $2");
+        asm volatile("int $1");
     }
-
 }

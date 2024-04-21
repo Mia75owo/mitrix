@@ -12,6 +12,7 @@ void tty_puts(char* str, u8 color);
 void tty_printf(const char* format, ...);
 void tty_vprintf(const char* format, va_list va);
 void tty_reset();
+void tty_set_color(u8 color);
 bool tty_should_redraw();
 u32 tty_redraw_last_from();
 
