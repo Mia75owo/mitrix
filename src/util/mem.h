@@ -24,7 +24,10 @@ void* memset(void* dest, u8 val, u32 len);
 void* memcpy(void* dest, const void* src, u32 len);
 bool memcmp(void* a, void* b, u32 len);
 u32 strcmp(const char* s1, const char* s2);
+u32 strncmp(const char* s1, const char* s2, u32 n);
 char* strchr(const char* str, char c);
+char* strncpy(char* dest, const char* src, u32 n);
+char* strncat(char *dest, const char* src, u32 n);
 
 u32 strlen(const char* str);
 
@@ -34,6 +37,9 @@ void itoa(char* dest, u64 val, u32 len, u16 base);
 
 u8 ctoi(char c);
 u64 atoi(char* str, u16 base);
+
+char toupper(char c);
+char tolower(char c);
 
 bool cishex(char c);
 
