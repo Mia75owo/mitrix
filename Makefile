@@ -9,31 +9,42 @@ CC_flags =
 CC_flags += -ffreestanding
 CC_flags += -fno-builtin
 CC_flags += -nostdlib
-#CC_flags += -nostdinc
 CC_flags += -Wall
 CC_flags += -Wextra
-
 CC_flags += -I$(SRC)
 
 AS=$(PROVIDED_AS)
 AS_flags=-f elf32
 
+NATIVE_CC=gcc
+
+################
+# Source files #
+################
+
 $(OUT)/boot.o: $(SRC)/boot.asm
 	$(AS) $(AS_flags) $< -o $@
+
 $(OUT)/idt.o: $(SRC)/idt/idt.c
 	$(CC) $(CC_flags) -c $< -o $@
+
 $(OUT)/serial.o: $(SRC)/serial/serial.c
 	$(CC) $(CC_flags) -c $< -o $@
+
 $(OUT)/fpu.o: $(SRC)/fpu/fpu.c
 	$(CC) $(CC_flags) -c $< -o $@
+
 $(OUT)/keyboard.o: $(SRC)/keyboard/keyboard.c
 	$(CC) $(CC_flags) -c $< -o $@
+
 $(OUT)/pit.o: $(SRC)/pit/pit.c
 	$(CC) $(CC_flags) -c $< -o $@
+
 $(OUT)/memory.o: $(SRC)/memory/memory.c
 	$(CC) $(CC_flags) -c $< -o $@
 $(OUT)/pmm.o: $(SRC)/memory/pmm.c
 	$(CC) $(CC_flags) -c $< -o $@
+
 $(OUT)/gfx.o: $(SRC)/gfx/gfx.c
 	$(CC) $(CC_flags) -c $< -o $@
 $(OUT)/vtty.o: $(SRC)/gfx/vtty.c
@@ -41,6 +52,11 @@ $(OUT)/vtty.o: $(SRC)/gfx/vtty.c
 $(OUT)/gui.o: $(SRC)/gfx/gui.c
 	$(CC) $(CC_flags) -c $< -o $@
 $(OUT)/tty.o: $(SRC)/gfx/tty.c
+	$(CC) $(CC_flags) -c $< -o $@
+
+$(OUT)/disk.o: $(SRC)/disk/disk.c
+	$(CC) $(CC_flags) -c $< -o $@
+$(OUT)/mifs.o: $(SRC)/disk/mifs.c
 	$(CC) $(CC_flags) -c $< -o $@
 
 $(OUT)/mem.o: $(SRC)/util/mem.c
@@ -56,25 +72,65 @@ $(OUT)/tests.o: $(SRC)/tests/tests.c
 $(OUT)/kernel.o: $(SRC)/kernel/kernel.c
 	$(CC) -c $< -o $@ $(CC_flags)
 
+###########
+# RAMDISK #
+###########
+
+RAMDISK=ramdisk
+$(OUT)/$(RAMDISK): $(OUT)/tool_mifs ramdisk/
+	cd ramdisk && ../build/tool_mifs ../$@ ./*
+	# $(OUT)/tool_mifs $@ ./ramdisk/*
+	# dd if=/dev/zero of=$@ bs=10M count=1
+	# mformat -i $@ -F ::
+	# mcopy -i $@ -s ramdisk/* ::
+
+#############
+# OS-floppy #
+#############
+
 OS=OS.flp
-$(OUT)/$(OS): $(OUT)/boot.o $(OUT)/idt.o $(OUT)/kernel.o $(OUT)/fpu.o $(OUT)/serial.o $(OUT)/mem.o $(OUT)/debug.o $(OUT)/keyboard.o $(OUT)/tests.o $(OUT)/pit.o $(OUT)/sys.o $(OUT)/memory.o $(OUT)/pmm.o $(OUT)/gfx.o $(OUT)/vtty.o $(OUT)/gui.o $(OUT)/tty.o
+$(OUT)/$(OS): $(OUT)/boot.o $(OUT)/idt.o $(OUT)/kernel.o $(OUT)/fpu.o $(OUT)/serial.o $(OUT)/mem.o $(OUT)/debug.o $(OUT)/keyboard.o $(OUT)/tests.o $(OUT)/pit.o $(OUT)/sys.o $(OUT)/memory.o $(OUT)/pmm.o $(OUT)/gfx.o $(OUT)/vtty.o $(OUT)/gui.o $(OUT)/tty.o $(OUT)/disk.o $(OUT)/mifs.o
 	$(CC) -T $(SRC)/linker.ld -o $@ $^ -ffreestanding -nostdlib -lgcc
+
+############
+# ISO file #
+############
+
+$(OUT)/mitrix.iso: $(OUT)/$(OS) $(OUT)/$(RAMDISK)
+	cp $(OUT)/$(OS) mitrix/boot/kernel
+	cp $(OUT)/$(RAMDISK) mitrix/boot/ramdisk
+	grub-mkrescue -o $@ mitrix
+
+#########################
+# compile_commands.json #
+#########################
 
 gen_cc_json: clean
 	bear -- make $(OUT)/$(OS)
 
+#########################
+# clean compile outputs #
+#########################
+
 clean:
 	rm -rf $(OUT)/*
+	rm -rf mitrix/boot/kernel
+	rm -rf mitrix/boot/$(RAMDISK)
+
+#########
+# tools #
+#########
+
+$(OUT)/tool_mifs: tools/mifs.c
+	$(NATIVE_CC) -Wall -Wextra -O2 $< -o $@
+
+###################
+# run in emulator #
+###################
 
 VM=qemu-system-i386
-# run: $(OUT)/$(OS)
-# 	$(VM) -serial stdio -kernel $<
 run: $(OUT)/mitrix.iso
 	$(VM) -serial stdio $<
-
-$(OUT)/mitrix.iso: $(OUT)/$(OS)
-	cp $(OUT)/$(OS) mitrix/boot/kernel
-	grub-mkrescue -o $@ mitrix
 
 bochs: $(OUT)/mitrix.iso
 	bochs -f bochsrc.txt

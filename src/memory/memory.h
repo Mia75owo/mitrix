@@ -6,8 +6,9 @@
 extern u32 initial_page_dir[1024];
 
 // clang-format off
-#define KERNEL_START 0xC0000000
-#define KERNEL_GFX   0xC8000000
+#define KERNEL_START   0xC0000000
+#define KERNEL_GFX     0xC8000000
+#define KERNEL_RAMDISK 0xE0000000
 // clang-format on
 
 #define KMEM(a) ((void*)((u32)KERNEL_START + (u32)(a)))

@@ -2,4 +2,5 @@ build/*
 compile_commands.json
 .cache
 mitrix/boot/kernel
+mitrix/boot/ramdisk
 result
