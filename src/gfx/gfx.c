@@ -1,9 +1,11 @@
 #include "gfx.h"
 
+#include "disk/mifs.h"
 #include "memory/memory.h"
+#include "util/debug.h"
 #include "util/mem.h"
 
-#include "font.inc"
+static u8* font;
 
 bool gfx_ready = false;
 
@@ -20,6 +22,10 @@ void gfx_init(gfx_info info) {
         u32 offset = i * 0x1000;
         memory_map_page((u32)(KERNEL_GFX + offset), ((u32)gfx.addr) + offset, 0);
     }
+
+    FilePtr font_file = mifs_file("kernelfont.raw");
+    assert_msg(font_file.addr != 0, "'kernelfont.raw' NOT FOUND IN RAMDISK!");
+    font = font_file.addr;
 
     gfx_ready = true;
 }
