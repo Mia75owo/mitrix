@@ -1,5 +1,6 @@
 #include "gui.h"
 
+#include "disk/mifs.h"
 #include "gfx/gfx.h"
 #include "gfx/tty.h"
 #include "gfx/vtty.h"
@@ -81,5 +82,40 @@ static void gui_check_command() {
     } else if (strcmp(gui.prompt_buffer, "logo") == 0) {
         gfx_logo();
         sleep(1000);
+    } else if (strcmp(gui.prompt_buffer, "ls") == 0) {
+        klog("\n%[50|=]");
+
+        FilePtr file;
+        u32 i = 0;
+        while (true) {
+            file = mifs_file_by_index(i);
+            if (file.addr == 0) break;
+
+#define SIZE_BUF_LEN 8
+
+            static char size_buffer[SIZE_BUF_LEN];
+            itoa(size_buffer, file.size, SIZE_BUF_LEN, 10);
+            u32 size_len = strlen(size_buffer);
+
+            klog("%0FSIZE:%0C%s", size_buffer);
+            for (u32 i = 0; i < SIZE_BUF_LEN - size_len; i++) klog(" ");
+
+            klog("%0F| NAME:%0A%s\n", file.name);
+
+            i++;
+        }
+
+        klog("%[50|=]");
+    } else if (strncmp(gui.prompt_buffer, "cat ", 4) == 0) {
+        static char file_name_buffer[FNAME_SIZE];
+        strncpy(file_name_buffer, gui.prompt_buffer + 4, FNAME_SIZE);
+
+        FilePtr file = mifs_file(file_name_buffer);
+
+        if (file.addr == 0) {
+            klog("\n%0CFile '%s' not found!", file_name_buffer);
+        } else {
+            klog("\n%0F%s", file.addr);
+        }
     }
 }
