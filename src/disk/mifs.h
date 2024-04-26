@@ -25,9 +25,11 @@ typedef struct {
 typedef struct {
     u8* addr;
     u32 size;
+    char* name;
 } FilePtr;
 
 void mifs_init(u8* start, u8* end);
 FilePtr mifs_file(char* file_name);
+FilePtr mifs_file_by_index(u32 index);
 
 #endif

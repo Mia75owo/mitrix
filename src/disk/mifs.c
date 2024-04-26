@@ -26,11 +26,30 @@ FilePtr mifs_file(char* file_name) {
         ptr += sizeof(MIFS_File);
 
         if (strncmp(file_name, file->name, FNAME_SIZE) == 0) {
-            return (FilePtr){ptr, file->size};
+            return (FilePtr){ptr, file->size, file->name};
         }
 
         ptr += file->size;
     }
 
-    return (FilePtr){NULL, 0};
+    return (FilePtr){NULL, 0, NULL};
+}
+
+FilePtr mifs_file_by_index(u32 index) {
+    u8* ptr = (u8*)fs.first_file;
+
+    u32 i = 0;
+    while (ptr < (u8*)fs.end) {
+        MIFS_File* file = (MIFS_File*)ptr;
+        ptr += sizeof(MIFS_File);
+
+        if (index == i) {
+            return (FilePtr){ptr, file->size, file->name};
+        }
+
+        ptr += file->size;
+        i++;
+    }
+
+    return (FilePtr){NULL, 0, NULL};
 }

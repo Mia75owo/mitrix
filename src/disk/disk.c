@@ -30,7 +30,8 @@ void disk_map() {
     u32 pages_needed = CEIL_DIV(ramdisk.size, 0x1000);
 
     for (u32 i = 0; i < pages_needed; i++) {
-        memory_map_page(KERNEL_RAMDISK + i * 0x1000, ramdisk.phys_addr + i * 0x1000, 0);
+        memory_map_page(KERNEL_RAMDISK + i * 0x1000,
+                        ramdisk.phys_addr + i * 0x1000, 0);
     }
 }
 
