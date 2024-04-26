@@ -6,6 +6,7 @@ void spin_halt();
 void halt();
 void abort();
 void reboot();
+void shutdown();
 void sleep(u32 ms);
 
 #endif

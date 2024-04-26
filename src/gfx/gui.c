@@ -65,6 +65,10 @@ static void gui_check_command() {
         tty_clear();
     } else if (strcmp(gui.prompt_buffer, "reboot") == 0) {
         reboot();
+    } else if (strcmp(gui.prompt_buffer, "shutdown") == 0) {
+        shutdown();
+    } else if (strcmp(gui.prompt_buffer, "quit") == 0) {
+        shutdown();
     } else if (strcmp(gui.prompt_buffer, "meminfo") == 0) {
         memory_print_info();
     } else if (strcmp(gui.prompt_buffer, "tics") == 0) {

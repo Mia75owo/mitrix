@@ -24,6 +24,17 @@ void reboot() {
     halt();
 }
 
+void shutdown() {
+    // NOTE: only works on BOCHS/old QEMU
+    outw(0xB004, 0x2000);
+
+    // NOTE: only works on QEMU
+    outw(0x604, 0x2000);
+
+    // NOTE: only works on VirtualBox
+    outw(0x4004, 0x3400);
+}
+
 void sleep(u32 ms) {
     asm volatile("sti");
     u64 tics = pit_get_tics();
