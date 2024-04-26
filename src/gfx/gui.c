@@ -78,5 +78,8 @@ static void gui_check_command() {
         gfx_fill(0xFF000000);
     } else if (strcmp(gui.prompt_buffer, "debugint") == 0) {
         asm volatile("int $1");
+    } else if (strcmp(gui.prompt_buffer, "logo") == 0) {
+        gfx_logo();
+        sleep(1000);
     }
 }

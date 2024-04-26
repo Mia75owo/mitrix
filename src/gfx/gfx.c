@@ -6,6 +6,7 @@
 #include "util/mem.h"
 
 static u8* font;
+static u8* logo;
 
 bool gfx_ready = false;
 
@@ -26,6 +27,10 @@ void gfx_init(gfx_info info) {
     FilePtr font_file = mifs_file("kernelfont.raw");
     assert_msg(font_file.addr != 0, "'kernelfont.raw' NOT FOUND IN RAMDISK!");
     font = font_file.addr;
+
+    FilePtr logo_file = mifs_file("mitrix_logo.raw");
+    assert_msg(logo_file.addr != 0, "'mitrix_logo.raw' NOT FOUND IN RAMDISK!");
+    logo = logo_file.addr;
 
     gfx_ready = true;
 }
@@ -76,6 +81,19 @@ void gfx_char(u32 x, u32 y, unsigned char c, Color fg, Color bg) {
                 }
             } else {
                 screen[(j + y) * gfx.width + (i + x)] = fg;
+            }
+        }
+    }
+}
+
+void gfx_logo() {
+    if (!gfx_ready) return;
+    for (u32 i = 0; i < 800; i++) {
+        for (u32 j = 0; j < 208; j++) {
+            if (logo[j * 800 + i] == 0xFF) {
+                screen[j * gfx.width + i] = 0xFF000000;
+            } else {
+                screen[j * gfx.width + i] = 0xFFFFFFFF;
             }
         }
     }
