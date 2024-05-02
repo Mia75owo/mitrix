@@ -119,7 +119,23 @@ static void gui_check_command() {
         if (file.addr == 0) {
             klog("\n%0CFile '%s' not found!", file_name_buffer);
         } else {
-            klog("\n%0F%s", file.addr);
+            klog("\n");
+
+            for (u32 i = 0; i < file.size; i++) {
+                klog("%0F%c", file.addr[i]);
+            }
+        }
+    } else if (strncmp(gui.prompt_buffer, "exec ", 5) == 0) {
+        static char file_name_buffer[FNAME_SIZE];
+        strncpy(file_name_buffer, gui.prompt_buffer + 5, FNAME_SIZE);
+
+        FilePtr file = mifs_file(file_name_buffer);
+
+        if (file.addr == 0) {
+            klog("\n%0CFile '%s' not found!", file_name_buffer);
+        } else {
+            void (*func)() = (void(*)()) file.addr;
+            func();
         }
     }
 }
