@@ -1,6 +1,7 @@
 #include "disk/disk.h"
 #include "disk/mifs.h"
 #include "fpu/fpu.h"
+#include "gdt/gdt.h"
 #include "gfx/gfx.h"
 #include "gfx/gui.h"
 #include "gfx/tty.h"
@@ -29,7 +30,7 @@ void kernel_main(u32 magic, struct multiboot_info* boot_info) {
 
     assert_msg(magic == 0x2badb002, "Kernel magic parameter wrong!");
 
-    kinit(gdt_load(), "GDT");
+    kinit(gdt_init(), "GDT");
     kinit(idt_load(), "IDT");
     kinit(serial_init(), "Serial");
     kinit(fpu_init(), "FPU");
@@ -42,7 +43,7 @@ void kernel_main(u32 magic, struct multiboot_info* boot_info) {
         .height = boot_info->framebuffer_height,
         .bpp = boot_info->framebuffer_bpp,
         .pitch = boot_info->framebuffer_pitch,
-        .addr = (u32*)boot_info->framebuffer_addr,
+        .addr = (u32*)(u32)boot_info->framebuffer_addr,
     };
 
     {

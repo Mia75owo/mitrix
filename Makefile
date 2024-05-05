@@ -25,7 +25,13 @@ NATIVE_CC=gcc
 $(OUT)/boot.o: $(SRC)/boot.asm
 	$(AS) $(AS_flags) $< -o $@
 
+$(OUT)/gdt.o: $(SRC)/gdt/gdt.c
+	$(CC) $(CC_flags) -c $< -o $@
+
 $(OUT)/idt.o: $(SRC)/idt/idt.c
+	$(CC) $(CC_flags) -c $< -o $@
+
+$(OUT)/tss.o: $(SRC)/tasks/tss.c
 	$(CC) $(CC_flags) -c $< -o $@
 
 $(OUT)/serial.o: $(SRC)/serial/serial.c
@@ -89,7 +95,7 @@ $(OUT)/$(RAMDISK): $(OUT)/tool_mifs ramdisk/
 #############
 
 OS=OS.flp
-$(OUT)/$(OS): $(OUT)/boot.o $(OUT)/idt.o $(OUT)/kernel.o $(OUT)/fpu.o $(OUT)/serial.o $(OUT)/mem.o $(OUT)/debug.o $(OUT)/keyboard.o $(OUT)/tests.o $(OUT)/pit.o $(OUT)/sys.o $(OUT)/memory.o $(OUT)/pmm.o $(OUT)/gfx.o $(OUT)/vtty.o $(OUT)/gui.o $(OUT)/tty.o $(OUT)/disk.o $(OUT)/mifs.o
+$(OUT)/$(OS): $(OUT)/boot.o $(OUT)/gdt.o $(OUT)/idt.o $(OUT)/kernel.o $(OUT)/fpu.o $(OUT)/serial.o $(OUT)/mem.o $(OUT)/debug.o $(OUT)/keyboard.o $(OUT)/tests.o $(OUT)/pit.o $(OUT)/sys.o $(OUT)/memory.o $(OUT)/pmm.o $(OUT)/gfx.o $(OUT)/vtty.o $(OUT)/gui.o $(OUT)/tty.o $(OUT)/disk.o $(OUT)/mifs.o $(OUT)/tss.o
 	$(CC) -T $(SRC)/linker.ld -o $@ $^ -ffreestanding -nostdlib -lgcc
 
 ############

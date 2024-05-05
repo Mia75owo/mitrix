@@ -79,6 +79,7 @@ halt:
 %include "./src/gdt/gdt.asm"
 %include "./src/idt/load_idt.asm"
 %include "./src/idt/interrupts_defines.asm"
+%include "./src/tasks/tss_flush.asm"
 
 ; ===============================================
 ; DATA
