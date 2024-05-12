@@ -65,6 +65,9 @@ $(OUT)/disk.o: $(SRC)/disk/disk.c
 $(OUT)/mifs.o: $(SRC)/disk/mifs.c
 	$(CC) $(CC_flags) -c $< -o $@
 
+$(OUT)/shell.o: $(SRC)/shell/shell.c
+	$(CC) $(CC_flags) -c $< -o $@
+
 $(OUT)/mem.o: $(SRC)/util/mem.c
 	$(CC) $(CC_flags) -c $< -o $@
 $(OUT)/debug.o: $(SRC)/util/debug.c
@@ -95,7 +98,7 @@ $(OUT)/$(RAMDISK): $(OUT)/tool_mifs ramdisk/
 #############
 
 OS=OS.flp
-$(OUT)/$(OS): $(OUT)/boot.o $(OUT)/gdt.o $(OUT)/idt.o $(OUT)/kernel.o $(OUT)/fpu.o $(OUT)/serial.o $(OUT)/mem.o $(OUT)/debug.o $(OUT)/keyboard.o $(OUT)/tests.o $(OUT)/pit.o $(OUT)/sys.o $(OUT)/memory.o $(OUT)/pmm.o $(OUT)/gfx.o $(OUT)/vtty.o $(OUT)/gui.o $(OUT)/tty.o $(OUT)/disk.o $(OUT)/mifs.o $(OUT)/tss.o
+$(OUT)/$(OS): $(OUT)/boot.o $(OUT)/gdt.o $(OUT)/idt.o $(OUT)/kernel.o $(OUT)/fpu.o $(OUT)/serial.o $(OUT)/mem.o $(OUT)/debug.o $(OUT)/keyboard.o $(OUT)/tests.o $(OUT)/pit.o $(OUT)/sys.o $(OUT)/memory.o $(OUT)/pmm.o $(OUT)/gfx.o $(OUT)/vtty.o $(OUT)/gui.o $(OUT)/tty.o $(OUT)/disk.o $(OUT)/mifs.o $(OUT)/tss.o $(OUT)/shell.o
 	$(CC) -T $(SRC)/linker.ld -o $@ $^ -ffreestanding -nostdlib -lgcc
 
 ############
