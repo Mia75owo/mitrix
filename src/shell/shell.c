@@ -59,7 +59,7 @@ void shell_init() {
                       "Print file contents to screen",
                       CMD_CAT);
     shell_add_command("exec",
-                      "Jump the execution to a file (dangerouse)",
+                      "Jump the execution to a file (dangerous)",
                       CMD_EXEC);
     // clang-format on
 }
@@ -103,9 +103,30 @@ void shell_execute_command(const char* command) {
 
     u32 cmd = commands[index].command_ID;
 
+    // TODO: cleanup this mess D:
     switch (cmd) {
         case CMD_HELP: {
-            klog("TODO");
+            klog("\n%[50|=]");
+
+            if (command[commands[index].command_length + 1] != '\0') {
+                i32 idx = shell_get_command_index(
+                    &command[commands[index].command_length + 1]);
+                if (idx == -1) {
+                    klog("\n%0CCommand '%s' not found!",
+                         &command[commands[index].command_length + 1]);
+                    break;
+                }
+                klog("%0F%s -> %s\n", commands[idx].name,
+                     commands[idx].description);
+            } else {
+                klog("%0FUse 'help [COMMAND]' to get a description\n\n");
+                for (u32 i = 0; i < SHELL_COMMANDS_SIZE; i++) {
+                    if (commands[i].command_length == 0) break;
+                    klog("%0F%s\n", commands[i].name);
+                }
+            }
+
+            klog("%[50|=]");
         } break;
         case CMD_CLEAR: {
             tty_clear();

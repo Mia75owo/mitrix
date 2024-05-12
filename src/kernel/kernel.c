@@ -63,8 +63,9 @@ void kernel_main(u32 magic, struct multiboot_info* boot_info) {
 
     /*debug_tests();*/
 
+    klog("\n");
     klog("%00 %10 %20 %30 %40 %50 %60 %70 %80 %90 %A0 %B0 %C0 %D0 %E0 %F0 \n");
-    klog("hi");
+    klog("hi :D");
 
     memory_set_boot_info(boot_info);
 
