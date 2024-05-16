@@ -23,14 +23,32 @@ typedef struct {
 } __attribute__((packed)) IDTR;
 
 typedef struct {
-    u32 gs, fs, es, ds;
-    u32 edi, esi, ebp, esp, ebx, edx, ecx, eax;
-    u32 interrupt, error;
+    u32 eax;
+    u32 ebx;
+    u32 ecx;
+    u32 edx;
 
-    u32 eip, cs, eflags, usermode_esp, usermode_ss;
-} InterruptFrame;
+    u32 esi;
+    u32 edi;
+    u32 ebp;
 
-typedef void (*ISRFunction)(InterruptFrame*);
+    u32 gs;
+    u32 fs;
+    u32 es;
+    u32 ds;
+
+    u32 interrupt;
+    u32 error;
+
+    // Pushed by CPU
+    u32 eip;
+    u32 cs;
+    u32 eflags;
+    u32 esp;
+    u32 ss;
+} __attribute__((packed)) CPUState;
+
+typedef void (*ISRFunction)(CPUState*);
 
 void set_isr_function(u8 index, ISRFunction func);
 void idt_set_entry(IDTDescEntry* idt, u8 index, void* isr, u8 attributes);

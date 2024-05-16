@@ -4,6 +4,6 @@
 #include "idt/idt.h"
 
 void keyboard_init();
-void keyboard_handler(InterruptFrame* frame);
+void keyboard_handler(CPUState* frame);
 
 #endif

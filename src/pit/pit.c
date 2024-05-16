@@ -18,7 +18,7 @@ void pit_init(u32 freq) {
     set_isr_function(32, pit_handle_int);
 }
 
-void pit_handle_int(InterruptFrame* frame) {
+void pit_handle_int(CPUState* frame) {
     (void)frame;
     pit.tics++;
 }

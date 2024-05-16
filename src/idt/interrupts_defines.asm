@@ -1,24 +1,37 @@
 isr_common:
-    pushad
+    ; pushad
+
+
+    push ebp
+    push edi
+    push esi
+
+    push edx
+    push ecx
+    push ebx
+    push eax
+
     push ds
     push es
     push fs
     push gs
 
-    push eax
-    mov ax, 0x10
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-    pop eax
+    ; set ds,es,fs,gs to 0
+    ; push eax
+    ; mov ax, 0x10
+    ; mov ds, ax
+    ; mov es, ax
+    ; mov fs, ax
+    ; mov gs, ax
+    ; pop eax
 
     push esp
 
     extern handle_interrupt
     call handle_interrupt
 
-    add esp, 4
+    mov esp, eax
+    ; add esp, 4
 
 global isr_exit
 isr_exit:
@@ -26,7 +39,17 @@ isr_exit:
     pop fs
     pop es
     pop ds
-    popad
+    ; popad
+
+
+    pop eax
+    pop ebx
+    pop ecx
+    pop edx
+
+    pop esi
+    pop edi
+    pop ebp
 
     add esp, 8
 

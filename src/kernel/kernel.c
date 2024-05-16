@@ -10,6 +10,7 @@
 #include "multiboot.h"
 #include "pit/pit.h"
 #include "serial/serial.h"
+#include "tasks/tasks.h"
 #include "tests/tests.h"
 #include "util/debug.h"
 #include "util/mem.h"
@@ -24,6 +25,8 @@ extern void idt_load();
     (call);                                          \
     klog("%0F[  %0AOK  %0F] %07%s Success\n", name);
 
+void kernel_loop();
+
 void kernel_main(u32 magic, struct multiboot_info* boot_info) {
     gui_init_early_tty();
     tty_reset();
@@ -36,6 +39,7 @@ void kernel_main(u32 magic, struct multiboot_info* boot_info) {
     kinit(fpu_init(), "FPU");
     kinit(keyboard_init(), "Keyboard");
     kinit(pit_init(1000), "PIT");
+    kinit(tasks_init(), "Tasks");
     kinit(disk_init(boot_info), "Ramdisk");
 
     gfx_info gfx_data = {
@@ -59,8 +63,6 @@ void kernel_main(u32 magic, struct multiboot_info* boot_info) {
     gfx_fill(0x111111);
     // gfx_debug(GFX_DEBUG_FONT_FILL);
 
-    asm volatile("sti");
-
     /*debug_tests();*/
 
     klog("\n");
@@ -71,6 +73,17 @@ void kernel_main(u32 magic, struct multiboot_info* boot_info) {
 
     gui_init(gfx_data.width, gfx_data.height);
 
+    Task kernel_task;
+    task_create(&kernel_task, kernel_loop);
+    tasks_add_task(&kernel_task);
+
+    asm volatile("sti");
+
+    while (true)
+        ;
+}
+
+void kernel_loop() {
     u64 last_draw = 0;
     while (true) {
         u64 tics = pit_get_tics();

@@ -19,7 +19,7 @@ static char scancode_map_alt[128];
 
 void keyboard_init() { set_isr_function(33, keyboard_handler); }
 
-void keyboard_handler(InterruptFrame* frame) {
+void keyboard_handler(CPUState* frame) {
     (void)frame;
 
     u8 scan_code = inb(0x60) & 0x7F;
