@@ -79,8 +79,7 @@ void kernel_main(u32 magic, struct multiboot_info* boot_info) {
 
     asm volatile("sti");
 
-    while (true)
-        ;
+    spin_halt();
 }
 
 void kernel_loop() {
