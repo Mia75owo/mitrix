@@ -77,6 +77,10 @@ void kernel_main(u32 magic, struct multiboot_info* boot_info) {
     task_kernel_create(&gui_task, gui_loop);
     tasks_add_task(&gui_task);
 
+    Task user_task;
+    task_user_create(&user_task, "user.exe");
+    tasks_add_task(&user_task);
+
     asm volatile("sti");
     spin_halt();
 }

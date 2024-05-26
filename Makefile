@@ -90,7 +90,7 @@ $(OUT)/kernel.o: $(SRC)/kernel/kernel.c
 ###########
 
 RAMDISK=ramdisk
-$(OUT)/$(RAMDISK): $(OUT)/tool_mifs ramdisk/
+$(OUT)/$(RAMDISK): $(OUT)/tool_mifs ramdisk/ ramdisk/user.exe
 	cd ramdisk && ../build/tool_mifs ../$@ ./*
 	# $(OUT)/tool_mifs $@ ./ramdisk/*
 	# dd if=/dev/zero of=$@ bs=10M count=1
@@ -136,6 +136,13 @@ clean:
 
 $(OUT)/tool_mifs: tools/mifs.c
 	$(NATIVE_CC) -Wall -Wextra -O2 $< -o $@
+
+##################
+# userspace code #
+##################
+
+ramdisk/user.exe: userspace/user.asm
+	nasm -f bin $< -o $@
 
 ###################
 # run in emulator #

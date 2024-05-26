@@ -47,7 +47,6 @@ isr_common:
 
 global isr_exit
 isr_exit:
-    ; TaskReturnContext
     pop gs
     pop fs
     pop es

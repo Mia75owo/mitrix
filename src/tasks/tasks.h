@@ -8,7 +8,7 @@
 
 typedef struct {
     u32 kesp;   // esp
-    u32 kesp0;  // esp top (stack + sizeof(stack))
+    u32 kesp0;  // esp top
     u32* page_dir;
 
     CPUState* cpustate;
@@ -26,7 +26,7 @@ typedef struct {
 
 void task_create(Task* this, void entrypoint(), bool kernel_task, u32* pagedir);
 void task_kernel_create(Task* this, void entrypoint());
-void task_user_create(Task* this, void entrypoint());
+void task_user_create(Task* this, char* filename);
 
 void tasks_init();
 void tasks_add_task(Task* task);

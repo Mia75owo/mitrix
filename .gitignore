@@ -4,3 +4,4 @@ compile_commands.json
 mitrix/boot/kernel
 mitrix/boot/ramdisk
 result
+ramdisk/user.exe
