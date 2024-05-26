@@ -1,5 +1,6 @@
 #include "pit.h"
 
+#include "tasks/tasks.h"
 #include "util/port.h"
 #include "util/mem.h"
 
@@ -21,6 +22,7 @@ void pit_init(u32 freq) {
 void pit_handle_int(CPUState* frame) {
     (void)frame;
     pit.tics++;
+    tasks_schedule();
 }
 
 u64 pit_get_tics() {

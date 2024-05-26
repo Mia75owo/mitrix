@@ -4,18 +4,15 @@
 #include "util/port.h"
 
 void spin_halt() {
-    while (1)
-        ;
+    while (1) halt();
 }
 
-void halt() {
+void halt() { asm volatile("hlt"); }
+
+void abort() {
     asm volatile("cli");
-    while (1) {
-        asm volatile("hlt");
-    }
+    spin_halt();
 }
-
-void abort() { halt(); }
 
 void reboot() {
     u8 good = 0x02;

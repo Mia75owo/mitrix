@@ -80,6 +80,7 @@ halt:
 %include "./src/idt/load_idt.asm"
 %include "./src/idt/interrupts_defines.asm"
 %include "./src/tasks/tss_flush.asm"
+%include "./src/tasks/switch_context.asm"
 
 ; ===============================================
 ; DATA

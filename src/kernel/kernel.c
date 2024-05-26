@@ -25,7 +25,7 @@ extern void idt_load();
     (call);                                          \
     klog("%0F[  %0AOK  %0F] %07%s Success\n", name);
 
-void kernel_loop();
+void gui_loop();
 
 void kernel_main(u32 magic, struct multiboot_info* boot_info) {
     gui_init_early_tty();
@@ -73,16 +73,15 @@ void kernel_main(u32 magic, struct multiboot_info* boot_info) {
 
     gui_init(gfx_data.width, gfx_data.height);
 
-    Task kernel_task;
-    task_create(&kernel_task, kernel_loop);
-    tasks_add_task(&kernel_task);
+    Task gui_task;
+    task_kernel_create(&gui_task, gui_loop);
+    tasks_add_task(&gui_task);
 
     asm volatile("sti");
-
     spin_halt();
 }
 
-void kernel_loop() {
+void gui_loop() {
     u64 last_draw = 0;
     while (true) {
         u64 tics = pit_get_tics();

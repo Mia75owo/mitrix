@@ -1,4 +1,5 @@
 #include "gdt.h"
+
 #include "tasks/tss.h"
 
 void gdt_load(u32 pointer);
@@ -31,6 +32,8 @@ void gdt_init() {
     gdt_set_entry(4, 0, 0xFFFFFFFF, 0xF2, 0b1100);
 
     gdt_set_entry(5, (u32)&tss, tss_size, 0x89, 0b1100);
+    tss.ss0 = 16;
 
     gdt_load((u32)&gdt_pointer);
+    tss_flush();
 }

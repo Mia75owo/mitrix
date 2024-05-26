@@ -1,6 +1,5 @@
 #include "idt.h"
 
-#include "tasks/tasks.h"
 #include "util/debug.h"
 #include "util/mem.h"
 #include "util/port.h"
@@ -82,9 +81,7 @@ void idt_init() {
 
 static char* exception_names[];
 
-u32 handle_interrupt(CPUState* frame) {
-    u32 esp = (u32)frame;
-
+void handle_interrupt(CPUState* frame) {
     if (frame->interrupt >= 32 && frame->interrupt <= 47) {
         if (frame->interrupt >= 40) {
             outb(PIC2, PIC_EOI);
@@ -101,12 +98,6 @@ u32 handle_interrupt(CPUState* frame) {
         }
     }
     isr(frame);
-
-    if (frame->interrupt == 32) {
-        esp = (u32)tasks_scedule(frame);
-    }
-
-    return esp;
 }
 
 static char* exception_names[] = {

@@ -23,4 +23,8 @@ typedef struct {
     u16 debug_flag, io_map;
 } __attribute__((packed)) TSS;
 
+void tss_update_esp0(u32 esp0);
+
+extern void tss_flush();
+
 #endif

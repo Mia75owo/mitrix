@@ -1,7 +1,5 @@
 isr_common:
-    ; pushad
-
-
+    ; struct CPUState
     push ebp
     push edi
     push esi
@@ -16,32 +14,35 @@ isr_common:
     push fs
     push gs
 
-    ; set ds,es,fs,gs to 0
-    ; push eax
-    ; mov ax, 0x10
-    ; mov ds, ax
-    ; mov es, ax
-    ; mov fs, ax
-    ; mov gs, ax
-    ; pop eax
+    ; load kernel data segment
+    push eax
+    mov ax, 0x10
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    pop eax
 
+    ; u32 handle_interrupt(CPUState* frame)
+    ;                                ^^^^^
     push esp
 
     extern handle_interrupt
     call handle_interrupt
 
-    mov esp, eax
-    ; add esp, 4
+    ; return value (new stack pointer)
+    ; mov esp, eax
+    add esp, 4
 
 global isr_exit
 isr_exit:
+    ; TaskReturnContext
     pop gs
     pop fs
     pop es
     pop ds
-    ; popad
 
-
+    ; CPUState
     pop eax
     pop ebx
     pop ecx
