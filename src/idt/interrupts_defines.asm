@@ -1,4 +1,15 @@
+extern handler_additional_info
+
 isr_common:
+    push ecx
+    ; save additional handler info
+    mov ecx, cr2
+    mov [handler_additional_info], ecx
+    mov ecx, [esp + 12]
+    mov [handler_additional_info + 4], ecx
+    ; restore ecx
+    pop ecx
+
     ; struct CPUState
     push ebp
     push edi

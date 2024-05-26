@@ -1,5 +1,6 @@
 #include "idt.h"
 
+#include "idt/handlers.h"
 #include "util/debug.h"
 #include "util/mem.h"
 #include "util/port.h"
@@ -69,6 +70,9 @@ void idt_init() {
 
     memset(isr_functions, 0, sizeof(isr_functions));
     set_isr_function(39, empty_handle);
+
+    set_isr_function(13, handler_general_protection_fault);
+    set_isr_function(14, handler_page_fault);
 
     setup_irq();
 
