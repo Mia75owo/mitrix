@@ -1,6 +1,7 @@
 #include "kmalloc.h"
 
 #include "memory/memory.h"
+#include "memory/pmm.h"
 #include "util/debug.h"
 #include "util/mem.h"
 
@@ -36,6 +37,13 @@ void kmalloc_init() {
     memset(buddy4096, 0, sizeof(buddy4096));
 
     memset(big_allocations, 0, sizeof(big_allocations));
+
+    // Map pages
+    u32 pages = EXACT_ALLOC_SIZE / 0x1000;
+    for (u32 i = 0; i < pages; i++) {
+        u32 phys_addr = pmm_alloc_pageframe();
+        memory_map_page(KERNEL_MALLOC + i * 0x1000, phys_addr, PTE_READ_WRITE);
+    }
 
     initialized = true;
 }
