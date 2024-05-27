@@ -23,6 +23,7 @@ typedef enum {
     CMD_SHUTDOWN,
 
     CMD_MEMINFO,
+    CMD_MALLOCINFO,
     CMD_TICS,
 
     CMD_DEBUGGFX,

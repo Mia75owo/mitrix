@@ -3,6 +3,7 @@
 #include "disk/mifs.h"
 #include "gfx/gfx.h"
 #include "gfx/tty.h"
+#include "memory/kmalloc.h"
 #include "memory/memory.h"
 #include "pit/pit.h"
 #include "util/debug.h"
@@ -36,6 +37,9 @@ void shell_init() {
     shell_add_command("meminfo",
                       "Display the memory map provided by GRUB",
                       CMD_MEMINFO);
+    shell_add_command("mallocinfo",
+                      "Display the content of the KMALLOC buddy bitmaps",
+                      CMD_MALLOCINFO);
     shell_add_command("tics",
                       "Display the number of tics recorded by the PIT",
                       CMD_TICS);
@@ -139,6 +143,9 @@ void shell_execute_command(const char* command) {
         } break;
         case CMD_MEMINFO: {
             memory_print_info();
+        } break;
+        case CMD_MALLOCINFO: {
+            kmalloc_print_info();
         } break;
         case CMD_TICS: {
             klog("\n%n", (u64)pit_get_tics());

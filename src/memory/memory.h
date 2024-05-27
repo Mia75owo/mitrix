@@ -12,6 +12,7 @@ extern u32 initial_page_dir[1024];
 
 #define KERNEL_START      0xC0000000
 #define KERNEL_GFX        0xC8000000
+#define KERNEL_MALLOC     0xD0000000
 #define KERNEL_RAMDISK    0xE0000000
 // clang-format on
 

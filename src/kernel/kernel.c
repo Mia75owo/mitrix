@@ -6,6 +6,7 @@
 #include "gfx/gui.h"
 #include "gfx/tty.h"
 #include "keyboard/keyboard.h"
+#include "memory/kmalloc.h"
 #include "memory/memory.h"
 #include "multiboot.h"
 #include "pit/pit.h"
@@ -55,6 +56,8 @@ void kernel_main(u32 magic, struct multiboot_info* boot_info) {
         u32 physical_alloc_start = 0x100000 * 16;
         kinit(memory_init(mem_high, physical_alloc_start), "Memory");
     }
+
+    kinit(kmalloc_init(), "Kmalloc");
 
     disk_map();
     disk_init_fs();

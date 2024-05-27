@@ -2,6 +2,7 @@
 
 #include "gfx/gfx.h"
 #include "gfx/gui.h"
+#include "memory/kmalloc.h"
 #include "memory/memory.h"
 #include "util/debug.h"
 #include "util/mem.h"
@@ -51,6 +52,8 @@ void keyboard_handler(CPUState* frame) {
         reboot();
     } else if (!press && k_alt && c == 'm') {
         memory_print_info();
+    } else if (!press && k_alt && c == 'k') {
+        kmalloc_print_info();
     } else if (!press && c != 0) {
         gui_key_input(c);
     }
