@@ -12,9 +12,10 @@ CC_flags += -nostdlib
 CC_flags += -Wall
 CC_flags += -Wextra
 CC_flags += -I$(SRC)
+CC_flags += -g
 
 AS=$(PROVIDED_AS)
-AS_flags=-f elf32
+AS_flags=-f elf32 -g
 
 NATIVE_CC=gcc
 
@@ -82,10 +83,10 @@ $(OUT)/sys.o: $(SRC)/util/sys.c
 	$(CC) $(CC_flags) -c $< -o $@
 
 $(OUT)/tests.o: $(SRC)/tests/tests.c
-	$(CC) -c $< -o $@ $(CC_flags)
+	$(CC) $(CC_flags) -c $< -o $@
 
 $(OUT)/kernel.o: $(SRC)/kernel/kernel.c
-	$(CC) -c $< -o $@ $(CC_flags)
+	$(CC) $(CC_flags) -c $< -o $@
 
 ###########
 # RAMDISK #

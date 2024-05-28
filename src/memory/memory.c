@@ -64,7 +64,7 @@ void memory_map_page(u32 virt_addr, u32 phys_addr, u32 flags) {
         u32 pt_paddr = pmm_alloc_pageframe();
 
         page_dir[PD_INDEX(virt_addr)] =
-            pt_paddr | PTE_PRESENT | PTE_OWNER | flags;
+            pt_paddr | PTE_PRESENT | PTE_READ_WRITE | PTE_OWNER | flags;
         invalidate(virt_addr);
 
         for (u32 i = 0; i < 1024; i++) {
