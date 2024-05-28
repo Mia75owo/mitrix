@@ -1,6 +1,7 @@
 #include "sys.h"
 
 #include "pit/pit.h"
+#include "util/debug.h"
 #include "util/port.h"
 
 void spin_halt() {
@@ -36,5 +37,24 @@ void sleep(u32 ms) {
     asm volatile("sti");
     u64 tics = pit_get_tics();
     while ((tics + ms) > pit_get_tics()) {
+    }
+}
+
+static u32 cli_depth = 0;
+static u32 cli_initially_enabled = false;
+
+void cli_push() {
+    if (cli_depth == 0) {
+        cli_initially_enabled = eflags_check(EF_INTERRUPTS);
+    }
+    cli_depth++;
+    asm volatile("cli");
+}
+void cli_pop() {
+    assert(cli_depth > 0);
+    cli_depth--;
+
+    if (cli_depth == 0 && cli_initially_enabled) {
+        asm volatile("sti");
     }
 }

@@ -112,6 +112,8 @@ void task_kernel_create(Task* this, void entrypoint()) {
 }
 
 void task_user_create(Task* this, char* filename) {
+    cli_push();
+
     u32* page_dir = memory_get_current_page_dir();
 
     u32* new_page_dir = memory_alloc_page_dir();
@@ -139,4 +141,6 @@ void task_user_create(Task* this, char* filename) {
     assert(new_page_dir != NULL);
 
     memory_change_page_dir(page_dir);
+
+    cli_pop();
 }
