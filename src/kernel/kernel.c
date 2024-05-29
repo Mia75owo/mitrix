@@ -10,6 +10,7 @@
 #include "multiboot.h"
 #include "pit/pit.h"
 #include "serial/serial.h"
+#include "syscalls/syscalls.h"
 #include "tasks/tasks.h"
 #include "tests/tests.h"
 #include "util/debug.h"
@@ -65,11 +66,13 @@ void kernel_main(u32 magic, struct multiboot_info* boot_info) {
     gfx_fill(0x111111);
     // gfx_debug(GFX_DEBUG_FONT_FILL);
 
+    kinit(syscalls_init(), "Syscalls");
+
     /*debug_tests();*/
 
     klog("\n");
     klog("%00 %10 %20 %30 %40 %50 %60 %70 %80 %90 %A0 %B0 %C0 %D0 %E0 %F0 \n");
-    klog("hi :D");
+    klog("hi :D\n");
 
     memory_set_boot_info(boot_info);
 

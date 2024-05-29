@@ -10,6 +10,7 @@ IDTDescEntry IDT[256];
 ISRFunction isr_functions[256];
 
 extern void* isr_redirect_table[];
+extern void isr128();
 
 void idt_set_entry(IDTDescEntry* idt, u8 index, void* isr, u8 attributes) {
     DWord offset;
@@ -79,6 +80,8 @@ void idt_init() {
     for (int i = 0; i < 48; i++) {
         idt_set_entry(idtr.ptr, i, isr_redirect_table[i], TA_INTERRUPT);
     }
+
+    idt_set_entry(idtr.ptr, 0x80, isr128, 0xEE);
 
     asm("lidt %0" : : "m"(idtr));
 }
