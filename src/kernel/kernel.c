@@ -1,5 +1,4 @@
 #include "disk/disk.h"
-#include "disk/mifs.h"
 #include "fpu/fpu.h"
 #include "gdt/gdt.h"
 #include "gfx/gfx.h"

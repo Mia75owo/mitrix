@@ -82,6 +82,9 @@ $(OUT)/debug.o: $(SRC)/util/debug.c
 $(OUT)/sys.o: $(SRC)/util/sys.c
 	$(CC) $(CC_flags) -c $< -o $@
 
+$(OUT)/elf.o: $(SRC)/elf/elf.c
+	$(CC) $(CC_flags) -c $< -o $@
+
 $(OUT)/tests.o: $(SRC)/tests/tests.c
 	$(CC) $(CC_flags) -c $< -o $@
 
@@ -105,7 +108,7 @@ $(OUT)/$(RAMDISK): $(OUT)/tool_mifs ramdisk/ ramdisk/user.exe
 #############
 
 OS=OS.flp
-$(OUT)/$(OS): $(OUT)/boot.o $(OUT)/gdt.o $(OUT)/idt.o $(OUT)/handlers.o $(OUT)/kernel.o $(OUT)/fpu.o $(OUT)/serial.o $(OUT)/mem.o $(OUT)/debug.o $(OUT)/keyboard.o $(OUT)/tests.o $(OUT)/pit.o $(OUT)/sys.o $(OUT)/memory.o $(OUT)/pmm.o $(OUT)/kmalloc.o $(OUT)/gfx.o $(OUT)/vtty.o $(OUT)/gui.o $(OUT)/tty.o $(OUT)/disk.o $(OUT)/mifs.o $(OUT)/tss.o $(OUT)/tasks.o $(OUT)/shell.o
+$(OUT)/$(OS): $(OUT)/boot.o $(OUT)/gdt.o $(OUT)/idt.o $(OUT)/handlers.o $(OUT)/kernel.o $(OUT)/fpu.o $(OUT)/serial.o $(OUT)/mem.o $(OUT)/debug.o $(OUT)/keyboard.o $(OUT)/tests.o $(OUT)/pit.o $(OUT)/sys.o $(OUT)/memory.o $(OUT)/pmm.o $(OUT)/kmalloc.o $(OUT)/gfx.o $(OUT)/vtty.o $(OUT)/gui.o $(OUT)/tty.o $(OUT)/disk.o $(OUT)/mifs.o $(OUT)/tss.o $(OUT)/tasks.o $(OUT)/shell.o $(OUT)/elf.o
 	$(CC) -T $(SRC)/linker.ld -o $@ $^ -ffreestanding -nostdlib -lgcc
 
 ############
@@ -144,8 +147,12 @@ $(OUT)/tool_mifs: tools/mifs.c
 # userspace code #
 ##################
 
-ramdisk/user.exe: userspace/user.asm
-	nasm -f bin $< -o $@
+.PHONY: always
+always:
+
+ramdisk/user.exe: userspace/user.c always
+	$(CC) $(CC_flags) -c $< -o build/user.o
+	$(CC) build/user.o -o $@ -fno-builtin -nostdlib
 
 ###################
 # run in emulator #

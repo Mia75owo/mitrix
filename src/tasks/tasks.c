@@ -1,11 +1,14 @@
 #include "tasks.h"
 
 #include "disk/mifs.h"
+#include "elf/elf.h"
+#include "memory/kmalloc.h"
 #include "memory/memory.h"
 #include "memory/pmm.h"
 #include "tasks/tss.h"
 #include "util/debug.h"
 #include "util/mem.h"
+#include "util/sys.h"
 
 extern void isr_exit();
 extern void switch_context(Task* old, Task* next);
@@ -111,14 +114,32 @@ void task_kernel_create(Task* this, void entrypoint()) {
     task_create(this, entrypoint, true, initial_page_dir);
 }
 
-void task_user_create(Task* this, char* filename) {
+void task_user_create(Task* this, char* elf_file_name) {
     cli_push();
+    ELFObject elf = {0};
+
+    FilePtr file = mifs_file(elf_file_name);
+
+    assert_msg(file.addr, "Failed to load file for user task!");
+    elf.size = file.size;
+
+    assert_msg(elf.size >= 52, "ELF file to small");
+    elf.raw = kmalloc(elf.size);
+    memcpy(elf.raw, file.addr, file.size);
 
     u32* page_dir = memory_get_current_page_dir();
-
     u32* new_page_dir = memory_alloc_page_dir();
     memory_change_page_dir(new_page_dir);
 
+    if (!elf_parse(&elf)) {
+        assert_msg(0, "Failed to parse ELF");
+    }
+    if (!elf_load_executable(&elf)) {
+        assert_msg(0, "Failed to load ELF");
+    }
+    assert_msg(elf.entry, "ELF has no entry");
+
+    // allocate user stack
     for (u32 i = 0; i < USER_STACK_PAGES; i++) {
         u32 virt_addr =
             USER_STACK_BOTTOM - USER_STACK_PAGES * 0x1000 + i * 0x1000;
@@ -128,14 +149,7 @@ void task_user_create(Task* this, char* filename) {
         memory_map_page(virt_addr, phys_addr, flags);
     }
 
-    FilePtr file = mifs_file(filename);
-    assert_msg(file.addr, "Failed to load file for user task!");
-
-    memory_map_page(0xA1000000, pmm_alloc_pageframe(),
-                    PTE_OWNER | PTE_USER | PTE_READ_WRITE);
-    memcpy((u8*)0xA1000000, file.addr, file.size);
-
-    task_create(this, (void(*))0xA1000000, false, new_page_dir);
+    task_create(this, (void(*))elf.entry, false, new_page_dir);
 
     assert(page_dir != NULL);
     assert(new_page_dir != NULL);
