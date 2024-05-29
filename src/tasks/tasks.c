@@ -158,3 +158,34 @@ void task_user_create(Task* this, char* elf_file_name) {
 
     cli_pop();
 }
+
+void task_kill_index(u32 index) {
+    cli_push();
+
+    Task* task = tasks[index];
+    assert(task);
+
+    memory_free_page_dir(task->page_dir);
+
+    num_tasks--;
+    tasks[index] = NULL;
+
+    cli_pop();
+}
+void task_kill(Task* task) {
+    i32 index = -1;
+    for (u32 i = 0; i < TASKS_COUNT; i++) {
+        if (tasks[i] == task) {
+            index = i;
+            break;
+        }
+    }
+
+    assert(index >= 0);
+    task_kill_index(index);
+}
+
+void task_kill_current() {
+    assert(current_task != 0);
+    task_kill_index(current_task);
+}
