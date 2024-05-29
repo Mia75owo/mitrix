@@ -11,6 +11,11 @@ isr_common:
     pop ecx
 
     ; struct CPUState
+    push ds
+    push es
+    push fs
+    push gs
+
     push ebp
     push edi
     push esi
@@ -19,11 +24,6 @@ isr_common:
     push ecx
     push ebx
     push eax
-
-    push ds
-    push es
-    push fs
-    push gs
 
     ; load kernel data segment
     push eax
@@ -47,11 +47,6 @@ isr_common:
 
 global isr_exit
 isr_exit:
-    pop gs
-    pop fs
-    pop es
-    pop ds
-
     ; CPUState
     pop eax
     pop ebx
@@ -61,6 +56,11 @@ isr_exit:
     pop esi
     pop edi
     pop ebp
+
+    pop gs
+    pop fs
+    pop es
+    pop ds
 
     add esp, 8
 
@@ -130,6 +130,10 @@ ISR_NO_ERROR_CODE 44
 ISR_NO_ERROR_CODE 45
 ISR_NO_ERROR_CODE 46
 ISR_NO_ERROR_CODE 47
+
+; syscall 0x80
+ISR_NO_ERROR_CODE 128
+global isr128
 
 global isr_redirect_table
 isr_redirect_table:
