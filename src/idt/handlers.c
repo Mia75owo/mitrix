@@ -2,7 +2,6 @@
 
 HandlerAdditionalInfo handler_additional_info;
 
-#include "gfx/gfx.h"
 #include "gfx/tty.h"
 #include "gfx/vtty.h"
 #include "util/debug.h"

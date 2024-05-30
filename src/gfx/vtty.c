@@ -2,8 +2,6 @@
 
 #include "gfx/tty.h"
 #include "gfx/gfx.h"
-#include "memory/memory.h"
-#include "serial/serial.h"
 #include "util/mem.h"
 
 #define WIDTH 50

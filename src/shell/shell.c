@@ -219,6 +219,7 @@ void shell_execute_command(const char* command) {
                 klog("\n%0CFile '%s' not found!", file_name_buffer);
             } else {
                 Task* new_task = create_user_task(file_name_buffer);
+                (void)new_task;
             }
         } break;
     }

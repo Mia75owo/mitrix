@@ -12,7 +12,6 @@
 #include "serial/serial.h"
 #include "syscalls/syscalls.h"
 #include "tasks/task_manager.h"
-#include "tests/tests.h"
 #include "util/debug.h"
 #include "util/mem.h"
 #include "util/sys.h"
