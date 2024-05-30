@@ -4,7 +4,13 @@
 #include "idt/idt.h"
 #include "util/types.h"
 
-#define TASKS_COUNT 16
+#define TASK_STACK_SIZE 0x1000
+
+typedef enum {
+    TASK_STATE_DEAD,
+    TASK_STATE_IDLE,
+    TASK_STATE_RUNNING,
+} TaskState;
 
 typedef struct {
     u32 kesp;   // esp
@@ -13,7 +19,9 @@ typedef struct {
 
     CPUState* cpustate;
 
-    u8 stack[0x1000];
+    TaskState state;
+
+    u8* stack;
 } Task;
 
 typedef struct {
@@ -24,18 +32,10 @@ typedef struct {
     u32 eip;
 } TaskReturnContext;
 
-void task_create(Task* this, void entrypoint(), bool kernel_task, u32* pagedir);
 void task_kernel_create(Task* this, void entrypoint());
 void task_user_create(Task* this, char* elf_file_name);
-
-void task_kill_index(u32 index);
 void task_kill(Task* task);
-void task_kill_current();
 
-void tasks_init();
-void tasks_add_task(Task* task);
-void tasks_schedule();
-
-bool tasks_current_task_alive();
+void task_switch(Task* old, Task* new);
 
 #endif

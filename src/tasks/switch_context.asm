@@ -4,10 +4,6 @@ switch_context:
     mov eax, [esp + 4] ; eax = old
     mov edx, [esp + 8] ; edx = next
 
-    ; old task could be dead (old == 0)
-    cmp eax, 0
-    jz skip_old
-
     ; save old TaskReturnContext
     push ebp
     push ebx

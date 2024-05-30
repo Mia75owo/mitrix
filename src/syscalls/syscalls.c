@@ -3,7 +3,7 @@
 #include "idt/idt.h"
 #include "pit/pit.h"
 #include "syscalls/syscall_list.h"
-#include "tasks/tasks.h"
+#include "tasks/task_manager.h"
 #include "util/debug.h"
 #include "util/mem.h"
 
@@ -37,7 +37,7 @@ static void handle_syscall_interrupt(CPUState* frame) {
     frame->eax = ret;
 }
 
-static void syscall_exit() { task_kill_current(); }
+static void syscall_exit() { task_manager_kill_current_task(); }
 static void syscall_print(const char* string) { klog("%s", string); }
 static void syscall_print_char(const char c) { klog("%c", c); }
 static u32 syscall_get_systime() { return pit_get_tics(); }

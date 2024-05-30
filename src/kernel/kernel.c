@@ -11,7 +11,7 @@
 #include "pit/pit.h"
 #include "serial/serial.h"
 #include "syscalls/syscalls.h"
-#include "tasks/tasks.h"
+#include "tasks/task_manager.h"
 #include "tests/tests.h"
 #include "util/debug.h"
 #include "util/mem.h"
@@ -40,7 +40,7 @@ void kernel_main(u32 magic, struct multiboot_info* boot_info) {
     kinit(fpu_init(), "FPU");
     kinit(keyboard_init(), "Keyboard");
     kinit(pit_init(1000), "PIT");
-    kinit(tasks_init(), "Tasks");
+    kinit(task_manager_init(), "Task manager");
     kinit(disk_init(boot_info), "Ramdisk");
 
     gfx_info gfx_data = {
@@ -78,13 +78,10 @@ void kernel_main(u32 magic, struct multiboot_info* boot_info) {
 
     gui_init(gfx_data.width, gfx_data.height);
 
-    Task gui_task;
-    task_kernel_create(&gui_task, gui_loop);
-    tasks_add_task(&gui_task);
-
-    Task user_task;
-    task_user_create(&user_task, "user.exe");
-    tasks_add_task(&user_task);
+    Task* gui_task = create_kernel_task(gui_loop);
+    gui_task->state = TASK_STATE_RUNNING;
+    // Task* user_task = create_user_task("user.exe");
+    // user_task->state = TASK_STATE_RUNNING;
 
     asm volatile("sti");
     spin_halt();

@@ -13,55 +13,11 @@
 extern void isr_exit();
 extern void switch_context(Task* old, Task* next);
 
-static Task* tasks[TASKS_COUNT];
-static Task initial_task;  // initial kernel task
-static u32 num_tasks;
-static i32 current_task;
+static void task_create(Task* this, void entrypoint(), bool kernel_task,
+                        u32* pagedir) {
+    this->stack = kmalloc(TASK_STACK_SIZE);
 
-void tasks_init() {
-    num_tasks = 1;
-    current_task = 0;
-    memset(tasks, 0, sizeof(tasks));
-
-    tasks[current_task] = &initial_task;
-    tasks[current_task]->page_dir = memory_get_current_page_dir();
-}
-
-void tasks_add_task(Task* task) {
-    assert_msg(num_tasks <= TASKS_COUNT, "MAX TASK SIZE EXEEDED");
-    tasks[num_tasks++] = task;
-}
-
-static i32 tasks_choose_next() {
-    i32 index = current_task;
-
-    for (u32 i = 0; i < TASKS_COUNT; i++) {
-        index++;
-        index %= TASKS_COUNT;
-
-        if (tasks[index] != 0) {
-            return index;
-        }
-    }
-
-    return 0;
-}
-
-void tasks_schedule() {
-    i32 index = tasks_choose_next();
-
-    Task* next = tasks[index];
-    Task* old = tasks[current_task];
-
-    current_task = index;
-
-    tss_update_esp0((u32)next->kesp0);
-    switch_context(old, next);
-}
-
-void task_create(Task* this, void entrypoint(), bool kernel_task,
-                 u32* pagedir) {
-    u8* kesp0 = this->stack + 0x1000;
+    u8* kesp0 = this->stack + TASK_STACK_SIZE;
     u8* kesp = kesp0;
 
     kesp -= sizeof(CPUState);
@@ -159,37 +115,17 @@ void task_user_create(Task* this, char* elf_file_name) {
     cli_pop();
 }
 
-void task_kill_index(u32 index) {
+void task_kill(Task* task) {
     cli_push();
 
-    Task* task = tasks[index];
-    assert(task);
-
     memory_free_page_dir(task->page_dir);
-
-    num_tasks--;
-    tasks[index] = NULL;
+    kfree(task->stack);
+    memset(task, 0, sizeof(Task));
 
     cli_pop();
 }
-void task_kill(Task* task) {
-    i32 index = -1;
-    for (u32 i = 0; i < TASKS_COUNT; i++) {
-        if (tasks[i] == task) {
-            index = i;
-            break;
-        }
-    }
 
-    assert(index >= 0);
-    task_kill_index(index);
-}
-
-void task_kill_current() {
-    assert(current_task != 0);
-    task_kill_index(current_task);
-}
-
-bool tasks_current_task_alive() {
-    return tasks[current_task] != 0;
+void task_switch(Task* old, Task* new) {
+    tss_update_esp0((u32) new->kesp0);
+    switch_context(old, new);
 }
