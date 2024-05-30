@@ -1,13 +1,8 @@
 #include "keyboard.h"
 
-#include "gfx/gfx.h"
 #include "gfx/gui.h"
-#include "memory/kmalloc.h"
-#include "memory/memory.h"
 #include "util/debug.h"
-#include "util/mem.h"
 #include "util/port.h"
-#include "util/sys.h"
 #include "util/types.h"
 
 static bool k_shift = false;
@@ -18,45 +13,66 @@ static char scancode_map[128];
 static char scancode_map_shift[128];
 static char scancode_map_alt[128];
 
+static bool extended = false;
+
 void keyboard_init() { set_isr_function(33, keyboard_handler); }
 
 void keyboard_handler(CPUState* frame) {
     (void)frame;
 
+    KeyEvent event;
+
     u8 scan_code = inb(0x60) & 0x7F;
-    u8 press = inb(0x60) & 0x80;
+    u8 pressed = !(inb(0x60) & 0x80);
 
     if (scan_code == 29) {
-        k_ctrl = !press;
+        k_ctrl = pressed;
     } else if (scan_code == 42) {
-        k_shift = !press;
+        k_shift = pressed;
     } else if (scan_code == 56) {
-        k_alt = !press;
+        k_alt = pressed;
     }
 
-    char c;
+    if (scan_code == 96) {
+        extended = true;
+        return;
+    }
 
+    // "parse" the key
     if (k_shift) {
-        c = scancode_map_shift[(u32)scan_code];
+        event.c = scancode_map_shift[(u32)scan_code];
     } else if (k_alt) {
-        c = scancode_map_alt[(u32)scan_code];
+        event.c = scancode_map_alt[(u32)scan_code];
     } else {
-        c = scancode_map[(u32)scan_code];
+        event.c = scancode_map[(u32)scan_code];
     }
 
-    if (!press && k_alt && c == 'd') {
-        gfx_debug(GFX_DEBUG_FONT_FILL);
-    } else if (!press && k_alt && c == 'e') {
-        asm volatile("int $1");
-    } else if (!press && k_alt && c == 'r') {
-        reboot();
-    } else if (!press && k_alt && c == 'm') {
-        memory_print_info();
-    } else if (!press && k_alt && c == 'k') {
-        kmalloc_print_info();
-    } else if (!press && c != 0) {
-        gui_key_input(c);
+    event.special = false;
+    if (extended) {
+        if (scan_code == 72) {
+            event.c = KEYCODE_UP;
+            event.special = true;
+        } else if (scan_code == 75) {
+            event.c = KEYCODE_LEFT;
+            event.special = true;
+        } else if (scan_code == 80) {
+            event.c = KEYCODE_DOWN;
+            event.special = true;
+        } else if (scan_code == 77) {
+            event.c = KEYCODE_RIGHT;
+            event.special = true;
+        }
+        extended = false;
     }
+
+    event.pressed = pressed;
+    event.shift = k_shift;
+    event.ctrl = k_ctrl;
+    event.alt = k_alt;
+    event.extended = extended;
+    event.raw = scan_code;
+
+    gui_key_event(event);
 }
 
 // clang-format off

@@ -40,13 +40,45 @@ void gui_redraw() {
     }
 }
 
-void gui_key_input(char c) {
+void gui_key_event(KeyEvent evt) {
+    // Ignore key release
+    if (!evt.pressed) {
+        return;
+    }
+
+    if (evt.alt) {
+        switch (evt.c) {
+            case 'd':
+                gfx_debug(GFX_DEBUG_FONT_FILL);
+                break;
+            case 'e':
+                asm volatile("int $1");
+                break;
+            case 'r':
+                reboot();
+                break;
+            case 'm':
+                memory_print_info();
+                break;
+            case 'k':
+                kmalloc_print_info();
+                break;
+        }
+        return;
+    }
+
+    if (evt.special) {
+        return;
+    }
+
+    // Update prompt
+    char c = evt.c;
     if (c == '\b') {
         if (gui.prompt_cursor > 0) gui.prompt_cursor--;
         gui.prompt_buffer[gui.prompt_cursor] = 0;
         return;
     } else if (c == '\n') {
-        klog("\n%s", gui.prompt_buffer);
+        klog("%s\n", gui.prompt_buffer);
 
         gui_check_command();
 
