@@ -14,6 +14,7 @@ CC_flags += -nostdlib
 CC_flags += -Wall
 CC_flags += -Wextra
 CC_flags += -I../libmitrix/include
+CC_flags += -I../libc/include
 
 AS_flags=-f elf32
 
@@ -21,13 +22,15 @@ LD_flags =
 LD_flags += -ffreestanding
 LD_flags += -fno-builtin
 LD_flags += -nostdlib
-LD_flags += -L../libmitrix -l:libmitrix.a
+LD_flags += -L../libmitrix -l:libmitrix.a -L../libc -l:libc.a -static-libgcc -lgcc
 
 export
 
 all:
 	mkdir -p bin
 	$(MAKE) -C libmitrix
+	$(MAKE) -C libc
+
 	$(MAKE) -C utest
 	cp utest/*.exe bin/
 
