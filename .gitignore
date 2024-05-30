@@ -5,3 +5,6 @@ mitrix/boot/kernel
 mitrix/boot/ramdisk
 result
 ramdisk/user.exe
+*.a
+*.o
+*.exe

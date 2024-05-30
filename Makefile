@@ -3,6 +3,11 @@ OUT=build
 
 PROVIDED_CC?=i686-elf-gcc
 PROVIDED_AS?=nasm
+PROVIDED_AR?=i686-elf-ar
+
+export PROVIDED_CC
+export PROVIDED_AS
+export PROVIDED_AR
 
 CC=$(PROVIDED_CC)
 CC_flags =
@@ -18,6 +23,9 @@ AS=$(PROVIDED_AS)
 AS_flags=-f elf32 -g
 
 NATIVE_CC=gcc
+
+.PHONY: always
+always:
 
 ################
 # Source files #
@@ -101,7 +109,7 @@ $(OUT)/kernel.o: $(SRC)/kernel/kernel.c
 ###########
 
 RAMDISK=ramdisk
-$(OUT)/$(RAMDISK): $(OUT)/tool_mifs ramdisk/ ramdisk/user.exe
+$(OUT)/$(RAMDISK): $(OUT)/tool_mifs userspace ramdisk/
 	cd ramdisk && ../build/tool_mifs ../$@ ./*
 	# $(OUT)/tool_mifs $@ ./ramdisk/*
 	# dd if=/dev/zero of=$@ bs=10M count=1
@@ -140,6 +148,7 @@ clean:
 	rm -rf $(OUT)/*
 	rm -rf mitrix/boot/kernel
 	rm -rf mitrix/boot/$(RAMDISK)
+	make -C userspace clean
 
 #########
 # tools #
@@ -152,12 +161,9 @@ $(OUT)/tool_mifs: tools/mifs.c
 # userspace code #
 ##################
 
-.PHONY: always
-always:
-
-ramdisk/user.exe: userspace/user.c always
-	$(CC) $(CC_flags) -c $< -o build/user.o
-	$(CC) build/user.o -o $@ -fno-builtin -nostdlib
+userspace: always
+	make -C userspace
+	cp userspace/bin/* ramdisk/
 
 ###################
 # run in emulator #
