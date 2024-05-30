@@ -1,6 +1,7 @@
 #ifndef SYSCALLS_H_
 #define SYSCALLS_H_
 
+#include "syscall_list.h"
 #include "util/types.h"
 
 #define SYSCALLS_COUNT 64

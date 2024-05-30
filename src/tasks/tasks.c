@@ -189,3 +189,7 @@ void task_kill_current() {
     assert(current_task != 0);
     task_kill_index(current_task);
 }
+
+bool tasks_current_task_alive() {
+    return tasks[current_task] != 0;
+}

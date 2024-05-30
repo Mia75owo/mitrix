@@ -36,4 +36,6 @@ void tasks_init();
 void tasks_add_task(Task* task);
 void tasks_schedule();
 
+bool tasks_current_task_alive();
+
 #endif

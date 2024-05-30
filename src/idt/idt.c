@@ -1,6 +1,7 @@
 #include "idt.h"
 
 #include "idt/handlers.h"
+#include "tasks/tasks.h"
 #include "util/debug.h"
 #include "util/mem.h"
 #include "util/port.h"
@@ -105,6 +106,11 @@ void handle_interrupt(CPUState* frame) {
         }
     }
     isr(frame);
+
+    if (!tasks_current_task_alive()) {
+        asm volatile("sti");
+        while(1);
+    }
 }
 
 static char* exception_names[] = {
