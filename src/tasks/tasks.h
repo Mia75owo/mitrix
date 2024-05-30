@@ -20,6 +20,7 @@ typedef struct {
     CPUState* cpustate;
 
     TaskState state;
+    u8* raw_elf;
 
     u8* stack;
 } Task;

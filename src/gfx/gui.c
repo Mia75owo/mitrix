@@ -121,7 +121,7 @@ void gui_key_event(KeyEvent evt) {
 
     // Enter
     if (c == '\n') {
-        klog("%s\n", gui.prompt_buffer);
+        klog("%07%s\n", gui.prompt_buffer);
 
         if (strlen(gui.prompt_buffer) == 0) {
             return;

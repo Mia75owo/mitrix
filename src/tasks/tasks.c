@@ -67,6 +67,7 @@ static void task_create(Task* this, void entrypoint(), bool kernel_task,
 }
 
 void task_kernel_create(Task* this, void entrypoint()) {
+    this->raw_elf = 0;
     task_create(this, entrypoint, true, initial_page_dir);
 }
 
@@ -82,6 +83,7 @@ void task_user_create(Task* this, char* elf_file_name) {
     assert_msg(elf.size >= 52, "ELF file to small");
     elf.raw = kmalloc(elf.size);
     memcpy(elf.raw, file.addr, file.size);
+    this->raw_elf = elf.raw;
 
     u32* page_dir = memory_get_current_page_dir();
     u32* new_page_dir = memory_alloc_page_dir();
@@ -120,6 +122,9 @@ void task_kill(Task* task) {
 
     memory_free_page_dir(task->page_dir);
     kfree(task->stack);
+    if (task->raw_elf) {
+        kfree(task->raw_elf);
+    }
     memset(task, 0, sizeof(Task));
 
     cli_pop();
