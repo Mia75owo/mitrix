@@ -21,21 +21,26 @@ void keyboard_handler(CPUState* frame) {
     (void)frame;
 
     KeyEvent event;
+    event.special = false;
 
     u8 scan_code = inb(0x60) & 0x7F;
     u8 pressed = !(inb(0x60) & 0x80);
 
-    if (scan_code == 29) {
-        k_ctrl = pressed;
-    } else if (scan_code == 42) {
-        k_shift = pressed;
-    } else if (scan_code == 56) {
-        k_alt = pressed;
-    }
-
+    // Some keys get send in two steps
     if (scan_code == 96) {
         extended = true;
         return;
+    }
+
+    if (scan_code == 29) {
+        k_ctrl = pressed;
+        event.special = true;
+    } else if (scan_code == 42) {
+        k_shift = pressed;
+        event.special = true;
+    } else if (scan_code == 56) {
+        k_alt = pressed;
+        event.special = true;
     }
 
     // "parse" the key
@@ -47,7 +52,20 @@ void keyboard_handler(CPUState* frame) {
         event.c = scancode_map[(u32)scan_code];
     }
 
-    event.special = false;
+    if (scan_code == 1) {
+        event.c = KEYCODE_ESCAPE;
+        event.special = true;
+    } else if (scan_code >= 59 && scan_code <= 59 + 10) {
+        event.c = KEYCODE_F1 + (scan_code - 59);
+        event.special = true;
+    } else if (scan_code == 87) {
+        event.c = KEYCODE_F11;
+        event.special = true;
+    } else if (scan_code == 88) {
+        event.c = KEYCODE_F12;
+        event.special = true;
+    }
+
     if (extended) {
         if (scan_code == 72) {
             event.c = KEYCODE_UP;
@@ -60,6 +78,9 @@ void keyboard_handler(CPUState* frame) {
             event.special = true;
         } else if (scan_code == 77) {
             event.c = KEYCODE_RIGHT;
+            event.special = true;
+        } else if (scan_code == 91) {
+            event.c = KEYCODE_MOD;
             event.special = true;
         }
         extended = false;
