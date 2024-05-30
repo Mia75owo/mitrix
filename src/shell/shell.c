@@ -6,6 +6,7 @@
 #include "memory/kmalloc.h"
 #include "memory/memory.h"
 #include "pit/pit.h"
+#include "tasks/task_manager.h"
 #include "util/debug.h"
 #include "util/mem.h"
 #include "util/sys.h"
@@ -217,8 +218,7 @@ void shell_execute_command(const char* command) {
             if (file.addr == 0) {
                 klog("\n%0CFile '%s' not found!", file_name_buffer);
             } else {
-                void (*func)() = (void (*)())file.addr;
-                func();
+                Task* new_task = create_user_task(file_name_buffer);
             }
         } break;
     }
