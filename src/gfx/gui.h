@@ -5,12 +5,16 @@
 #include "util/types.h"
 
 #define GUI_PROMPT_SIZE 256
+#define GUI_PROMPT_HISTORY_SIZE 16
 
 typedef struct {
     u32 width;
     u32 height;
 
     char prompt_buffer[GUI_PROMPT_SIZE];
+    char prompt_history[GUI_PROMPT_HISTORY_SIZE][GUI_PROMPT_SIZE];
+    u32 history_index;
+
     u32 prompt_cursor;
 } GUI;
 
