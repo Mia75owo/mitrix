@@ -1,6 +1,7 @@
 #include "task_manager.h"
 
 #include "memory/memory.h"
+#include "util/debug.h"
 #include "util/mem.h"
 
 static Task tasks[TASKS_COUNT];
@@ -77,4 +78,9 @@ void task_manager_kill_current_task() {
 }
 bool task_manager_current_task_alive() {
     return tasks[current_task].state == TASK_STATE_RUNNING;
+}
+
+Task* task_manager_get_task(u32 task_id) {
+    assert(task_id < TASKS_COUNT);
+    return &tasks[task_id];
 }

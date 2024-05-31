@@ -67,6 +67,8 @@ $(OUT)/pmm.o: $(SRC)/memory/pmm.c
 	$(CC) $(CC_flags) -c $< -o $@
 $(OUT)/kmalloc.o: $(SRC)/memory/kmalloc.c
 	$(CC) $(CC_flags) -c $< -o $@
+$(OUT)/shmem.o: $(SRC)/memory/shmem.c
+	$(CC) $(CC_flags) -c $< -o $@
 
 $(OUT)/gfx.o: $(SRC)/gfx/gfx.c
 	$(CC) $(CC_flags) -c $< -o $@
@@ -121,7 +123,7 @@ $(OUT)/$(RAMDISK): $(OUT)/tool_mifs userspace ramdisk/
 #############
 
 OS=OS.flp
-$(OUT)/$(OS): $(OUT)/boot.o $(OUT)/gdt.o $(OUT)/idt.o $(OUT)/handlers.o $(OUT)/kernel.o $(OUT)/fpu.o $(OUT)/serial.o $(OUT)/mem.o $(OUT)/debug.o $(OUT)/keyboard.o $(OUT)/tests.o $(OUT)/pit.o $(OUT)/sys.o $(OUT)/memory.o $(OUT)/pmm.o $(OUT)/kmalloc.o $(OUT)/gfx.o $(OUT)/vtty.o $(OUT)/gui.o $(OUT)/tty.o $(OUT)/disk.o $(OUT)/mifs.o $(OUT)/tss.o $(OUT)/tasks.o $(OUT)/task_manager.o $(OUT)/shell.o $(OUT)/elf.o $(OUT)/syscalls.o
+$(OUT)/$(OS): $(OUT)/boot.o $(OUT)/gdt.o $(OUT)/idt.o $(OUT)/handlers.o $(OUT)/kernel.o $(OUT)/fpu.o $(OUT)/serial.o $(OUT)/mem.o $(OUT)/debug.o $(OUT)/keyboard.o $(OUT)/tests.o $(OUT)/pit.o $(OUT)/sys.o $(OUT)/memory.o $(OUT)/pmm.o $(OUT)/kmalloc.o $(OUT)/shmem.o $(OUT)/gfx.o $(OUT)/vtty.o $(OUT)/gui.o $(OUT)/tty.o $(OUT)/disk.o $(OUT)/mifs.o $(OUT)/tss.o $(OUT)/tasks.o $(OUT)/task_manager.o $(OUT)/shell.o $(OUT)/elf.o $(OUT)/syscalls.o
 	$(CC) -T $(SRC)/linker.ld -o $@ $^ -ffreestanding -nostdlib -lgcc
 
 ############

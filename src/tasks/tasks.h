@@ -2,6 +2,7 @@
 #define TASKS_H_
 
 #include "idt/idt.h"
+#include "memory/shmem.h"
 #include "util/types.h"
 
 #define TASK_STACK_SIZE 0x1000
@@ -21,6 +22,8 @@ typedef struct {
 
     TaskState state;
     u8* raw_elf;
+
+    SharedMemPool sh_mem_pool;
 
     u8* stack;
 } Task;
