@@ -28,3 +28,23 @@ u32 syscall_get_systime() {
     asm volatile("int $0x80" : "=a"(ret) : "a"(syscall));
     return ret;
 }
+void syscall_read(u32 file_id, u8* buf, u32 len) {
+    u32 ret;
+    u32 syscall = SYSCALL_READ;
+    u32 arg0 = (u32)file_id;
+    u32 arg1 = (u32)buf;
+    u32 arg2 = (u32)len;
+
+    asm volatile("int $0x80" : "=a"(ret) : "a"(syscall), "b"(arg0), "c"(arg1), "d"(arg2));
+    return ret;
+}
+void syscall_write(u32 file_id, u8* buf, u32 len) {
+    u32 ret;
+    u32 syscall = SYSCALL_WRITE;
+    u32 arg0 = (u32)file_id;
+    u32 arg1 = (u32)buf;
+    u32 arg2 = (u32)len;
+
+    asm volatile("int $0x80" : "=a"(ret) : "a"(syscall), "b"(arg0), "c"(arg1), "d"(arg2));
+    return ret;
+}

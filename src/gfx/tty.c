@@ -2,6 +2,7 @@
 
 #include <stdarg.h>
 
+#include "util/debug.h"
 #include "util/mem.h"
 #include "util/types.h"
 
@@ -60,6 +61,12 @@ void tty_putchar(char c, u8 color) {
 
 void tty_puts(char* str, u8 color) {
     while (*str != '\0') tty_putchar(*str++, color);
+}
+
+void tty_putbuf(char* str, u32 len, u8 color) {
+    for (u32 i = 0; i < len; i++) {
+        tty_putchar(str[i], color);
+    }
 }
 
 void tty_printf(const char* format, ...) {

@@ -9,6 +9,7 @@ void tty_scroll(u32 lines);
 void tty_clear();
 void tty_putchar(char c, u8 color);
 void tty_puts(char* str, u8 color);
+void tty_putbuf(char* str, u32 len, u8 color);
 void tty_printf(const char* format, ...);
 void tty_vprintf(const char* format, va_list va);
 void tty_reset();

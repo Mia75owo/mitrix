@@ -1,5 +1,6 @@
 #include "syscalls.h"
 
+#include "gfx/tty.h"
 #include "idt/idt.h"
 #include "pit/pit.h"
 #include "syscalls/syscall_list.h"
@@ -41,6 +42,23 @@ static void syscall_exit() { task_manager_kill_current_task(); }
 static void syscall_print(const char* string) { klog("%s", string); }
 static void syscall_print_char(const char c) { klog("%c", c); }
 static u32 syscall_get_systime() { return pit_get_tics(); }
+static void syscall_read(u32 file_id, u8* buffer, u32 len) { 
+    assert_msg(file_id <= SYSCALL_STDERR_FILE, "SYSCALL_READ: only user io allowed");
+    if (file_id != SYSCALL_STDIN_FILE) {
+        return;
+    }
+
+    // TODO: stdin
+}
+static void syscall_write(u32 file_id, u8* buffer, u32 len) {
+    assert_msg(file_id <= 2, "SYSCALL_READ: only user io allowed");
+
+    if (file_id == SYSCALL_STDOUT_FILE) {
+        tty_putbuf((char*)buffer, len, 0x03);
+    } else if (file_id == SYSCALL_STDERR_FILE) {
+        tty_putbuf((char*)buffer, len, 0x0c);
+    }
+}
 
 void syscalls_init() {
     memset(syscall_handlers, 0, sizeof(syscall_handlers));
@@ -49,6 +67,9 @@ void syscalls_init() {
     syscall_handlers[SYSCALL_PRINT] = syscall_print;
     syscall_handlers[SYSCALL_PRINT_CHAR] = syscall_print_char;
     syscall_handlers[SYSCALL_GET_SYSTIME] = syscall_get_systime;
+
+    syscall_handlers[SYSCALL_READ] = syscall_read;
+    syscall_handlers[SYSCALL_WRITE] = syscall_write;
 
     set_isr_function(0x80, handle_syscall_interrupt);
 }
