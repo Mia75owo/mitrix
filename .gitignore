@@ -1,10 +1,9 @@
 build/*
 compile_commands.json
-.cache
+**/.cache
 mitrix/boot/kernel
 mitrix/boot/ramdisk
 result
-ramdisk/user.exe
-*.a
-*.o
-*.exe
+**/*.a
+**/*.o
+**/*.elf

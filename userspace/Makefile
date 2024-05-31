@@ -33,9 +33,9 @@ all:
 	$(MAKE) -C libc
 
 	$(MAKE) -C utest
-	cp utest/*.exe bin/
+	cp utest/*.elf bin/
 	$(MAKE) -C fib
-	cp fib/*.exe bin/
+	cp fib/*.elf bin/
 
 gen_cc_json:
 	$(MAKE) -C libmitrix gen_cc_json
@@ -44,7 +44,7 @@ gen_cc_json:
 	$(MAKE) -C fib gen_cc_json
 
 clean:
-	rm -f bin/*.exe
+	rm -f bin/*.elf
 	$(MAKE) -C libmitrix clean
 	$(MAKE) -C libc clean
 	$(MAKE) -C utest clean

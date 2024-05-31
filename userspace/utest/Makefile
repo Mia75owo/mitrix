@@ -1,5 +1,5 @@
 OBJ = $(patsubst %.c, %.o, $(wildcard *.c))
-EXE = utest.exe
+EXE = utest.elf
 
 all: $(EXE)
 

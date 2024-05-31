@@ -1,5 +1,5 @@
 OBJ = $(patsubst %.c, %.o, $(wildcard *.c))
-EXE = fib.exe
+EXE = fib.elf
 
 all: $(EXE)
 
