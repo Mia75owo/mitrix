@@ -141,6 +141,7 @@ $(OUT)/mitrix.iso: $(OUT)/$(OS) $(OUT)/$(RAMDISK)
 
 gen_cc_json: clean
 	bear -- make $(OUT)/$(OS)
+	make -C userspace gen_cc_json
 
 #########################
 # clean compile outputs #

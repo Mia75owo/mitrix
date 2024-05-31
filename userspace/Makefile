@@ -8,6 +8,7 @@ LD=$(PROVIDED_CC)
 AR=$(PROVIDED_AR)
 
 CC_flags =
+CC_flags += -std=gnu11
 CC_flags += -ffreestanding
 CC_flags += -fno-builtin
 CC_flags += -nostdlib
@@ -33,11 +34,18 @@ all:
 
 	$(MAKE) -C utest
 	cp utest/*.exe bin/
+	$(MAKE) -C fib
+	cp fib/*.exe bin/
 
 gen_cc_json:
 	$(MAKE) -C libmitrix gen_cc_json
+	$(MAKE) -C libc gen_cc_json
 	$(MAKE) -C utest gen_cc_json
+	$(MAKE) -C fib gen_cc_json
 
 clean:
-	$(MAKE) -C utest clean
 	rm -f bin/*.exe
+	$(MAKE) -C libmitrix clean
+	$(MAKE) -C libc clean
+	$(MAKE) -C utest clean
+	$(MAKE) -C fib clean
