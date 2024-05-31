@@ -1,5 +1,6 @@
 #include "syscalls.h"
 
+#include "gfx/gui.h"
 #include "gfx/tty.h"
 #include "idt/idt.h"
 #include "pit/pit.h"
@@ -7,6 +8,7 @@
 #include "tasks/task_manager.h"
 #include "util/debug.h"
 #include "util/mem.h"
+#include "util/sys.h"
 
 void* syscall_handlers[SYSCALLS_COUNT];
 
@@ -42,15 +44,24 @@ static void syscall_exit() { task_manager_kill_current_task(); }
 static void syscall_print(const char* string) { klog("%s", string); }
 static void syscall_print_char(const char c) { klog("%c", c); }
 static u32 syscall_get_systime() { return pit_get_tics(); }
-static void syscall_read(u32 file_id, u8* buffer, u32 len) { 
+static u32 syscall_read(u32 file_id, u8* buffer, u32 len) { 
     assert_msg(file_id <= SYSCALL_STDERR_FILE, "SYSCALL_READ: only user io allowed");
     if (file_id != SYSCALL_STDIN_FILE) {
-        return;
+        return 0;
     }
-
     // TODO: stdin
+    asm volatile("sti");
+    char* user_input = gui_get_user_input(len);
+
+    if (len <= GUI_PROMPT_SIZE) {
+        memcpy(buffer, user_input, len);
+        return len;
+    } else {
+        memcpy(buffer, user_input, GUI_PROMPT_SIZE);
+        return GUI_PROMPT_SIZE;
+    }
 }
-static void syscall_write(u32 file_id, u8* buffer, u32 len) {
+static u32 syscall_write(u32 file_id, u8* buffer, u32 len) {
     assert_msg(file_id <= 2, "SYSCALL_READ: only user io allowed");
 
     if (file_id == SYSCALL_STDOUT_FILE) {
@@ -58,6 +69,8 @@ static void syscall_write(u32 file_id, u8* buffer, u32 len) {
     } else if (file_id == SYSCALL_STDERR_FILE) {
         tty_putbuf((char*)buffer, len, 0x0c);
     }
+
+    return len;
 }
 
 void syscalls_init() {
