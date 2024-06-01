@@ -96,7 +96,7 @@ void* shmem_map(u32 object_id, u32 task_id) {
         pool = &task->shmem_pool;
     }
 
-    SharedMemHandle* handle = insert_into_pool(pool, task_id);
+    SharedMemHandle* handle = insert_into_pool(pool, object_id);
     assert(handle);
 
     bool map_to_kernel = task_id == 0;
