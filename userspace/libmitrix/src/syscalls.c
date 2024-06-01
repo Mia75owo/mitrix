@@ -67,3 +67,10 @@ void syscall_request_screen() {
 
     asm volatile("int $0x80" : "=a"(ret) : "a"(syscall));
 }
+void* syscall_create_events_buf() {
+    u32 ret;
+    u32 syscall = SYSCALL_CREATE_EVENTS_BUF;
+
+    asm volatile("int $0x80" : "=a"(ret) : "a"(syscall));
+    return (void*)ret;
+}

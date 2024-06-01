@@ -3,6 +3,7 @@
 #include "gfx/gui.h"
 #include "util/port.h"
 #include "util/types.h"
+#include "events/events.h"
 
 static bool k_shift = false;
 static bool k_ctrl = false;
@@ -92,6 +93,7 @@ void keyboard_handler(CPUState* frame) {
     event.extended = extended;
     event.raw = scan_code;
 
+    events_key_event(event);
     gui_key_event(event);
 }
 

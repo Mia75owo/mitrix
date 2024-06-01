@@ -6,7 +6,7 @@ CC_flags += -I include
 all: libgfx.a
 
 libgfx.a: $(OBJ)
-	$(AR) rcs $@ $<
+	$(AR) rcs $@ $^
 
 %.o: %.c
 	$(CC) -c $< -o $@ $(CC_flags)

@@ -1,5 +1,6 @@
 #include "syscalls.h"
 
+#include "events/events.h"
 #include "gfx/gfx.h"
 #include "gfx/gui.h"
 #include "gfx/tty.h"
@@ -43,7 +44,7 @@ static void handle_syscall_interrupt(CPUState* frame) {
     frame->eax = ret;
 }
 
-static void syscall_exit() { 
+static void syscall_exit() {
     u32 task_id = task_manager_get_current_task_id();
     shmem_destroy_owned_by(task_id);
 
@@ -137,6 +138,29 @@ static void syscall_request_screen() {
     Task* gui_task = task_manager_get_task(1);
     gui_task->state = TASK_STATE_IDLE;
 }
+void* syscall_create_events_buf() {
+    Task* task = task_manager_get_current_task();
+    u32 task_id = task_manager_get_current_task_id();
+
+    if (task->shmem_events_obj != -1) {
+        shmem_unmap(task_id, task->shmem_events_obj);
+        shmem_destroy(task->shmem_events_obj);
+    }
+
+    u32 object_id = shmem_create(sizeof(EventBuffer), task_id);
+    task->shmem_events_obj = task_id;
+
+    void* kernel_vaddr = shmem_map(object_id, 0);
+    klog("%x\n", (u64)kernel_vaddr);
+    ((u32*)kernel_vaddr)[0] = 1;
+
+    assert(kernel_vaddr);
+    events_add_receiver(kernel_vaddr);
+
+    void* user_vaddr = shmem_map(object_id, task_id);
+    assert(user_vaddr);
+    return user_vaddr;
+}
 
 void syscalls_init() {
     memset(syscall_handlers, 0, sizeof(syscall_handlers));
@@ -149,6 +173,8 @@ void syscalls_init() {
     syscall_handlers[SYSCALL_CREATE_FB] = syscall_create_fb;
     syscall_handlers[SYSCALL_DRAW_FB] = syscall_draw_fb;
     syscall_handlers[SYSCALL_REQUEST_SCREEN] = syscall_request_screen;
+
+    syscall_handlers[SYSCALL_CREATE_EVENTS_BUF] = syscall_create_events_buf;
 
     syscall_handlers[SYSCALL_READ] = syscall_read;
     syscall_handlers[SYSCALL_WRITE] = syscall_write;

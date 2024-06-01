@@ -13,5 +13,6 @@ u32 syscall_write(u32 file_id, u8* buf, u32 len);
 u8* syscall_create_fb();
 void syscall_draw_fb();
 void syscall_request_screen();
+void* syscall_create_events_buf();
 
 #endif

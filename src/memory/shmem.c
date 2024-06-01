@@ -100,12 +100,9 @@ void* shmem_map(u32 object_id, u32 task_id) {
     assert(handle);
 
     bool map_to_kernel = task_id == 0;
-    u32* prev_pd = NULL;
-    if (!map_to_kernel) {
-        prev_pd = memory_get_current_page_dir();
-        u32* new_pd = task_manager_get_task(task_id)->page_dir;
-        memory_change_page_dir(new_pd);
-    }
+    u32* prev_pd = memory_get_current_page_dir();
+    u32* new_pd = task_manager_get_task(task_id)->page_dir;
+    memory_change_page_dir(new_pd);
 
     for (u32 i = 0; i < obj->num_pages; i++) {
         u32 flags = PTE_READ_WRITE;
@@ -115,9 +112,7 @@ void* shmem_map(u32 object_id, u32 task_id) {
                         flags);
     }
 
-    if (!map_to_kernel) {
-        memory_change_page_dir(prev_pd);
-    }
+    memory_change_page_dir(prev_pd);
 
     assert(handle->vaddr);
     cli_pop();

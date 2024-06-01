@@ -11,7 +11,7 @@ CC_flags += -I include
 all: libmitrix.a
 
 libmitrix.a: $(OBJ)
-	$(AR) rcs $@ $<
+	$(AR) rcs $@ $^
 
 %.o: %.c
 	$(CC) -c $< -o $@ $(CC_flags)

@@ -25,6 +25,7 @@ typedef struct {
 
     SharedMemPool shmem_pool;
     i32 shmem_fb_obj;
+    i32 shmem_events_obj;
 
     u8* stack;
 } Task;
