@@ -21,7 +21,8 @@ void gfx_init(gfx_info info) {
 
     for (u32 i = 0; i < needed_page_count; i++) {
         u32 offset = i * 0x1000;
-        memory_map_page((u32)(KERNEL_GFX + offset), ((u32)gfx.addr) + offset, 0);
+        memory_map_page((u32)(KERNEL_GFX + offset), ((u32)gfx.addr) + offset,
+                        0);
     }
 
     FilePtr font_file = mifs_file("kernelfont.raw");
@@ -74,7 +75,6 @@ void gfx_char(u32 x, u32 y, unsigned char c, Color fg, Color bg) {
 
     for (u32 i = 0; i < 16; i++) {
         for (u32 j = 0; j < 16; j++) {
-
             if (font[j * 256 + i + offset] == 0xFF) {
                 if ((bg >> 24) != 0x00) {
                     screen[(j + y) * gfx.width + (i + x)] = bg;
@@ -84,6 +84,10 @@ void gfx_char(u32 x, u32 y, unsigned char c, Color fg, Color bg) {
             }
         }
     }
+}
+
+void gfx_clone(u32* addr) {
+    memcpy(screen, addr, gfx.width * gfx.height * sizeof(u32));
 }
 
 void gfx_logo() {
@@ -117,11 +121,13 @@ void gfx_debug(GFX_DEBUG_TYPE kind) {
         gfx_rect(20, 60, 100, 100, 0x0000FF);
     } else if (kind == GFX_DEBUG_FONT_SINGLE) {
         for (int i = 0; i < 255; i++) {
-            gfx_char(i * 16, (i * 16 / gfx.width) * 16, i, 0xFFFFFFFF, 0xFFFF0000);
+            gfx_char(i * 16, (i * 16 / gfx.width) * 16, i, 0xFFFFFFFF,
+                     0xFFFF0000);
         }
     } else if (kind == GFX_DEBUG_FONT_FILL) {
         for (int i = 0; i < 1750; i++) {
-            gfx_char(i * 16, (i * 16 / gfx.width) * 16, i, 0xFFFFFFFF, 0xFFFF0000);
+            gfx_char(i * 16, (i * 16 / gfx.width) * 16, i, 0xFFFFFFFF,
+                     0xFFFF0000);
         }
     }
 }

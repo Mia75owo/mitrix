@@ -22,6 +22,7 @@ void gfx_pixel(u32 x, u32 y, Color color);
 void gfx_rect(u32 x, u32 y, u32 width, u32 height, Color color);
 void gfx_box(u32 x, u32 y, u32 width, u32 height, u32 border, Color color);
 void gfx_char(u32 x, u32 y, unsigned char c, Color fg, Color bg);
+void gfx_clone(u32* addr);
 void gfx_logo();
 
 typedef enum {
