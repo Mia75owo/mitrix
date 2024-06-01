@@ -10,7 +10,7 @@ static u32 big_allocation_size(u32 chunk);
 static void big_allocation_remove(u32 chunk);
 static void big_allocation_add(u32 chunk, u32 length);
 
-#define EXACT_ALLOC_SIZE (1024 * 128)
+#define EXACT_ALLOC_SIZE (1024 * 512)
 
 #define BUDDY64_RAW_SIZE (EXACT_ALLOC_SIZE / 64 / 32)
 #define BUDDY512_RAW_SIZE (EXACT_ALLOC_SIZE / 512 / 32)
@@ -104,7 +104,7 @@ u8* kmalloc(u32 size) {
         i32 found_index = 0;
 
         for (u32 i = 0; i < BUDDY4096_RAW_SIZE; i++) {
-            if (buddy4096[i] == 0xFFFFFFFF) break;
+            if (buddy4096[i] == 0xFFFFFFFF) continue;
 
             for (u32 j = 0; j < 32; j++) {
                 if (BITMAP_GET(buddy4096, i * 32 + j) == 0) {
