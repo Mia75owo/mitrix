@@ -151,9 +151,6 @@ EventBuffer* syscall_create_events_buf() {
     task->shmem_events_obj = task_id;
 
     void* kernel_vaddr = shmem_map(object_id, 0);
-    klog("%x\n", (u64)kernel_vaddr);
-    ((u32*)kernel_vaddr)[0] = 1;
-
     assert(kernel_vaddr);
     events_add_receiver(kernel_vaddr);
 

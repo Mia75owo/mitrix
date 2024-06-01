@@ -82,7 +82,6 @@ void kernel_main(u32 magic, struct multiboot_info* boot_info) {
 
     Task* gui_task = create_kernel_task(gui_loop);
     gui_task->state = TASK_STATE_RUNNING;
-    Task* user_task = create_user_task("utest.elf");
 
     asm volatile("sti");
     spin_halt();

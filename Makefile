@@ -11,6 +11,7 @@ export PROVIDED_AR
 
 CC=$(PROVIDED_CC)
 CC_flags =
+CC_flags += -O3
 CC_flags += -ffreestanding
 CC_flags += -fno-builtin
 CC_flags += -nostdlib
@@ -26,6 +27,7 @@ NATIVE_CC=gcc
 
 .PHONY: always
 always:
+	mkdir -p build
 
 ################
 # Source files #

@@ -1,6 +1,6 @@
 # You can override the CC_flags and C compiler externally,
 # e.g. make PLATFORM=cortex-m3
-CC_flags += -Wall -I include
+CC_flags += -Wall -I include -O3
 
 # With this, the makefile should work on Windows also.
 ifdef windir

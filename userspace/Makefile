@@ -37,6 +37,8 @@ all:
 	cp utest/*.elf bin/
 	$(MAKE) -C fib
 	cp fib/*.elf bin/
+	$(MAKE) -C flappy
+	cp flappy/*.elf bin/
 
 gen_cc_json:
 	$(MAKE) -C libmitrix gen_cc_json
@@ -44,6 +46,7 @@ gen_cc_json:
 	$(MAKE) -C libgfx gen_cc_json
 	$(MAKE) -C utest gen_cc_json
 	$(MAKE) -C fib gen_cc_json
+	$(MAKE) -C flappy gen_cc_json
 
 clean:
 	rm -f bin/*.elf
@@ -52,3 +55,4 @@ clean:
 	$(MAKE) -C libgfx clean
 	$(MAKE) -C utest clean
 	$(MAKE) -C fib clean
+	$(MAKE) -C flappy clean
