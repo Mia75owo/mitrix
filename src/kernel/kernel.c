@@ -66,6 +66,7 @@ void kernel_main(u32 magic, struct multiboot_info* boot_info) {
     // gfx_debug(GFX_DEBUG_FONT_FILL);
 
     kinit(syscalls_init(), "Syscalls");
+    kinit(shmem_init(), "SharedMem");
 
     /*debug_tests();*/
 
@@ -77,10 +78,11 @@ void kernel_main(u32 magic, struct multiboot_info* boot_info) {
 
     gui_init(gfx_data.width, gfx_data.height);
 
+    u32 mem = shmem_create(0x1000, 0);
+    shmem_map(mem, 0);
+
     Task* gui_task = create_kernel_task(gui_loop);
     gui_task->state = TASK_STATE_RUNNING;
-    // Task* user_task = create_user_task("user.exe");
-    // user_task->state = TASK_STATE_RUNNING;
 
     asm volatile("sti");
     spin_halt();

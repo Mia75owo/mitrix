@@ -24,4 +24,10 @@ typedef struct {
 
 void shmem_init();
 
+u32 shmem_create(u32 size, u32 owner_task_index);
+void shmem_destroy(u32 slot);
+
+void* shmem_map(u32 object_id, u32 task_id);
+void shmem_unmap(u32 id, u32 task_id);
+
 #endif

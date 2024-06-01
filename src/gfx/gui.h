@@ -22,11 +22,14 @@ typedef struct {
     u32 user_input_wanted_len;
     u32 user_input_cursor;
     char user_input[GUI_PROMPT_SIZE];
+
+    bool entire_redraw;
 } GUI;
 
 void gui_init_early_tty();
 void gui_init(u32 width, u32 height);
 void gui_redraw();
+void gui_trigger_entire_redraw();
 
 void gui_key_event(KeyEvent evt);
 

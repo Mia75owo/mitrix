@@ -84,3 +84,17 @@ Task* task_manager_get_task(u32 task_id) {
     assert(task_id < TASKS_COUNT);
     return &tasks[task_id];
 }
+i32 task_manager_get_task_id(Task* task) {
+    for (u32 i = 0; i < TASKS_COUNT; i++) {
+        if (&tasks[i] == task) {
+            return i;
+        }
+    }
+    return -1;
+}
+Task* task_manager_get_current_task() {
+    return task_manager_get_task(current_task);
+}
+u32 task_manager_get_current_task_id() {
+    return current_task;
+}

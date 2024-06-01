@@ -23,7 +23,8 @@ typedef struct {
     TaskState state;
     u8* raw_elf;
 
-    SharedMemPool sh_mem_pool;
+    SharedMemPool shmem_pool;
+    i32 shmem_fb_obj;
 
     u8* stack;
 } Task;

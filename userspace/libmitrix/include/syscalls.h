@@ -10,5 +10,8 @@ void syscall_print_char(const char c);
 u32 syscall_get_systime();
 u32 syscall_read(u32 file_id, u8* buf, u32 len);
 u32 syscall_write(u32 file_id, u8* buf, u32 len);
+u8* syscall_create_fb();
+void syscall_draw_fb();
+void syscall_request_screen();
 
 #endif

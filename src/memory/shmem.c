@@ -14,6 +14,7 @@ static SharedMemPool kernel_shpool;
 void shmem_init() {
     memset(&shared_mem_objects, 0, sizeof(shared_mem_objects));
     memset(&kernel_shpool, 0, sizeof(kernel_shpool));
+    kernel_shpool.vaddr_start = KERNEL_SHARED_MEM;
 }
 
 static i32 find_available_obj_slot() {
@@ -53,13 +54,13 @@ void shmem_destroy(u32 slot) {
     memset(obj, 0, sizeof(SharedMemObject));
 }
 
-static SharedMemHandle* insert_into_pool(SharedMemPool* pool, u32 num_pages,
-                                         u32 object_id) {
+static SharedMemHandle* insert_into_pool(SharedMemPool* pool, u32 object_id) {
     assert(pool);
     assert(pool->num_handles < MAX_SHARED_MEM_HANDLES);
 
     SharedMemHandle* handle = &pool->handles[pool->num_handles];
     handle->shared_mem_object_index = object_id;
+    handle->vaddr = pool->vaddr_start;
 
     if (pool->num_handles > 0) {
         SharedMemHandle* prev = &pool->handles[pool->num_handles - 1];
@@ -92,10 +93,10 @@ void* shmem_map(u32 object_id, u32 task_id) {
         pool = &kernel_shpool;
     } else {
         Task* task = task_manager_get_task(task_id);
-        pool = &task->sh_mem_pool;
+        pool = &task->shmem_pool;
     }
 
-    SharedMemHandle* handle = insert_into_pool(pool, obj->num_pages, task_id);
+    SharedMemHandle* handle = insert_into_pool(pool, task_id);
     assert(handle);
 
     bool map_to_kernel = task_id == 0;
@@ -118,6 +119,7 @@ void* shmem_map(u32 object_id, u32 task_id) {
         memory_change_page_dir(prev_pd);
     }
 
+    assert(handle->vaddr);
     cli_pop();
     return (void*)handle->vaddr;
 }
@@ -130,7 +132,7 @@ void shmem_unmap(u32 id, u32 task_id) {
         pool = &kernel_shpool;
     } else {
         Task* task = task_manager_get_task(task_id);
-        pool = &task->sh_mem_pool;
+        pool = &task->shmem_pool;
     }
 
     assert(pool);

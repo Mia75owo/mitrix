@@ -64,6 +64,13 @@ static void task_create(Task* this, void entrypoint(), bool kernel_task,
     this->page_dir = pagedir;
     this->kesp0 = (u32)kesp0;
     this->kesp = (u32)kesp;
+
+    if (kernel_task) {
+        this->shmem_pool.vaddr_start = KERNEL_SHARED_MEM;
+    } else {
+        this->shmem_pool.vaddr_start = USER_SHARED_MEM;
+    }
+    this->shmem_fb_obj = -1;
 }
 
 void task_kernel_create(Task* this, void entrypoint()) {

@@ -25,13 +25,18 @@ void gui_init(u32 width, u32 height) {
     gui.history_index = 0;
     gui.getting_user_input = false;
     gui.user_input_ready = false;
+    gui.entire_redraw = true;
     memset(gui.prompt_buffer, 0, GUI_PROMPT_SIZE);
     memset(gui.prompt_history, 0, sizeof(gui.prompt_history));
 
     shell_init();
 }
 void gui_redraw() {
-    if (tty_should_redraw()) {
+    if (gui.entire_redraw) {
+        gfx_fill(0xFF000000);
+        vtty_render();
+        gui.entire_redraw = false;
+    } else if (tty_should_redraw()) {
         vtty_render();
     }
     vtty_render_last_line(tty_redraw_last_from());
@@ -58,13 +63,12 @@ void gui_redraw() {
     }
 
     if (pit_get_tics() % 1000 > 500) {
-        gfx_rect(10 + cursor_pos * 16, gui.height - 28, 2, 16,
-                 0xFFFFFFFF);
+        gfx_rect(10 + cursor_pos * 16, gui.height - 28, 2, 16, 0xFFFFFFFF);
     } else {
-        gfx_rect(10 + cursor_pos * 16, gui.height - 28, 2, 16,
-                 0xFF57FF57);
+        gfx_rect(10 + cursor_pos * 16, gui.height - 28, 2, 16, 0xFF57FF57);
     }
 }
+void gui_trigger_entire_redraw() { gui.entire_redraw = true; }
 
 void gui_key_event(KeyEvent evt) {
     // Ignore key release
