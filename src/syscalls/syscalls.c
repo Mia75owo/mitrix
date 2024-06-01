@@ -90,7 +90,7 @@ static u32 syscall_write(u32 file_id, u8* buffer, u32 len) {
 
     return len;
 }
-static u8* syscall_create_fb() {
+static u32* syscall_create_fb() {
     u32 task_id = task_manager_get_current_task_id();
 
     // TODO: make the size dynamic
@@ -101,7 +101,7 @@ static u8* syscall_create_fb() {
     Task* task = task_manager_get_task(task_id);
     task->shmem_fb_obj = object_id;
 
-    return addr;
+    return (u32*)addr;
 }
 static void syscall_draw_fb() {
     Task* task = task_manager_get_current_task();
@@ -138,7 +138,7 @@ static void syscall_request_screen() {
     Task* gui_task = task_manager_get_task(1);
     gui_task->state = TASK_STATE_IDLE;
 }
-void* syscall_create_events_buf() {
+EventBuffer* syscall_create_events_buf() {
     Task* task = task_manager_get_current_task();
     u32 task_id = task_manager_get_current_task_id();
 

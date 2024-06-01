@@ -48,7 +48,7 @@ u32 syscall_write(u32 file_id, u8* buf, u32 len) {
     asm volatile("int $0x80" : "=a"(ret) : "a"(syscall), "b"(arg0), "c"(arg1), "d"(arg2));
     return ret;
 }
-u8* syscall_create_fb() {
+u32* syscall_create_fb() {
     u32 ret;
     u32 syscall = SYSCALL_CREATE_FB;
 
@@ -67,7 +67,7 @@ void syscall_request_screen() {
 
     asm volatile("int $0x80" : "=a"(ret) : "a"(syscall));
 }
-void* syscall_create_events_buf() {
+EventBuffer* syscall_create_events_buf() {
     u32 ret;
     u32 syscall = SYSCALL_CREATE_EVENTS_BUF;
 

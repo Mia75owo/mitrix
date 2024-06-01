@@ -4,14 +4,7 @@
 #include "gfx.h"
 
 int _start() {
-    // char buf[256];
-
-    // fgets(buf, 256, stdin);
-    // i32 foo = 0;
-    // sscanf(buf, "%d", &foo);
-    // printf("owo: %d\n", foo);
-
-    u32* addr = (u32*)syscall_create_fb();
+    u32* addr = syscall_create_fb();
     printf("fb_addr: %x\n", addr);
     GfxInfo gfx_info;
     gfx_info.width = 800;
@@ -21,7 +14,7 @@ int _start() {
     gfx_info.addr = addr;
     gfx_init(gfx_info);
 
-    void* events_buf = syscall_create_events_buf();
+    EventBuffer* events_buf = syscall_create_events_buf();
     printf("events_buf: %x\n", events_buf);
 
     events_init(events_buf);
