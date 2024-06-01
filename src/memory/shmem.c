@@ -166,3 +166,11 @@ void shmem_unmap(u32 id, u32 task_id) {
 
     remove_from_pool(pool, pool_index);
 }
+
+void shmem_destroy_owned_by(u32 task_id) {
+    for (u32 i = 0; i < MAX_SHARED_MEM_OBJS; i++) {
+        if (shared_mem_objects[i].owner_task_index == task_id) {
+            shmem_destroy(i);
+        }
+    }
+}

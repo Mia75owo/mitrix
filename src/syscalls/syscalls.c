@@ -45,6 +45,7 @@ static void handle_syscall_interrupt(CPUState* frame) {
 
 static void syscall_exit() { 
     u32 task_id = task_manager_get_current_task_id();
+    shmem_destroy_owned_by(task_id);
 
     if (currently_drawing_task == (i32)task_id) {
         currently_drawing_task = -1;

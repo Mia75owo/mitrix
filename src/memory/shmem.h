@@ -30,4 +30,6 @@ void shmem_destroy(u32 slot);
 void* shmem_map(u32 object_id, u32 task_id);
 void shmem_unmap(u32 id, u32 task_id);
 
+void shmem_destroy_owned_by(u32 task_id);
+
 #endif
