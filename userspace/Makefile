@@ -31,6 +31,7 @@ all:
 	mkdir -p bin
 	$(MAKE) -C libmitrix
 	$(MAKE) -C libc
+	$(MAKE) -C libgfx
 
 	$(MAKE) -C utest
 	cp utest/*.elf bin/
@@ -40,6 +41,7 @@ all:
 gen_cc_json:
 	$(MAKE) -C libmitrix gen_cc_json
 	$(MAKE) -C libc gen_cc_json
+	$(MAKE) -C libgfx gen_cc_json
 	$(MAKE) -C utest gen_cc_json
 	$(MAKE) -C fib gen_cc_json
 
@@ -47,5 +49,6 @@ clean:
 	rm -f bin/*.elf
 	$(MAKE) -C libmitrix clean
 	$(MAKE) -C libc clean
+	$(MAKE) -C libgfx clean
 	$(MAKE) -C utest clean
 	$(MAKE) -C fib clean

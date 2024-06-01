@@ -1,5 +1,6 @@
 #include "stdio.h"
 #include "syscalls.h"
+#include "gfx.h"
 
 int _start() {
     // char buf[256];
@@ -11,12 +12,17 @@ int _start() {
 
     u32* addr = (u32*)syscall_create_fb();
     printf("fb_addr: %x\n", addr);
+    GfxInfo gfx_info;
+    gfx_info.width = 800;
+    gfx_info.height = 600;
+    gfx_info.bpp = 8;
+    gfx_info.pitch = 0;
+    gfx_info.addr = addr;
+    gfx_init(gfx_info);
 
     syscall_request_screen();
 
-    for (u32 i = 0; i < 600 * 800; i++) {
-        addr[i] = 0xFFFFFFFF;
-    }
+    gfx_fill(0xFFFF0000);
     for (u32 i = 0; i < 20; i++) {
         syscall_draw_fb();
     }
