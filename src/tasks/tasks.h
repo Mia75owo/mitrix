@@ -27,6 +27,9 @@ typedef struct {
     i32 shmem_fb_obj;
     i32 shmem_events_obj;
 
+    u32 heap_start;
+    u32 heap_end;
+    u32* physical_heap_pages;
     u8* stack;
 } Task;
 

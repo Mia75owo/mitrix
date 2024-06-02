@@ -2,6 +2,7 @@
 #include "syscalls.h"
 #include "events.h"
 #include "gfx.h"
+#include "stdlib.h"
 
 int _start() {
     u32* addr = syscall_create_fb();
@@ -47,6 +48,25 @@ int _start() {
     
         syscall_draw_fb();
     }
+
+    syscall_set_heap_size(0x1000 * 2);
+    printf("start: %x\n", syscall_get_heap_start());
+    printf("end: %x\n", syscall_get_heap_end());
+
+    void* heap_start = syscall_get_heap_start();
+    add_malloc_block(heap_start, 0x1000 * 2);
+
+    void* a = malloc(64);
+    void* b = malloc(64);
+    void* c = malloc(64);
+
+    printf("%x\n", a);
+    printf("%x\n", b);
+    printf("%x\n", c);
+
+    free(a);
+    free(b);
+    free(c);
 
     syscall_exit();
 

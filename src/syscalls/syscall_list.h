@@ -19,6 +19,10 @@
 
 #define SYSCALL_READ              0xA
 #define SYSCALL_WRITE             0xB
+
+#define SYSCALL_GET_HEAP_START    0xC
+#define SYSCALL_GET_HEAP_END      0xD
+#define SYSCALL_SET_HEAP_SIZE     0xE
 // clang-format on
 
 #endif

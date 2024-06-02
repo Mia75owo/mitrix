@@ -8,6 +8,7 @@ extern u32 initial_page_dir[1024];
 // clang-format off
 #define USER_STACK_PAGES  16
 
+#define USER_HEAP_START   0x20000000
 #define USER_STACK_BOTTOM 0xB0000000
 #define USER_SHARED_MEM   0xB0000000
 

@@ -8,6 +8,7 @@
 #include "pit/pit.h"
 #include "syscalls/syscall_list.h"
 #include "tasks/task_manager.h"
+#include "userheap/userheap.h"
 #include "util/debug.h"
 #include "util/mem.h"
 
@@ -45,6 +46,7 @@ static void handle_syscall_interrupt(CPUState* frame) {
 }
 
 static void syscall_exit() {
+    Task* task = task_manager_get_current_task();
     u32 task_id = task_manager_get_current_task_id();
     shmem_destroy_owned_by(task_id);
 
@@ -55,6 +57,9 @@ static void syscall_exit() {
         gui_task->state = TASK_STATE_RUNNING;
         gui_trigger_entire_redraw();
     }
+
+    // Free userheap
+    userheap_set_size(task, 0);
 
     task_manager_kill_current_task();
 }
@@ -159,6 +164,19 @@ EventBuffer* syscall_create_events_buf() {
     return user_vaddr;
 }
 
+void* syscall_get_heap_start() {
+    Task* task = task_manager_get_current_task();
+    return (void*)task->heap_start;
+}
+void* syscall_get_heap_end() {
+    Task* task = task_manager_get_current_task();
+    return (void*)task->heap_end;
+}
+void syscall_set_heap_size(u32 size) {
+    Task* task = task_manager_get_current_task();
+    userheap_set_size(task, size);
+}
+
 void syscalls_init() {
     memset(syscall_handlers, 0, sizeof(syscall_handlers));
 
@@ -175,6 +193,10 @@ void syscalls_init() {
 
     syscall_handlers[SYSCALL_READ] = syscall_read;
     syscall_handlers[SYSCALL_WRITE] = syscall_write;
+
+    syscall_handlers[SYSCALL_GET_HEAP_START] = syscall_get_heap_start;
+    syscall_handlers[SYSCALL_GET_HEAP_END] = syscall_get_heap_end;
+    syscall_handlers[SYSCALL_SET_HEAP_SIZE] = syscall_set_heap_size;
 
     set_isr_function(0x80, handle_syscall_interrupt);
 }

@@ -1,5 +1,6 @@
-#include "types.h"
 #include "syscalls.h"
+
+#include "types.h"
 
 void syscall_exit() {
     u32 ret;
@@ -35,7 +36,9 @@ u32 syscall_read(u32 file_id, u8* buf, u32 len) {
     u32 arg1 = (u32)buf;
     u32 arg2 = (u32)len;
 
-    asm volatile("int $0x80" : "=a"(ret) : "a"(syscall), "b"(arg0), "c"(arg1), "d"(arg2));
+    asm volatile("int $0x80"
+                 : "=a"(ret)
+                 : "a"(syscall), "b"(arg0), "c"(arg1), "d"(arg2));
     return ret;
 }
 u32 syscall_write(u32 file_id, u8* buf, u32 len) {
@@ -45,7 +48,9 @@ u32 syscall_write(u32 file_id, u8* buf, u32 len) {
     u32 arg1 = (u32)buf;
     u32 arg2 = (u32)len;
 
-    asm volatile("int $0x80" : "=a"(ret) : "a"(syscall), "b"(arg0), "c"(arg1), "d"(arg2));
+    asm volatile("int $0x80"
+                 : "=a"(ret)
+                 : "a"(syscall), "b"(arg0), "c"(arg1), "d"(arg2));
     return ret;
 }
 u32* syscall_create_fb() {
@@ -73,4 +78,25 @@ EventBuffer* syscall_create_events_buf() {
 
     asm volatile("int $0x80" : "=a"(ret) : "a"(syscall));
     return (void*)ret;
+}
+void* syscall_get_heap_start() {
+    u32 ret;
+    u32 syscall = SYSCALL_GET_HEAP_START;
+
+    asm volatile("int $0x80" : "=a"(ret) : "a"(syscall));
+    return (void*)ret;
+}
+void* syscall_get_heap_end() {
+    u32 ret;
+    u32 syscall = SYSCALL_GET_HEAP_END;
+
+    asm volatile("int $0x80" : "=a"(ret) : "a"(syscall));
+    return (void*)ret;
+}
+void syscall_set_heap_size(u32 size) {
+    u32 ret;
+    u32 syscall = SYSCALL_SET_HEAP_SIZE;
+    u32 arg0 = size;
+
+    asm volatile("int $0x80" : "=a"(ret) : "a"(syscall), "b"(arg0));
 }

@@ -6,6 +6,7 @@
 #include "memory/memory.h"
 #include "memory/pmm.h"
 #include "tasks/tss.h"
+#include "userheap/userheap.h"
 #include "util/debug.h"
 #include "util/mem.h"
 #include "util/sys.h"
@@ -69,9 +70,11 @@ static void task_create(Task* this, void entrypoint(), bool kernel_task,
         this->shmem_pool.vaddr_start = KERNEL_SHARED_MEM;
     } else {
         this->shmem_pool.vaddr_start = USER_SHARED_MEM;
+        userheap_init(this);
     }
     this->shmem_fb_obj = -1;
     this->shmem_events_obj = -1;
+    this->physical_heap_pages = NULL;
 }
 
 void task_kernel_create(Task* this, void entrypoint()) {
