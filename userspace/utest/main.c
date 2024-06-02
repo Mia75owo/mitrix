@@ -68,6 +68,21 @@ int _start() {
     free(b);
     free(c);
 
+    u32 file_id = syscall_file_open("TESTFILE");
+    printf("ID: %i\n", file_id);
+    printf("offset: %i\n", syscall_get_file_offset(file_id));
+    printf("size: %i\n", syscall_get_file_size(file_id));
+
+    char buf[16];
+    syscall_read(file_id, (u8*)buf, 16);
+    printf("content: %s\n", buf);
+
+    syscall_set_file_offset(file_id, 1);
+    syscall_read(file_id, (u8*)buf, 16);
+    printf("content: %s\n", buf);
+
+    syscall_file_close(file_id);
+
     syscall_exit();
 
     return 0;
