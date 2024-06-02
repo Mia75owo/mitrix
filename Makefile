@@ -12,6 +12,7 @@ export PROVIDED_AR
 CC=$(PROVIDED_CC)
 CC_flags =
 CC_flags += -O3
+# CC_flags += -flto
 CC_flags += -ffreestanding
 CC_flags += -fno-builtin
 CC_flags += -nostdlib

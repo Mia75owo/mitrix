@@ -4,6 +4,39 @@
 #include "gfx.h"
 #include "stdlib.h"
 
+#define CUBE_SIZE 50
+#define CUBE_NUM 1000
+
+typedef struct {
+    i32 x;
+    i32 y;
+    u32 vx;
+    u32 vy;
+} Cube;
+
+static inline void move_cube(Cube* cube) {
+    cube->x += cube->vx;
+    cube->y += cube->vy;
+
+    if (cube->x + CUBE_SIZE >= 800) {
+        cube->x = 800 - CUBE_SIZE;
+        cube->vx = -cube->vx;
+    }
+    if (cube->x <= 0) {
+        cube->x = 0;
+        cube->vx = -cube->vx;
+    }
+
+    if (cube->y + CUBE_SIZE >= 600) {
+        cube->y = 600 - CUBE_SIZE;
+        cube->vy = -cube->vy;
+    }
+    if (cube->y <= 0) {
+        cube->y = 0;
+        cube->vy = -cube->vy;
+    }
+}
+
 int _start() {
     u32* addr = syscall_create_fb(800, 600);
     printf("fb_addr: %x\n", addr);
@@ -15,6 +48,7 @@ int _start() {
     gfx_info.addr = addr;
     gfx_init(gfx_info);
 
+    /*
     EventBuffer* events_buf = syscall_create_events_buf();
     printf("events_buf: %x\n", events_buf);
 
@@ -82,6 +116,31 @@ int _start() {
     printf("content: %s\n", buf);
 
     syscall_file_close(file_id);
+    */
+
+    Cube cubes[CUBE_NUM];
+
+    for (u32 i = 0; i < CUBE_NUM; i++) {
+        cubes[i].x = 0;
+        cubes[i].y = 0;
+        cubes[i].vx = 10;
+        cubes[i].vy = 10;
+
+        for (u32 j = 0; j < i; j++) {
+            move_cube(&cubes[i]);
+        }
+    }
+
+    syscall_request_screen();
+
+    while(true) {
+        gfx_fill(0xFF000000);
+        for (u32 i = 0; i < CUBE_NUM; i++) {
+            gfx_rect(cubes[i].x, cubes[i].y, CUBE_SIZE, CUBE_SIZE, 0xFFFF0000);
+            move_cube(&cubes[i]);
+        }
+        syscall_draw_fb(800, 600);
+    }
 
     syscall_exit();
 

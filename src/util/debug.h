@@ -1,6 +1,7 @@
 #ifndef DEBUG_H_
 #define DEBUG_H_
 
+#include "config.h"
 #include "util/types.h"
 
 #define STRINGIZE_DETAIL(x) #x
@@ -8,6 +9,8 @@
 
 void klog(char* format, ...);
 void kpanic(const char* format, ...);
+
+#ifdef DEBUG
 
 #define assert(x)                                                     \
     if (!(x)) {                                                       \
@@ -18,5 +21,11 @@ void kpanic(const char* format, ...);
         kpanic("%s:%s assert failed: %s", __FILE__, \
                STRINGIZE(__LINE__), (msg));         \
     }
+#else
+
+#define assert(x)
+#define assert_msg(x, msg)
+
+#endif
 
 #endif

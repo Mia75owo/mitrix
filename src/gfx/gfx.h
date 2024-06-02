@@ -3,8 +3,6 @@
 
 #include "util/types.h"
 
-extern bool gfx_ready;
-
 typedef u32 Color;
 
 typedef struct {

@@ -83,6 +83,11 @@ void kernel_main(u32 magic, struct multiboot_info* boot_info) {
     Task* gui_task = create_kernel_task(gui_loop);
     gui_task->state = TASK_STATE_RUNNING;
 
+    // Set the kernel task to idle as it will just spin_halt()
+    // wasting CPU time
+    Task* kernel_task = task_manager_get_task(0);
+    kernel_task->state = TASK_STATE_IDLE;
+
     asm volatile("sti");
     spin_halt();
 }

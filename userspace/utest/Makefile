@@ -2,6 +2,7 @@ OBJ = $(patsubst %.c, %.o, $(wildcard *.c))
 EXE = utest.elf
 
 CC_flags += -I../libgfx/include
+CC_flags += -O3
 LD_flags += -L../libgfx -l:libgfx.a
 
 all: $(EXE)

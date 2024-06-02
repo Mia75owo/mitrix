@@ -71,7 +71,7 @@ static u32 syscall_get_systime() { return pit_get_tics(); }
 static u32 syscall_read(u32 file_id, u8* buffer, u32 len) {
     Task* task = task_manager_get_current_task();
 
-    if (file_id == SYSCALL_STDIN_FILE)  {
+    if (file_id == SYSCALL_STDIN_FILE) {
         asm volatile("sti");
         char* user_input = gui_get_user_input(len);
 
@@ -86,8 +86,10 @@ static u32 syscall_read(u32 file_id, u8* buffer, u32 len) {
         assert(file_id >= 10);
         u32 file_index = file_id - 10;
         assert(task->files[file_index].addr);
-        
-        memcpy(buffer, task->files[file_index].addr + task->files[file_index].offset, len);
+
+        memcpy(buffer,
+               task->files[file_index].addr + task->files[file_index].offset,
+               len);
         return len;
     }
 }
@@ -112,7 +114,8 @@ static u32 syscall_write(u32 file_id, u8* buffer, u32 len) {
     u32 file_index = file_id - 10;
     assert(task->files[file_index].addr);
 
-    memcpy(task->files[file_id].addr + task->files[file_id].offset, buffer, len);
+    memcpy(task->files[file_id].addr + task->files[file_id].offset, buffer,
+           len);
     return len;
 }
 static u32* syscall_create_fb(u32 width, u32 height) {
@@ -128,6 +131,10 @@ static u32* syscall_create_fb(u32 width, u32 height) {
 
     return (u32*)addr;
 }
+u32 last_tick = 0xFFFFFFFF;
+u32 frames = 0;
+u32 seconds = 0;
+
 static void syscall_draw_fb(u32 width, u32 height) {
     Task* task = task_manager_get_current_task();
     i32 object_id = task->shmem_fb_obj;
@@ -142,8 +149,19 @@ static void syscall_draw_fb(u32 width, u32 height) {
         currently_mapped_fb_addr = shmem_map(object_id, 0);
     }
 
-    gfx_clone((800 - width) / 2, (600 - height) / 2, width, height, (u32*)currently_mapped_fb_addr);
-    klog("DRAW: %n\n", (u64)pit_get_tics());
+    // Enable interrupts during this copying, to not block timer interrupts
+    asm volatile("sti");
+    gfx_clone((800 - width) / 2, (600 - height) / 2, width, height,
+              (u32*)currently_mapped_fb_addr);
+
+    u32 time = pit_get_tics();
+    u32 dt = time - last_tick;
+    frames++;
+    seconds = (time / 1000) + 1;
+    serial_printf("DRAW time: %n -> (fps %n) -> (tick %n) -> (average %n)\n",
+                  (u64)dt, (u64)(1000.f / (float)dt), (u64)time,
+                  (u64)(frames / seconds));
+    last_tick = time;
 }
 static void syscall_request_screen() {
     Task* task = task_manager_get_current_task();

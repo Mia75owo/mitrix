@@ -32,7 +32,9 @@ static u32 tasks_choose_next() {
 
     for (u32 i = 0; i < TASKS_COUNT; i++) {
         index++;
-        index %= TASKS_COUNT;
+        if (index >= TASKS_COUNT) {
+            index = 0;
+        }
 
         if (tasks[index].state == TASK_STATE_RUNNING) {
             return index;
@@ -43,7 +45,8 @@ static u32 tasks_choose_next() {
 }
 
 void task_manager_schedule() {
-    i32 index = tasks_choose_next();
+    u32 index = tasks_choose_next();
+    if (current_task == (u32)index) return;
 
     Task* old = &tasks[current_task];
     Task* new = &tasks[index];
@@ -95,6 +98,4 @@ i32 task_manager_get_task_id(Task* task) {
 Task* task_manager_get_current_task() {
     return task_manager_get_task(current_task);
 }
-u32 task_manager_get_current_task_id() {
-    return current_task;
-}
+u32 task_manager_get_current_task_id() { return current_task; }
