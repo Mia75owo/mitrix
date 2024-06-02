@@ -7,6 +7,7 @@
 #include "gfx/tty.h"
 #include "idt/idt.h"
 #include "pit/pit.h"
+#include "serial/serial.h"
 #include "syscalls/syscall_list.h"
 #include "tasks/task_manager.h"
 #include "userheap/userheap.h"
@@ -68,32 +69,50 @@ static void syscall_print(const char* string) { klog("%s", string); }
 static void syscall_print_char(const char c) { klog("%c", c); }
 static u32 syscall_get_systime() { return pit_get_tics(); }
 static u32 syscall_read(u32 file_id, u8* buffer, u32 len) {
-    assert_msg(file_id <= SYSCALL_STDERR_FILE,
-               "SYSCALL_READ: only user io allowed");
-    if (file_id != SYSCALL_STDIN_FILE) {
-        return 0;
-    }
-    // TODO: stdin
-    asm volatile("sti");
-    char* user_input = gui_get_user_input(len);
+    Task* task = task_manager_get_current_task();
 
-    if (len <= GUI_PROMPT_SIZE) {
-        memcpy(buffer, user_input, len);
-        return len;
+    if (file_id == SYSCALL_STDIN_FILE)  {
+        asm volatile("sti");
+        char* user_input = gui_get_user_input(len);
+
+        if (len <= GUI_PROMPT_SIZE) {
+            memcpy(buffer, user_input, len);
+            return len;
+        } else {
+            memcpy(buffer, user_input, GUI_PROMPT_SIZE);
+            return GUI_PROMPT_SIZE;
+        }
     } else {
-        memcpy(buffer, user_input, GUI_PROMPT_SIZE);
-        return GUI_PROMPT_SIZE;
+        assert(file_id >= 10);
+        u32 file_index = file_id - 10;
+        assert(task->files[file_index].addr);
+        
+        memcpy(buffer, task->files[file_index].addr + task->files[file_index].offset, len);
+        return len;
     }
 }
 static u32 syscall_write(u32 file_id, u8* buffer, u32 len) {
-    assert_msg(file_id <= 2, "SYSCALL_READ: only user io allowed");
+    Task* task = task_manager_get_current_task();
 
     if (file_id == SYSCALL_STDOUT_FILE) {
         tty_putbuf((char*)buffer, len, 0x03);
+        for (u32 i = 0; i < len; i++) {
+            serial_putchar(buffer[i]);
+        }
+        return len;
     } else if (file_id == SYSCALL_STDERR_FILE) {
         tty_putbuf((char*)buffer, len, 0x0c);
+        for (u32 i = 0; i < len; i++) {
+            serial_putchar(buffer[i]);
+        }
+        return len;
     }
 
+    assert(file_id >= 10);
+    u32 file_index = file_id - 10;
+    assert(task->files[file_index].addr);
+
+    memcpy(task->files[file_id].addr + task->files[file_id].offset, buffer, len);
     return len;
 }
 static u32* syscall_create_fb() {
