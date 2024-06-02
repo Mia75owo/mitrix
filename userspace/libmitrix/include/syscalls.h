@@ -20,5 +20,8 @@ void syscall_file_close(u32 file_id);
 void* syscall_get_heap_start();
 void* syscall_get_heap_end();
 void syscall_set_heap_size(u32 size);
+u32 syscall_get_file_offset(u32 file_id);
+void syscall_set_file_offset(u32 file_id, u32 offset);
+u32 syscall_get_file_size(u32 file_id);
 
 #endif

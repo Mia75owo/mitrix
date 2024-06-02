@@ -26,6 +26,10 @@
 #define SYSCALL_GET_HEAP_START    0xC
 #define SYSCALL_GET_HEAP_END      0xD
 #define SYSCALL_SET_HEAP_SIZE     0xE
+
+#define SYSCALL_GET_FILE_OFFSET   0xF
+#define SYSCALL_SET_FILE_OFFSET   0x10
+#define SYSCALL_GET_FILE_SIZE     0x11
 // clang-format on
 
 #endif

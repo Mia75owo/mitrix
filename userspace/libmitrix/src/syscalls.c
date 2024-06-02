@@ -115,3 +115,27 @@ void syscall_set_heap_size(u32 size) {
 
     asm volatile("int $0x80" : "=a"(ret) : "a"(syscall), "b"(arg0));
 }
+u32 syscall_get_file_offset(u32 file_id) {
+    u32 ret;
+    u32 syscall = SYSCALL_GET_FILE_OFFSET;
+    u32 arg0 = file_id;
+
+    asm volatile("int $0x80" : "=a"(ret) : "a"(syscall), "b"(arg0));
+    return ret;
+}
+void syscall_set_file_offset(u32 file_id, u32 offset) {
+    u32 ret;
+    u32 syscall = SYSCALL_SET_FILE_OFFSET;
+    u32 arg0 = file_id;
+    u32 arg1 = offset;
+
+    asm volatile("int $0x80" : "=a"(ret) : "a"(syscall), "b"(arg0), "c"(arg1));
+}
+u32 syscall_get_file_size(u32 file_id) {
+    u32 ret;
+    u32 syscall = SYSCALL_GET_FILE_SIZE;
+    u32 arg0 = file_id;
+
+    asm volatile("int $0x80" : "=a"(ret) : "a"(syscall), "b"(arg0));
+    return ret;
+}

@@ -208,6 +208,35 @@ void syscall_set_heap_size(u32 size) {
     Task* task = task_manager_get_current_task();
     userheap_set_size(task, size);
 }
+u32 syscall_get_file_offset(u32 file_id) {
+    if (file_id == 0) return 0;
+    assert(file_id >= 10);
+    u32 file_index = file_id - 10;
+
+    Task* task = task_manager_get_current_task();
+    assert(task->files[file_index].addr);
+
+    return task->files[file_index].offset;
+}
+void syscall_set_file_offset(u32 file_id, u32 offset) {
+    assert(file_id >= 10);
+    u32 file_index = file_id - 10;
+
+    Task* task = task_manager_get_current_task();
+    assert(task->files[file_index].addr);
+
+    task->files[file_index].offset = offset;
+}
+u32 syscall_get_file_size(u32 file_id) {
+    if (file_id == 0) return 0;
+    assert(file_id >= 10);
+    u32 file_index = file_id - 10;
+
+    Task* task = task_manager_get_current_task();
+    assert(task->files[file_index].addr);
+
+    return task->files[file_index].size;
+}
 
 void syscalls_init() {
     memset(syscall_handlers, 0, sizeof(syscall_handlers));
@@ -232,6 +261,10 @@ void syscalls_init() {
     syscall_handlers[SYSCALL_GET_HEAP_START] = syscall_get_heap_start;
     syscall_handlers[SYSCALL_GET_HEAP_END] = syscall_get_heap_end;
     syscall_handlers[SYSCALL_SET_HEAP_SIZE] = syscall_set_heap_size;
+
+    syscall_handlers[SYSCALL_GET_FILE_OFFSET] = syscall_get_file_offset;
+    syscall_handlers[SYSCALL_SET_FILE_OFFSET] = syscall_set_file_offset;
+    syscall_handlers[SYSCALL_GET_FILE_SIZE] = syscall_get_file_size;
 
     set_isr_function(0x80, handle_syscall_interrupt);
 }
