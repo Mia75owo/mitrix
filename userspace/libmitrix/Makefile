@@ -1,6 +1,7 @@
 OBJ = $(patsubst %.c, %.o, $(wildcard src/*.c))
 
 CC_flags =
+CC_flags += -O3
 CC_flags += -ffreestanding
 CC_flags += -fno-builtin
 CC_flags += -nostdlib

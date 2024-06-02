@@ -19,12 +19,9 @@ int _start() {
 
     char* argv[] = {"doom", "-iwad", "doom1.wad"};
 
-    printf("DOOM create\n");
     doomgeneric_Create(3, (char**)argv);
-    printf("DOOM create done\n");
 
     while(true) {
-        printf("DOOM tick\n");
         doomgeneric_Tick();
     }
 
@@ -33,7 +30,7 @@ int _start() {
 }
 
 void DG_Init() {
-    frame_buffer = syscall_create_fb();
+    frame_buffer = syscall_create_fb(640, 400);
     event_buffer = syscall_create_events_buf();
 
     events_init(event_buffer);
@@ -42,7 +39,7 @@ void DG_Init() {
 
 void DG_DrawFrame() {
     DG_ScreenBuffer = frame_buffer;
-    syscall_draw_fb();
+    syscall_draw_fb(640, 400);
 }
 void DG_SleepMs(uint32_t ms) {}
 uint32_t DG_GetTicksMs() { return syscall_get_systime(); }

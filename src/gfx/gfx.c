@@ -86,8 +86,12 @@ void gfx_char(u32 x, u32 y, unsigned char c, Color fg, Color bg) {
     }
 }
 
-void gfx_clone(u32* addr) {
-    memcpy(screen, addr, gfx.width * gfx.height * sizeof(u32));
+void gfx_clone(u32 x, u32 y, u32 width, u32 height, u32* source) {
+    for (u32 i = 0; i < width; i++) {
+        for (u32 j = 0; j < height; j++) {
+            screen[(j + y) * gfx.width + (i + x)] = source[j * width + i];
+        }
+    }
 }
 
 void gfx_logo() {

@@ -5,7 +5,7 @@
 #include "stdlib.h"
 
 int _start() {
-    u32* addr = syscall_create_fb();
+    u32* addr = syscall_create_fb(800, 600);
     printf("fb_addr: %x\n", addr);
     GfxInfo gfx_info;
     gfx_info.width = 800;
@@ -26,7 +26,7 @@ int _start() {
 
     gfx_fill(0xFFFF0000);
     gfx_rect(pos, 0, 100, 100, 0xFF00FF00);
-    syscall_draw_fb();
+    syscall_draw_fb(800, 600);
 
     while (true) {
         if (!events_has_event()) continue;
@@ -46,7 +46,7 @@ int _start() {
         gfx_fill(0xFFFF0000);
         gfx_rect(pos, 0, 100, 100, 0xFF00FF00);
     
-        syscall_draw_fb();
+        syscall_draw_fb(800, 600);
     }
 
     syscall_set_heap_size(0x1000 * 2);

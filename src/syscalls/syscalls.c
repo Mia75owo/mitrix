@@ -115,11 +115,11 @@ static u32 syscall_write(u32 file_id, u8* buffer, u32 len) {
     memcpy(task->files[file_id].addr + task->files[file_id].offset, buffer, len);
     return len;
 }
-static u32* syscall_create_fb() {
+static u32* syscall_create_fb(u32 width, u32 height) {
     u32 task_id = task_manager_get_current_task_id();
 
     // TODO: make the size dynamic
-    u32 object_id = shmem_create(800 * 600 * sizeof(u32), task_id);
+    u32 object_id = shmem_create(width * height * sizeof(u32), task_id);
     u8* addr = shmem_map(object_id, task_id);
     assert(addr);
 
@@ -128,7 +128,7 @@ static u32* syscall_create_fb() {
 
     return (u32*)addr;
 }
-static void syscall_draw_fb() {
+static void syscall_draw_fb(u32 width, u32 height) {
     Task* task = task_manager_get_current_task();
     i32 object_id = task->shmem_fb_obj;
     if (object_id == -1) {
@@ -142,8 +142,8 @@ static void syscall_draw_fb() {
         currently_mapped_fb_addr = shmem_map(object_id, 0);
     }
 
-    klog("render %n\n", pit_get_tics());
-    gfx_clone((u32*)currently_mapped_fb_addr);
+    gfx_clone((800 - width) / 2, (600 - height) / 2, width, height, (u32*)currently_mapped_fb_addr);
+    klog("DRAW: %n\n", (u64)pit_get_tics());
 }
 static void syscall_request_screen() {
     Task* task = task_manager_get_current_task();
