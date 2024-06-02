@@ -17,6 +17,9 @@
 
 #define SYSCALL_CREATE_EVENTS_BUF 0x7
 
+#define SYSCALL_FILE_OPEN         0x8
+#define SYSCALL_FILE_CLOSE        0x9
+
 #define SYSCALL_READ              0xA
 #define SYSCALL_WRITE             0xB
 

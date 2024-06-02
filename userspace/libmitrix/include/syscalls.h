@@ -15,6 +15,8 @@ u32* syscall_create_fb();
 void syscall_draw_fb();
 void syscall_request_screen();
 EventBuffer* syscall_create_events_buf();
+u32 syscall_file_open(char* file_name);
+void syscall_file_close(u32 file_id);
 void* syscall_get_heap_start();
 void* syscall_get_heap_end();
 void syscall_set_heap_size(u32 size);

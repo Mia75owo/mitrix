@@ -6,12 +6,19 @@
 #include "util/types.h"
 
 #define TASK_STACK_SIZE 0x1000
+#define TASK_MAX_FILES 16
 
 typedef enum {
     TASK_STATE_DEAD,
     TASK_STATE_IDLE,
     TASK_STATE_RUNNING,
 } TaskState;
+
+typedef struct {
+    u8* addr;
+    u32 offset;
+    u32 size;
+} TaskOpenFile;
 
 typedef struct {
     u32 kesp;   // esp
@@ -27,9 +34,11 @@ typedef struct {
     i32 shmem_fb_obj;
     i32 shmem_events_obj;
 
+    TaskOpenFile files[TASK_MAX_FILES];
     u32 heap_start;
     u32 heap_end;
     u32* physical_heap_pages;
+
     u8* stack;
 } Task;
 

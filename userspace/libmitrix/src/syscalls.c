@@ -79,6 +79,21 @@ EventBuffer* syscall_create_events_buf() {
     asm volatile("int $0x80" : "=a"(ret) : "a"(syscall));
     return (void*)ret;
 }
+u32 syscall_file_open(char* file_name) {
+    u32 ret;
+    u32 syscall = SYSCALL_FILE_OPEN;
+    u32 arg0 = (u32)file_name;
+
+    asm volatile("int $0x80" : "=a"(ret) : "a"(syscall), "b"(arg0));
+    return ret;
+}
+void syscall_file_close(u32 file_id) {
+    u32 ret;
+    u32 syscall = SYSCALL_FILE_CLOSE;
+    u32 arg0 = file_id;
+
+    asm volatile("int $0x80" : "=a"(ret) : "a"(syscall), "b"(arg0));
+}
 void* syscall_get_heap_start() {
     u32 ret;
     u32 syscall = SYSCALL_GET_HEAP_START;

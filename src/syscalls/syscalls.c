@@ -1,5 +1,6 @@
 #include "syscalls.h"
 
+#include "disk/mifs.h"
 #include "events/events.h"
 #include "gfx/gfx.h"
 #include "gfx/gui.h"
@@ -164,6 +165,37 @@ EventBuffer* syscall_create_events_buf() {
     return user_vaddr;
 }
 
+u32 syscall_file_open(char* file_name) {
+    Task* task = task_manager_get_current_task();
+
+    i32 file_index = -1;
+    for (u32 i = 0; i < TASK_MAX_FILES; i++) {
+        if (task->files[i].addr == 0) {
+            file_index = i;
+            break;
+        }
+    }
+    assert(file_index >= 0);
+
+    FilePtr file = mifs_file(file_name);
+    if (file.addr == 0) {
+        return 0;
+    }
+
+    task->files[file_index].addr = file.addr;
+    task->files[file_index].offset = 0;
+    task->files[file_index].size = file.size;
+    return file_index + 10;
+}
+void syscall_file_close(u32 file_id) {
+    if (file_id == 0) return;
+
+    assert(file_id >= 10);
+    u32 file_index = file_id - 10;
+
+    Task* task = task_manager_get_current_task();
+    task->files[file_index].addr = 0;
+}
 void* syscall_get_heap_start() {
     Task* task = task_manager_get_current_task();
     return (void*)task->heap_start;
@@ -190,6 +222,9 @@ void syscalls_init() {
     syscall_handlers[SYSCALL_REQUEST_SCREEN] = syscall_request_screen;
 
     syscall_handlers[SYSCALL_CREATE_EVENTS_BUF] = syscall_create_events_buf;
+
+    syscall_handlers[SYSCALL_FILE_OPEN] = syscall_file_open;
+    syscall_handlers[SYSCALL_FILE_CLOSE] = syscall_file_close;
 
     syscall_handlers[SYSCALL_READ] = syscall_read;
     syscall_handlers[SYSCALL_WRITE] = syscall_write;
