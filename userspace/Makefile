@@ -39,6 +39,8 @@ all:
 	cp fib/*.elf bin/
 	$(MAKE) -C flappy
 	cp flappy/*.elf bin/
+	$(MAKE) -C doomgeneric
+	cp doomgeneric/*.elf bin/
 
 gen_cc_json:
 	$(MAKE) -C libmitrix gen_cc_json
@@ -47,6 +49,7 @@ gen_cc_json:
 	$(MAKE) -C utest gen_cc_json
 	$(MAKE) -C fib gen_cc_json
 	$(MAKE) -C flappy gen_cc_json
+	$(MAKE) -C doomgeneric gen_cc_json
 
 clean:
 	rm -f bin/*.elf
@@ -56,3 +59,4 @@ clean:
 	$(MAKE) -C utest clean
 	$(MAKE) -C fib clean
 	$(MAKE) -C flappy clean
+	$(MAKE) -C doomgeneric clean
