@@ -1,9 +1,10 @@
 #include "doomgeneric.h"
-#include "stdio.h"
+#include "doomkeys.h"
+#include "events.h"
 #include "stdint.h"
+#include "stdio.h"
 #include "stdlib.h"
 #include "syscalls.h"
-#include "events.h"
 
 #undef FEATURE_DEHACKED
 
@@ -21,7 +22,7 @@ int _start() {
 
     doomgeneric_Create(3, (char**)argv);
 
-    while(true) {
+    while (true) {
         doomgeneric_Tick();
     }
 
@@ -41,7 +42,69 @@ void DG_DrawFrame() {
     DG_ScreenBuffer = frame_buffer;
     syscall_draw_fb(640, 400);
 }
-void DG_SleepMs(uint32_t ms) {}
+void DG_SleepMs(uint32_t ms) {
+    u32 start = syscall_get_systime();
+    while (syscall_get_systime() - start < ms) {
+    }
+}
 uint32_t DG_GetTicksMs() { return syscall_get_systime(); }
-int DG_GetKey(int* pressed, unsigned char* doomKey) {}
-void DG_SetWindowTitle(const char* tile) {}
+
+static u8 to_doom_key(KeyEvent evt) {
+    if (evt.special) {
+        switch (evt.c) {
+            case KEYCODE_UP:
+                return KEY_UPARROW;
+            case KEYCODE_LEFT:
+                return KEY_LEFTARROW;
+            case KEYCODE_DOWN:
+                return KEY_DOWNARROW;
+            case KEYCODE_RIGHT:
+                return KEY_RIGHTARROW;
+            case KEYCODE_ESCAPE:
+                return KEY_ESCAPE;
+        }
+    } else {
+        switch (evt.c) {
+            case 'w':
+                return KEY_UPARROW;
+            case 'a':
+                return KEY_STRAFE_L;
+            case 's':
+                return KEY_DOWNARROW;
+            case 'd':
+                return KEY_STRAFE_R;
+
+            case 'j':
+                return KEY_LEFTARROW;
+            case 'k':
+                return KEY_USE;
+            case 'l':
+                return KEY_RIGHTARROW;
+            case ' ':
+                return KEY_FIRE;
+            case 'u':
+                return KEY_USE;
+            case '\n':
+                return KEY_ENTER;
+        }
+    }
+
+    return evt.c;
+}
+
+int DG_GetKey(int* pressed, unsigned char* doomKey) {
+    if (!events_has_event()) return 0;
+
+    KeyEvent evt = events_pull();
+
+    while (events_has_event()) {
+        events_pull();
+    }
+
+    *pressed = evt.pressed;
+    *doomKey = to_doom_key(evt);
+
+    return 1;
+}
+
+void DG_SetWindowTitle(const char* title) { (void)title; }

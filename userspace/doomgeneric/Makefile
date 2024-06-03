@@ -15,5 +15,8 @@ $(EXE): $(OBJ)
 %.o: %.c
 	$(CC) -c $< -o $@ $(CC_flags)
 
+gen_cc_json: clean
+	bear -- make all
+
 clean:
 	rm -f doomgeneric/*.o $(EXE)
