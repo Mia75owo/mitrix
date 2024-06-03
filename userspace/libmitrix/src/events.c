@@ -4,16 +4,20 @@ static EventBuffer* buf;
 
 void events_init(EventBuffer* buffer) {
     buf = buffer;
-    buf->count = 0;
+    buf->read_index = MAX_EVENTS - 1;
+    buf->write_index = MAX_EVENTS - 1;
 }
 bool events_has_event() {
-    return buf->count > 0;
+    return buf->read_index != buf->write_index;
 }
 KeyEvent events_pull() {
-    if (buf->count == 0) {
+    if (!events_has_event()) {
         return (KeyEvent){0};
     }
 
-    buf->count--;
-    return buf->events[buf->count];
+    buf->read_index++;
+    if (buf->read_index >= MAX_EVENTS - 1) {
+        buf->read_index = 0;
+    }
+    return buf->events[buf->read_index];
 }

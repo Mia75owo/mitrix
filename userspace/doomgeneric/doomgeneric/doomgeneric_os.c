@@ -97,10 +97,6 @@ int DG_GetKey(int* pressed, unsigned char* doomKey) {
 
     KeyEvent evt = events_pull();
 
-    while (events_has_event()) {
-        events_pull();
-    }
-
     *pressed = evt.pressed;
     *doomKey = to_doom_key(evt);
 

@@ -21,9 +21,12 @@ void events_key_event(KeyEvent evt) {
         if (receivers[i].buf == 0) continue;
 
         EventBuffer* buf = (EventBuffer*)receivers[i].buf;
-        if (buf->count >= MAX_EVENTS) continue;
+        buf->write_index++;
+        if (buf->write_index >= MAX_EVENTS) {
+            buf->write_index = 0;
+        }
 
-        buf->events[buf->count++] = evt;
+        buf->events[buf->write_index] = evt;
     }
 }
 

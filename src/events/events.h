@@ -12,7 +12,8 @@ typedef struct {
 } EventReceiver;
 
 typedef struct {
-    u32 count;
+    u32 read_index;
+    u32 write_index;
     KeyEvent events[MAX_EVENTS];
 } EventBuffer;
 
