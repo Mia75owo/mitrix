@@ -54,6 +54,7 @@ static void syscall_exit() {
 
     if (currently_drawing_task == (i32)task_id) {
         currently_drawing_task = -1;
+        currently_mapped_fb = -1;
         // Enable GUI render loop
         Task* gui_task = task_manager_get_task(1);
         gui_task->state = TASK_STATE_RUNNING;

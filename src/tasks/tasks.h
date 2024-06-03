@@ -37,7 +37,6 @@ typedef struct {
     TaskOpenFile files[TASK_MAX_FILES];
     u32 heap_start;
     u32 heap_end;
-    u32* physical_heap_pages;
 
     u8* stack;
 } Task;
