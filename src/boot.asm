@@ -20,8 +20,10 @@ dd 0, 0, 0, 0, 0
 
 ; graphics
 dd 0
-dd 800     ; x-size
-dd 600     ; y-size
+; dd 800     ; x-size
+dd 1280    ; x-size
+; dd 600     ; y-size
+dd 800     ; y-size
 dd 32      ; depth
 
 ; ===============================================

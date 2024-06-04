@@ -1,11 +1,12 @@
 #include "vtty.h"
 
-#include "gfx/tty.h"
+#include "config.h"
 #include "gfx/gfx.h"
+#include "gfx/tty.h"
 #include "util/mem.h"
 
-#define WIDTH 50
-#define HEIGHT 35
+#define WIDTH (SCREEN_X / 16)
+#define HEIGHT (SCREEN_Y / 16 - 3)
 
 static u16 screen[WIDTH * HEIGHT];
 // clang-format off
@@ -44,7 +45,8 @@ void vtty_render() {
             char fg = col & 0xF;
             char bg = (col >> 4) & 0xF;
 
-            gfx_char(x * 16, y * 16, c, color_map[(u32)fg], color_map[(u32)bg] | 0xFF000000);
+            gfx_char(x * 16, y * 16, c, color_map[(u32)fg],
+                     color_map[(u32)bg] | 0xFF000000);
         }
     }
 }
@@ -58,6 +60,7 @@ void vtty_render_last_line(u32 from) {
         char fg = col & 0xF;
         char bg = (col >> 4) & 0xF;
 
-        gfx_char(x * 16, (HEIGHT - 1) * 16, c, color_map[(u32)fg], color_map[(u32)bg] | 0xFF000000);
+        gfx_char(x * 16, (HEIGHT - 1) * 16, c, color_map[(u32)fg],
+                 color_map[(u32)bg] | 0xFF000000);
     }
 }

@@ -152,7 +152,7 @@ static void syscall_draw_fb(u32 width, u32 height) {
 
     // Enable interrupts during this copying, to not block timer interrupts
     asm volatile("sti");
-    gfx_clone((800 - width) / 2, (600 - height) / 2, width, height,
+    gfx_clone((SCREEN_X - width) / 2, (SCREEN_Y - height) / 2, width, height,
               (u32*)currently_mapped_fb_addr);
 
     u32 time = pit_get_tics();
