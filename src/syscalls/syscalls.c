@@ -276,6 +276,9 @@ u32 syscall_get_file_size(u32 file_id) {
     return task->files[file_index].size;
 }
 
+u32 syscall_get_screen_size_x() { return SCREEN_X; }
+u32 syscall_get_screen_size_y() { return SCREEN_Y; }
+
 void syscalls_init() {
     memset(syscall_handlers, 0, sizeof(syscall_handlers));
 
@@ -303,6 +306,9 @@ void syscalls_init() {
     syscall_handlers[SYSCALL_GET_FILE_OFFSET] = syscall_get_file_offset;
     syscall_handlers[SYSCALL_SET_FILE_OFFSET] = syscall_set_file_offset;
     syscall_handlers[SYSCALL_GET_FILE_SIZE] = syscall_get_file_size;
+
+    syscall_handlers[SYSCALL_GET_SCREEN_SIZE_X] = syscall_get_screen_size_x;
+    syscall_handlers[SYSCALL_GET_SCREEN_SIZE_Y] = syscall_get_screen_size_y;
 
     set_isr_function(0x80, handle_syscall_interrupt);
 }

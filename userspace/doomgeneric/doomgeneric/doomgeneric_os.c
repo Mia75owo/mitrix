@@ -13,10 +13,17 @@
 u32* frame_buffer = NULL;
 EventBuffer* event_buffer = NULL;
 
+uint32_t DOOMGENERIC_RESX;
+uint32_t DOOMGENERIC_RESY;
+
 int _start() {
     syscall_set_heap_size(HEAP_SIZE);
     void* heap_start = syscall_get_heap_start();
     add_malloc_block(heap_start, HEAP_SIZE);
+
+    printf("%ix%i\n", syscall_get_screen_size_x(), syscall_get_screen_size_y());
+    DOOMGENERIC_RESX = syscall_get_screen_size_x();
+    DOOMGENERIC_RESY = syscall_get_screen_size_y();
 
     char* argv[] = {"doom", "-iwad", "doom1.wad"};
 

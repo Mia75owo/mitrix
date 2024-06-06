@@ -30,6 +30,9 @@
 #define SYSCALL_GET_FILE_OFFSET   0xF
 #define SYSCALL_SET_FILE_OFFSET   0x10
 #define SYSCALL_GET_FILE_SIZE     0x11
+
+#define SYSCALL_GET_SCREEN_SIZE_X 0x12
+#define SYSCALL_GET_SCREEN_SIZE_Y 0x13
 // clang-format on
 
 #endif

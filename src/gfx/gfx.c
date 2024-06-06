@@ -96,8 +96,8 @@ void gfx_char(u32 x, u32 y, unsigned char c, Color fg, Color bg) {
 }
 
 void gfx_clone(u32 x, u32 y, u32 width, u32 height, u32* restrict source) {
-    for (u32 i = 0; i < width; i++) {
-        for (u32 j = 0; j < height; j++) {
+    for (u32 j = 0; j < height; j++) {
+        for (u32 i = 0; i < width; i++) {
             screen[(j + y) * SCREEN_X + (i + x)] = source[j * width + i];
         }
     }

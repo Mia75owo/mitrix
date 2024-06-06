@@ -23,5 +23,7 @@ void syscall_set_heap_size(u32 size);
 u32 syscall_get_file_offset(u32 file_id);
 void syscall_set_file_offset(u32 file_id, u32 offset);
 u32 syscall_get_file_size(u32 file_id);
+u32 syscall_get_screen_size_x();
+u32 syscall_get_screen_size_y();
 
 #endif

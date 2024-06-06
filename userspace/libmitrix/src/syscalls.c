@@ -143,3 +143,17 @@ u32 syscall_get_file_size(u32 file_id) {
     asm volatile("int $0x80" : "=a"(ret) : "a"(syscall), "b"(arg0));
     return ret;
 }
+u32 syscall_get_screen_size_x() {
+    u32 ret;
+    u32 syscall = SYSCALL_GET_SCREEN_SIZE_X;
+
+    asm volatile("int $0x80" : "=a"(ret) : "a"(syscall));
+    return ret;
+}
+u32 syscall_get_screen_size_y() {
+    u32 ret;
+    u32 syscall = SYSCALL_GET_SCREEN_SIZE_Y;
+
+    asm volatile("int $0x80" : "=a"(ret) : "a"(syscall));
+    return ret;
+}
