@@ -2,6 +2,7 @@
 
 #include <stdarg.h>
 
+#include "gfx/vtty.h"
 #include "util/debug.h"
 #include "util/mem.h"
 #include "util/types.h"
@@ -127,6 +128,7 @@ void tty_vprintf(const char* format, va_list va) {
                 continue;
             } else if (format[1] == '[') {
                 // %[123|a]
+                // %[@|a] (the whole line)
                 // TODO: this doesn't support printing ']' for now
 
                 char* end_num = strchr(format, '|');
@@ -135,9 +137,15 @@ void tty_vprintf(const char* format, va_list va) {
                     continue;
                 }
 
-                *end_num = '\0';
-                u32 val = atoi((char*)&format[2], 10);
-                *end_num = '|';
+                u32 val;
+                if (format[2] == '@') {
+                    val = VTTY_WIDTH;
+                } else {
+                    *end_num = '\0';
+                    val = atoi((char*)&format[2], 10);
+                    *end_num = '|';
+                }
+
 
                 char* end = strchr(format, ']');
                 if (end == NULL || end == end_num + 1) {

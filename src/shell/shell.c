@@ -111,7 +111,7 @@ void shell_execute_command(const char* command) {
     // TODO: cleanup this mess D:
     switch (cmd) {
         case CMD_HELP: {
-            klog("\n%[50|=]");
+            klog("\n%[@|=]");
 
             if (command[commands[index].command_length + 1] != '\0') {
                 i32 idx = shell_get_command_index(
@@ -131,7 +131,7 @@ void shell_execute_command(const char* command) {
                 }
             }
 
-            klog("%[50|=]");
+            klog("%[@|=]");
         } break;
         case CMD_CLEAR: {
             tty_clear();
@@ -169,7 +169,7 @@ void shell_execute_command(const char* command) {
             sleep(1000);
         } break;
         case CMD_LS: {
-            klog("\n%[50|=]");
+            klog("\n%[@|=]");
 
             FilePtr file;
             u32 i = 0;
@@ -191,7 +191,7 @@ void shell_execute_command(const char* command) {
                 i++;
             }
 
-            klog("%[50|=]");
+            klog("%[@|=]");
         } break;
         case CMD_CAT: {
             static char file_name_buffer[FNAME_SIZE];

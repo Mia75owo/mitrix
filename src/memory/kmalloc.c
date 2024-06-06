@@ -1,5 +1,6 @@
 #include "kmalloc.h"
 
+#include "gfx/vtty.h"
 #include "memory/memory.h"
 #include "memory/pmm.h"
 #include "util/debug.h"
@@ -290,15 +291,15 @@ static void big_allocation_remove(u32 chunk) {
 }
 
 void kmalloc_print_info() {
-    klog("\n\n%40KMALLOC_INFO:\n%03%[50|=]");
+    klog("\n\n%40KMALLOC_INFO:\n%03%[@|=]");
 
     klog("%0F4096: \n");
-    print_buddy(buddy4096, BUDDY4096_RAW_SIZE * 32, 50 * 4);
+    print_buddy(buddy4096, BUDDY4096_RAW_SIZE * 32, VTTY_WIDTH * 4);
     klog("\n");
     klog("%0F512: \n");
-    print_buddy(buddy512, BUDDY512_RAW_SIZE * 32, 50 * 4);
+    print_buddy(buddy512, BUDDY512_RAW_SIZE * 32, VTTY_WIDTH * 4);
     klog("%0F64: \n");
-    print_buddy(buddy64, BUDDY64_RAW_SIZE * 32, 50 * 4);
+    print_buddy(buddy64, BUDDY64_RAW_SIZE * 32, VTTY_WIDTH * 4);
 
-    klog("%[50|=]%40KMALLOC_INFO_END\n");
+    klog("%[@|=]%40KMALLOC_INFO_END\n");
 }
