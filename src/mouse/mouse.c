@@ -1,5 +1,6 @@
 #include "mouse.h"
 
+#include "events/events.h"
 #include "gfx/gui.h"
 #include "idt/idt.h"
 #include "util/debug.h"
@@ -62,5 +63,6 @@ void mouse_handler(CPUState* frame) {
     evt.button_left = (packets[1] & (1 << 0)) > 0;
     evt.button_right = (packets[1] & (1 << 1)) > 0;
 
+    events_mouse_event(evt);
     gui_mouse_event(evt);
 }

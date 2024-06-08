@@ -30,6 +30,8 @@ void keyboard_handler(CPUState* frame);
 // clang-format on
 
 typedef struct {
+    u8 reserved : 1;
+
     u8 pressed : 1;
     u8 shift : 1;
     u8 ctrl : 1;

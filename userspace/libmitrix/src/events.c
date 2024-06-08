@@ -10,9 +10,9 @@ void events_init(EventBuffer* buffer) {
 bool events_has_event() {
     return buf->read_index != buf->write_index;
 }
-KeyEvent events_pull() {
+Event events_pull() {
     if (!events_has_event()) {
-        return (KeyEvent){0};
+        return (Event){0};
     }
 
     buf->read_index++;

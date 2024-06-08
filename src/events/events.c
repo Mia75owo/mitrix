@@ -26,7 +26,24 @@ void events_key_event(KeyEvent evt) {
             buf->write_index = 0;
         }
 
-        buf->events[buf->write_index] = evt;
+        // Key Event flag
+        evt.reserved = 1;
+        buf->events[buf->write_index] = (Event)evt;
+    }
+}
+void events_mouse_event(MouseEvent evt) {
+    for (u32 i = 0; i < MAX_EVENT_RECEIVERS; i++) {
+        if (receivers[i].buf == 0) continue;
+
+        EventBuffer* buf = (EventBuffer*)receivers[i].buf;
+        buf->write_index++;
+        if (buf->write_index >= MAX_EVENTS) {
+            buf->write_index = 0;
+        }
+
+        // Key Event flag
+        evt.reserved = 0;
+        buf->events[buf->write_index] = (Event)evt;
     }
 }
 

@@ -102,7 +102,10 @@ static u8 to_doom_key(KeyEvent evt) {
 int DG_GetKey(int* pressed, unsigned char* doomKey) {
     if (!events_has_event()) return 0;
 
-    KeyEvent evt = events_pull();
+    Event rawevt = events_pull();
+    if (!rawevt.is_keyevent) return 0;
+
+    KeyEvent evt = rawevt.keyevt;
 
     *pressed = evt.pressed;
     *doomKey = to_doom_key(evt);

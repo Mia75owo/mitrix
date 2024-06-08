@@ -65,16 +65,19 @@ int _start() {
     while (true) {
         if (!events_has_event()) continue;
 
-        KeyEvent evt = events_pull();
-        // Ignore keyup
-        if (!evt.pressed) continue;
+        Event rawevt = events_pull();
+        if (rawevt.is_keyevent) {
+            KeyEvent evt = rawevt.keyevt;
+            // Ignore keyup
+            if (!evt.pressed) continue;
 
-        if (evt.special && evt.c == 101) {
-            pos -= 10;
-        } else if (evt.special && evt.c == 103) {
-            pos += 10;
-        } else if (evt.c == 'q') {
-            break;
+            if (evt.special && evt.c == 101) {
+                pos -= 10;
+            } else if (evt.special && evt.c == 103) {
+                pos += 10;
+            } else if (evt.c == 'q') {
+                break;
+            }
         }
 
         gfx_fill(0xFFFF0000);
@@ -118,6 +121,7 @@ int _start() {
     syscall_file_close(file_id);
     */
 
+    /*
     Cube cubes[CUBE_NUM];
 
     for (u32 i = 0; i < CUBE_NUM; i++) {
@@ -140,6 +144,23 @@ int _start() {
             move_cube(&cubes[i]);
         }
         syscall_draw_fb(800, 600);
+    }
+    */
+
+    EventBuffer* events_buf = syscall_create_events_buf();
+    events_init(events_buf);
+
+    while (true) {
+        if (!events_has_event()) continue;
+
+        Event rawevt = events_pull();
+        if (rawevt.is_keyevent) {
+            KeyEvent evt = rawevt.keyevt;
+            printf("KeyEvent: (special: %i) (pressed: %i) (c: %c)\n", evt.special, evt.pressed, evt.c);
+        } else {
+            MouseEvent evt = rawevt.mouseevt;
+            printf("MouseEvent: (lmb: %i) (rmb: %i) (delta_x: %i) (delta_y: %i)\n", evt.button_left, evt.button_right, evt.delta_x, evt.delta_y);
+        }
     }
 
     syscall_exit();

@@ -12,6 +12,8 @@ typedef struct {
 } Mouse;
 
 typedef struct {
+    u8 reserved : 1;
+
     u8 button_left : 1;
     u8 button_right : 1;
     i8 delta_x;

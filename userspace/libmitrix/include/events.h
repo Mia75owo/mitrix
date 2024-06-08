@@ -30,6 +30,8 @@
 #define MAX_EVENTS 64
 
 typedef struct {
+    u8 reserved : 1;
+
     u8 pressed : 1;
     u8 shift : 1;
     u8 ctrl : 1;
@@ -42,13 +44,29 @@ typedef struct {
 } KeyEvent;
 
 typedef struct {
+    u8 reserved : 1;
+
+    u8 button_left : 1;
+    u8 button_right : 1;
+    i8 delta_x;
+    i8 delta_y;
+} MouseEvent;
+
+typedef union {
+    u8 is_keyevent : 1;
+    KeyEvent keyevt;
+    MouseEvent mouseevt;
+} Event;
+_Static_assert(sizeof(Event) == 3, "Event union size mismatch");
+
+typedef struct {
     u32 read_index;
     u32 write_index;
-    KeyEvent events[MAX_EVENTS];
+    Event events[MAX_EVENTS];
 } EventBuffer;
 
 void events_init(EventBuffer* buffer);
 bool events_has_event();
-KeyEvent events_pull();
+Event events_pull();
 
 #endif

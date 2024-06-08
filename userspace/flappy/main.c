@@ -53,12 +53,17 @@ int _start() {
 
         last_draw = systime;
 
-        KeyEvent evt = events_pull();
-        if (evt.c == 'q') {
-            goto exit;
-        } else if (evt.c == ' ') {
-            started = true;
+        Event rawevt = events_pull();
+        if (rawevt.is_keyevent) {
+            KeyEvent evt = rawevt.keyevt;
+
+            if (evt.c == 'q') {
+                goto exit;
+            } else if (evt.c == ' ') {
+                started = true;
+            }
         }
+
         if (!started) {
             goto render;
         }
@@ -83,10 +88,13 @@ int _start() {
             }
         }
 
-        if (evt.c == ' ' && evt.pressed) {
-            if (systime > last_jump + 100) {
-                player_vel = -20.5f;
-                last_jump = systime;
+        if (rawevt.is_keyevent) {
+            KeyEvent evt = rawevt.keyevt;
+            if (evt.c == ' ' && evt.pressed) {
+                if (systime > last_jump + 100) {
+                    player_vel = -20.5f;
+                    last_jump = systime;
+                }
             }
         }
 
