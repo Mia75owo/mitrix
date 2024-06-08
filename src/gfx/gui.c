@@ -41,6 +41,8 @@ void gui_redraw() {
     }
     vtty_render_last_line(tty_redraw_last_from());
 
+    gfx_rect(0, VTTY_HEIGHT * 16, SCREEN_X, SCREEN_Y - VTTY_HEIGHT * 16, 0xFF000000);
+
     u32 cursor_pos = 0;
     if (gui.getting_user_input) {
         gfx_box(0, gui.height - 40, gui.width, 40, 4, 0xFF57FF57);
@@ -67,6 +69,8 @@ void gui_redraw() {
     } else {
         gfx_rect(10 + cursor_pos * 16, gui.height - 28, 2, 16, 0xFF57FF57);
     }
+
+    gfx_display_backbuffer();
 }
 void gui_trigger_entire_redraw() { gui.entire_redraw = true; }
 

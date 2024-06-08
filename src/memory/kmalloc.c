@@ -11,7 +11,7 @@ static u32 big_allocation_size(u32 chunk);
 static void big_allocation_remove(u32 chunk);
 static void big_allocation_add(u32 chunk, u32 length);
 
-#define EXACT_ALLOC_SIZE (1024 * 512)
+#define EXACT_ALLOC_SIZE (1024 * 1024 * 64)
 
 #define BUDDY64_RAW_SIZE (EXACT_ALLOC_SIZE / 64 / 32)
 #define BUDDY512_RAW_SIZE (EXACT_ALLOC_SIZE / 512 / 32)

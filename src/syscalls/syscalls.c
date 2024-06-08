@@ -65,6 +65,7 @@ static void syscall_exit() {
     userheap_set_size(task, 0);
 
     task_manager_kill_current_task();
+    gfx_doublebuffering(true);
 }
 static void syscall_print(const char* string) { klog("%s", string); }
 static void syscall_print_char(const char c) { klog("%c", c); }
@@ -119,7 +120,7 @@ static u32 syscall_write(u32 file_id, u8* buffer, u32 len) {
            len);
     return len;
 }
-static u32* syscall_create_fb(u32 width, u32 height) {
+static u32* syscall_create_fb(u32 width, u32 height, bool double_buffering) {
     u32 task_id = task_manager_get_current_task_id();
 
     // TODO: make the size dynamic
@@ -129,6 +130,7 @@ static u32* syscall_create_fb(u32 width, u32 height) {
 
     Task* task = task_manager_get_task(task_id);
     task->shmem_fb_obj = object_id;
+    task->double_buffering = double_buffering;
 
     return (u32*)addr;
 }
@@ -150,10 +152,15 @@ static void syscall_draw_fb(u32 width, u32 height) {
         currently_mapped_fb_addr = shmem_map(object_id, 0);
     }
 
+    if (!task->double_buffering) {
+        gfx_doublebuffering(false);
+    }
+
     // Enable interrupts during this copying, to not block timer interrupts
     asm volatile("sti");
     gfx_clone((SCREEN_X - width) / 2, (SCREEN_Y - height) / 2, width, height,
               (u32*)currently_mapped_fb_addr);
+    gfx_display_backbuffer();
 
     u32 time = pit_get_tics();
     u32 dt = time - last_tick;

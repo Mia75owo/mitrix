@@ -11,7 +11,7 @@ void syscall_print_char(const char c);
 u32 syscall_get_systime();
 u32 syscall_read(u32 file_id, u8* buf, u32 len);
 u32 syscall_write(u32 file_id, u8* buf, u32 len);
-u32* syscall_create_fb(u32 width, u32 height);
+u32* syscall_create_fb(u32 width, u32 height, bool double_buffering);
 void syscall_draw_fb(u32 width, u32 height);
 void syscall_request_screen();
 EventBuffer* syscall_create_events_buf();

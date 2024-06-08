@@ -3,6 +3,7 @@
 // #include "config.h"
 
 #include "disk/mifs.h"
+#include "memory/kmalloc.h"
 #include "memory/memory.h"
 #include "util/debug.h"
 #include "util/mem.h"
@@ -11,9 +12,13 @@ static u8* font;
 static u8* logo;
 
 static bool gfx_ready = false;
+static bool double_buffering = true;
 
 static gfx_info gfx;
-static volatile u32* const screen = (u32*)KERNEL_GFX;
+static volatile u32* const frontbuffer = (u32*)KERNEL_GFX;
+static u32* restrict backbuffer;
+
+static u32* restrict screen;
 
 #ifdef DEBUG
 #define CHECK_INITIALIZED() \
@@ -41,6 +46,9 @@ void gfx_init(gfx_info info) {
     FilePtr logo_file = mifs_file("mitrix_logo.raw");
     assert_msg(logo_file.addr != 0, "'mitrix_logo.raw' NOT FOUND IN RAMDISK!");
     logo = logo_file.addr;
+
+    backbuffer = (u32*)kmalloc(size_bytes);
+    screen = backbuffer;
 
     gfx_ready = true;
 }
@@ -101,6 +109,26 @@ void gfx_clone(u32 x, u32 y, u32 width, u32 height, u32* restrict source) {
             screen[(j + y) * SCREEN_X + (i + x)] = source[j * width + i];
         }
     }
+}
+
+void gfx_display_backbuffer() {
+    if (!double_buffering) return;
+
+    u64* const from = (u64* const)backbuffer;
+    u64* restrict const to = (u64* restrict const)frontbuffer;
+
+    for (u32 i = 0; i < (SCREEN_X * SCREEN_Y / 2); i++) {
+        to[i] = from[i];
+    }
+}
+
+void gfx_doublebuffering(bool enable) {
+    if (enable) {
+        screen = backbuffer;
+    } else {
+        screen = (u32* restrict)frontbuffer;
+    }
+    double_buffering = enable;
 }
 
 void gfx_logo() {

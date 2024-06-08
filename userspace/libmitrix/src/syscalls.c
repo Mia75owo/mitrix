@@ -53,13 +53,14 @@ u32 syscall_write(u32 file_id, u8* buf, u32 len) {
                  : "a"(syscall), "b"(arg0), "c"(arg1), "d"(arg2));
     return ret;
 }
-u32* syscall_create_fb(u32 width, u32 height) {
+u32* syscall_create_fb(u32 width, u32 height, bool double_buffering) {
     u32 ret;
     u32 syscall = SYSCALL_CREATE_FB;
     u32 arg0 = width;
     u32 arg1 = height;
+    u32 arg2 = double_buffering;
 
-    asm volatile("int $0x80" : "=a"(ret) : "a"(syscall), "b"(arg0), "c"(arg1));
+    asm volatile("int $0x80" : "=a"(ret) : "a"(syscall), "b"(arg0), "c"(arg1), "d"(arg2));
     return (u8*)ret;
 }
 void syscall_draw_fb(u32 width, u32 height) {
