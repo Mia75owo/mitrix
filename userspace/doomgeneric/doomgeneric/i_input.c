@@ -276,63 +276,60 @@ static void UpdateShiftStatus(int pressed, unsigned char key)
 }
 
 
+static bool last_event_mouse_pressed = false;
 void I_GetEvent(void)
 {
+    DG_Event evt;
+
     event_t event;
-    int pressed;
-    unsigned char key;
 
-    
-	while (DG_GetKey(&pressed, &key))
-    {
-        UpdateShiftStatus(pressed, key);
+    while (DG_GetEvent(&evt)) {
+        if (evt.is_key_event) {
+            UpdateShiftStatus(evt.key_event.pressed, evt.key_event.key);
 
-        // process event
-        
-        if (pressed)
-        {
-            // data1 has the key pressed, data2 has the character
-            // (shift-translated, etc)
-            event.type = ev_keydown;
-            event.data1 = TranslateKey(key);
-            event.data2 = GetTypedChar(key);
+            if (evt.key_event.pressed) {
+                event.type = ev_keydown;
+                event.data1 = TranslateKey(evt.key_event.key);
+                event.data2 = GetTypedChar(evt.key_event.key);
 
-            if (event.data1 != 0)
-            {
-                D_PostEvent(&event);
+                if (event.data1 != 0) {
+                    D_PostEvent(&event);
+                }
+            } else {
+                event.type = ev_keyup;
+                event.data1 = TranslateKey(evt.key_event.key);
+                event.data2 = 0;
+
+                if (event.data1 != 0) {
+                    D_PostEvent(&event);
+                }
             }
-        }
-        else
-        {
-            event.type = ev_keyup;
-            event.data1 = TranslateKey(key);
-
-            // data2 is just initialized to zero for ev_keyup.
-            // For ev_keydown it's the shifted Unicode character
-            // that was typed, but if something wants to detect
-            // key releases it should do so based on data1
-            // (key ID), not the printable char.
-
-            event.data2 = 0;
-
-            if (event.data1 != 0)
-            {
+        } else {
+            if (evt.mouse_event.left_mouse_button) {
+                if (!last_event_mouse_pressed) {
+                    event.type = ev_keydown;
+                    event.data1 = TranslateKey(KEY_FIRE);
+                    event.data2 = GetTypedChar(KEY_FIRE);
+                    D_PostEvent(&event);
+                    last_event_mouse_pressed = true;
+                }
+            } else {
+                event.type = ev_keyup;
+                event.data1 = TranslateKey(KEY_FIRE);
+                event.data2 = 0;
                 D_PostEvent(&event);
+                last_event_mouse_pressed = false;
             }
-            break;
+            
+            event.type = ev_mouse;
+            event.data1 = 0;
+            event.data2 = evt.mouse_event.delta_x;
+            // ignore y direction
+            event.data3 = 0;
+
+            D_PostEvent(&event);
         }
     }
-
-
-                /*
-            case SDL_MOUSEMOTION:
-                event.type = ev_mouse;
-                event.data1 = mouse_button_state;
-                event.data2 = AccelerateMouse(sdlevent.motion.xrel);
-                event.data3 = -AccelerateMouse(sdlevent.motion.yrel);
-                D_PostEvent(&event);
-                break;
-                */
 }
 
 void I_InitInput(void)

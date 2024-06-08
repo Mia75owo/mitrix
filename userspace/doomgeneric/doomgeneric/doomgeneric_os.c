@@ -99,16 +99,23 @@ static u8 to_doom_key(KeyEvent evt) {
     return evt.c;
 }
 
-int DG_GetKey(int* pressed, unsigned char* doomKey) {
+int DG_GetEvent(DG_Event* doom_evt) {
     if (!events_has_event()) return 0;
 
     Event rawevt = events_pull();
-    if (!rawevt.is_keyevent) return 0;
 
-    KeyEvent evt = rawevt.keyevt;
-
-    *pressed = evt.pressed;
-    *doomKey = to_doom_key(evt);
+    if (rawevt.is_keyevent) {
+        KeyEvent evt = rawevt.keyevt;
+        doom_evt->is_key_event = 1;
+        doom_evt->key_event.pressed = evt.pressed;
+        doom_evt->key_event.key = to_doom_key(evt);
+    } else {
+        MouseEvent evt = rawevt.mouseevt;
+        doom_evt->is_key_event = 0;
+        doom_evt->mouse_event.left_mouse_button = evt.button_left;
+        doom_evt->mouse_event.delta_x = evt.delta_x * 3;
+        doom_evt->mouse_event.delta_y = evt.delta_y * 3;
+    }
 
     return 1;
 }
