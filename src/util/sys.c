@@ -4,25 +4,25 @@
 #include "util/debug.h"
 #include "util/port.h"
 
-void spin_halt() {
+__attribute__((noreturn)) void spin_halt() {
     while (1) halt();
 }
 
 void halt() { asm volatile("hlt"); }
 
-void abort() {
+__attribute__((noreturn)) void abort() {
     asm volatile("cli");
     spin_halt();
 }
 
-void reboot() {
+__attribute__((noreturn)) void reboot() {
     u8 good = 0x02;
     while (good & 0x02) good = inb(0x64);
     outb(0x64, 0xFE);
-    halt();
+    spin_halt();
 }
 
-void shutdown() {
+__attribute__((noreturn)) void shutdown() {
     // NOTE: only works on BOCHS/old QEMU
     outw(0xB004, 0x2000);
 
@@ -31,6 +31,8 @@ void shutdown() {
 
     // NOTE: only works on VirtualBox
     outw(0x4004, 0x3400);
+
+    spin_halt();
 }
 
 void sleep(u32 ms) {

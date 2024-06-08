@@ -5,7 +5,7 @@
 #include "util/types.h"
 
 typedef struct {
-    u64 tics;
+    volatile u64 tics;
     u32 freq;
     bool enabled;
 } PIT;

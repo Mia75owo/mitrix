@@ -2,11 +2,11 @@
 #define SYS_H_
 
 #include "util/types.h"
-void spin_halt();
+__attribute__((noreturn)) void spin_halt();
 void halt();
-void abort();
-void reboot();
-void shutdown();
+__attribute__((noreturn)) void abort();
+__attribute__((noreturn)) void reboot();
+__attribute__((noreturn)) void shutdown();
 void sleep(u32 ms);
 
 void cli_push();

@@ -14,8 +14,8 @@
 #include "util/debug.h"
 #include "util/mem.h"
 
-static i32 currently_mapped_fb = -1;
-static u8* currently_mapped_fb_addr = 0;
+static volatile i32 currently_mapped_fb = -1;
+static volatile u8* currently_mapped_fb_addr = 0;
 static i32 currently_drawing_task = -1;
 void* syscall_handlers[SYSCALLS_COUNT];
 

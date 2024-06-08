@@ -8,6 +8,7 @@
 #include "keyboard/keyboard.h"
 #include "memory/kmalloc.h"
 #include "memory/memory.h"
+#include "memory/pmm.h"
 #include "multiboot.h"
 #include "pit/pit.h"
 #include "serial/serial.h"
@@ -28,7 +29,8 @@ extern void idt_load();
 
 void gui_loop();
 
-void kernel_main(u32 magic, struct multiboot_info* boot_info) {
+__attribute__((noreturn)) void kernel_main(u32 magic,
+                                           struct multiboot_info* boot_info) {
     gui_init_early_tty();
     tty_reset();
 
@@ -88,11 +90,13 @@ void kernel_main(u32 magic, struct multiboot_info* boot_info) {
     Task* kernel_task = task_manager_get_task(0);
     kernel_task->state = TASK_STATE_IDLE;
 
+    // create_user_task("doom.elf");
+
     asm volatile("sti");
     spin_halt();
 }
 
-void gui_loop() {
+__attribute__((noreturn)) void gui_loop() {
     u64 last_draw = 0;
     while (true) {
         u64 tics = pit_get_tics();

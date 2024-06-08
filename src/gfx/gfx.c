@@ -13,7 +13,7 @@ static u8* logo;
 static bool gfx_ready = false;
 
 static gfx_info gfx;
-static u32* const screen = (u32*)KERNEL_GFX;
+static volatile u32* const screen = (u32*)KERNEL_GFX;
 
 #ifdef DEBUG
 #define CHECK_INITIALIZED() \
