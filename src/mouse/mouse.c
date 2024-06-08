@@ -12,7 +12,7 @@ static u8 packets[PACKET_COUNT];
 static u8 packet_index;
 
 static void mouse_write(u8 data);
-static void port_wait() {
+static void port_wait_output() {
     for (u32 i = 0; i < 1000; i++) {
         if ((inb(0x64) & 2) == 0) return;
     }
@@ -24,7 +24,7 @@ void mouse_init() {
 
     set_isr_function(44, mouse_handler);
 
-    port_wait();
+    port_wait_output();
     outb(0x64, 0x20);
     u8 status = inb(0x60);
     status |= 2;
@@ -37,16 +37,14 @@ void mouse_init() {
 }
 
 static void mouse_write(u8 data) {
-    port_wait();
+    port_wait_output();
     outb(0x64, 0xd4);
-    port_wait();
+    port_wait_output();
     outb(0x60, data);
 }
 
 void mouse_handler(CPUState* frame) {
     (void)frame;
-    port_wait();
-
     u8 data = inb(0x60);
     packets[packet_index++] = data;
 

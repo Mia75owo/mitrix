@@ -23,8 +23,9 @@ void keyboard_handler(CPUState* frame) {
     KeyEvent event;
     event.special = false;
 
-    u8 scan_code = inb(0x60) & 0x7F;
-    u8 pressed = !(inb(0x60) & 0x80);
+    u8 data = inb(0x60);
+    u8 scan_code = data & 0x7F;
+    u8 pressed = !(data & 0x80);
 
     // Some keys get send in two steps
     if (scan_code == 96) {
