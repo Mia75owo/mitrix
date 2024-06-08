@@ -189,7 +189,7 @@ static void gui_user_input_key_event(KeyEvent evt) {
 
     // Backspace
     if (c == '\b') {
-        if (gui.user_input > 0) gui.user_input_cursor--;
+        if (gui.user_input_cursor > 0) gui.user_input_cursor--;
         gui.user_input[gui.user_input_cursor] = 0;
         return;
     }
