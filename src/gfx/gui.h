@@ -2,6 +2,7 @@
 #define GUI_H_
 
 #include "keyboard/keyboard.h"
+#include "mouse/mouse.h"
 #include "util/types.h"
 
 #define GUI_PROMPT_SIZE 256
@@ -24,6 +25,8 @@ typedef struct {
     char user_input[GUI_PROMPT_SIZE];
 
     bool entire_redraw;
+
+    Mouse mouse;
 } GUI;
 
 void gui_init_early_tty();
@@ -32,6 +35,7 @@ void gui_redraw();
 void gui_trigger_entire_redraw();
 
 void gui_key_event(KeyEvent evt);
+void gui_mouse_event(MouseEvent evt);
 
 char* gui_get_user_input(u32 len);
 

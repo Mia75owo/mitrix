@@ -70,6 +70,8 @@ void gui_redraw() {
         gfx_rect(10 + cursor_pos * 16, gui.height - 28, 2, 16, 0xFF57FF57);
     }
 
+    gfx_rect(gui.mouse.x, gui.mouse.y, 5, 5, 0xFFFF0000);
+
     gfx_display_backbuffer();
 }
 void gui_trigger_entire_redraw() { gui.entire_redraw = true; }
@@ -181,6 +183,19 @@ void gui_key_event(KeyEvent evt) {
     if (gui.prompt_cursor >= GUI_PROMPT_SIZE) {
         gui.prompt_cursor = GUI_PROMPT_SIZE - 1;
     }
+}
+
+void gui_mouse_event(MouseEvent evt) {
+    gui.mouse.x += evt.delta_x;
+    gui.mouse.y += evt.delta_y;
+
+    if (gui.mouse.x < 0) gui.mouse.x = 0;
+    if (gui.mouse.y < 0) gui.mouse.y = 0;
+    if (gui.mouse.x > SCREEN_X) gui.mouse.x = SCREEN_X;
+    if (gui.mouse.y > SCREEN_Y) gui.mouse.y = SCREEN_Y;
+
+    gui.mouse.button_left = evt.button_left;
+    gui.mouse.button_right = evt.button_right;
 }
 
 static void gui_user_input_key_event(KeyEvent evt) {

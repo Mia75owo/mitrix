@@ -9,6 +9,7 @@
 #include "memory/kmalloc.h"
 #include "memory/memory.h"
 #include "memory/pmm.h"
+#include "mouse/mouse.h"
 #include "multiboot.h"
 #include "pit/pit.h"
 #include "serial/serial.h"
@@ -41,6 +42,7 @@ __attribute__((noreturn)) void kernel_main(u32 magic,
     kinit(serial_init(), "Serial");
     kinit(fpu_init(), "FPU");
     kinit(keyboard_init(), "Keyboard");
+    kinit(mouse_init(), "Mouse");
     kinit(pit_init(1000), "PIT");
     kinit(task_manager_init(), "Task manager");
     kinit(disk_init(boot_info), "Ramdisk");

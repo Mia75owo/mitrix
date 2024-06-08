@@ -61,6 +61,9 @@ $(OUT)/fpu.o: $(SRC)/fpu/fpu.c
 $(OUT)/keyboard.o: $(SRC)/keyboard/keyboard.c
 	$(CC) $(CC_flags) -c $< -o $@
 
+$(OUT)/mouse.o: $(SRC)/mouse/mouse.c
+	$(CC) $(CC_flags) -c $< -o $@
+
 $(OUT)/pit.o: $(SRC)/pit/pit.c
 	$(CC) $(CC_flags) -c $< -o $@
 
@@ -132,7 +135,7 @@ $(OUT)/$(RAMDISK): $(OUT)/tool_mifs userspace ramdisk/
 #############
 
 OS=OS.flp
-$(OUT)/$(OS): $(OUT)/boot.o $(OUT)/gdt.o $(OUT)/idt.o $(OUT)/handlers.o $(OUT)/kernel.o $(OUT)/fpu.o $(OUT)/serial.o $(OUT)/mem.o $(OUT)/debug.o $(OUT)/keyboard.o $(OUT)/tests.o $(OUT)/pit.o $(OUT)/sys.o $(OUT)/memory.o $(OUT)/pmm.o $(OUT)/kmalloc.o $(OUT)/shmem.o $(OUT)/gfx.o $(OUT)/vtty.o $(OUT)/gui.o $(OUT)/tty.o $(OUT)/disk.o $(OUT)/mifs.o $(OUT)/tss.o $(OUT)/tasks.o $(OUT)/task_manager.o $(OUT)/shell.o $(OUT)/elf.o $(OUT)/syscalls.o $(OUT)/events.o $(OUT)/userheap.o
+$(OUT)/$(OS): $(OUT)/boot.o $(OUT)/gdt.o $(OUT)/idt.o $(OUT)/handlers.o $(OUT)/kernel.o $(OUT)/fpu.o $(OUT)/serial.o $(OUT)/mem.o $(OUT)/debug.o $(OUT)/keyboard.o $(OUT)/mouse.o $(OUT)/tests.o $(OUT)/pit.o $(OUT)/sys.o $(OUT)/memory.o $(OUT)/pmm.o $(OUT)/kmalloc.o $(OUT)/shmem.o $(OUT)/gfx.o $(OUT)/vtty.o $(OUT)/gui.o $(OUT)/tty.o $(OUT)/disk.o $(OUT)/mifs.o $(OUT)/tss.o $(OUT)/tasks.o $(OUT)/task_manager.o $(OUT)/shell.o $(OUT)/elf.o $(OUT)/syscalls.o $(OUT)/events.o $(OUT)/userheap.o
 	$(CC) -T $(SRC)/linker.ld -o $@ $^ -ffreestanding -nostdlib -lgcc
 
 ############
@@ -183,7 +186,8 @@ userspace: always
 
 VM=qemu-system-i386
 run: $(OUT)/mitrix.iso
-	$(VM) -serial stdio $<
+	$(VM) -enable-kvm -serial stdio $<
+	# $(VM) -serial stdio $<
 
 bochs: $(OUT)/mitrix.iso
 	bochs -f bochsrc.txt
