@@ -28,6 +28,12 @@ u32 syscall_write(u32 file_id, u8* buf, u32 len) {
                  : "a"(SYSCALL_WRITE), "b"(file_id), "c"(buf), "d"(len));
     return ret;
 }
+void syscall_exec(char* file_name) {
+    asm volatile("int $0x80" ::"a"(SYSCALL_EXEC), "b"(file_name));
+}
+void syscall_exec_blocking(char* file_name) {
+    asm volatile("int $0x80" ::"a"(SYSCALL_EXEC_BLOCKING), "b"(file_name));
+}
 
 u32* syscall_create_fb(u32 width, u32 height, bool double_buffering) {
     u32 ret;

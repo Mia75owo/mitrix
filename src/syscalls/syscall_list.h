@@ -12,6 +12,8 @@
 #define SYSCALL_GET_SYSTIME       03
 #define SYSCALL_READ              04
 #define SYSCALL_WRITE             05
+#define SYSCALL_EXEC              06
+#define SYSCALL_EXEC_BLOCKING     07
 
 #define SYSCALL_CREATE_FB         10
 #define SYSCALL_DRAW_FB           11

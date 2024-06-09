@@ -64,6 +64,14 @@ static void syscall_exit() {
     // Free userheap
     userheap_set_size(task, 0);
 
+    // Unblock owner task
+    if (task->owner_task != -1) {
+        Task* owner = task_manager_get_task(task->owner_task);
+        if (owner->state == TASK_STATE_BLOCKED_BY_EXEC) {
+            owner->state = TASK_STATE_RUNNING;
+        }
+    }
+
     task_manager_kill_current_task();
     gfx_doublebuffering(true);
 }
@@ -120,6 +128,19 @@ static u32 syscall_write(u32 file_id, u8* buffer, u32 len) {
     memcpy(task->files[file_id].file.addr + task->files[file_id].offset, buffer,
            len);
     return len;
+}
+static void syscall_exec(char* file_name) {
+    Task* child = create_user_task(file_name);
+    child->owner_task = task_manager_get_current_task_id();
+}
+static void syscall_exec_blocking(char* file_name) {
+    Task* task = task_manager_get_current_task();
+
+    Task* child = create_user_task(file_name);
+    child->owner_task = task_manager_get_current_task_id();
+
+    task->state = TASK_STATE_BLOCKED_BY_EXEC;
+    task_manager_schedule();
 }
 
 static u32* syscall_create_fb(u32 width, u32 height, bool double_buffering) {
@@ -345,6 +366,8 @@ void syscalls_init() {
     syscall_handlers[SYSCALL_GET_SYSTIME] = syscall_get_systime;
     syscall_handlers[SYSCALL_READ] = syscall_read;
     syscall_handlers[SYSCALL_WRITE] = syscall_write;
+    syscall_handlers[SYSCALL_EXEC] = syscall_exec;
+    syscall_handlers[SYSCALL_EXEC_BLOCKING] = syscall_exec_blocking;
 
     syscall_handlers[SYSCALL_CREATE_FB] = syscall_create_fb;
     syscall_handlers[SYSCALL_DRAW_FB] = syscall_draw_fb;
