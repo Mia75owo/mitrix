@@ -26,6 +26,7 @@ u32 syscall_get_file_size(u32 file_id);
 u32 syscall_get_screen_size_x();
 u32 syscall_get_screen_size_y();
 void syscall_scheduler_next();
+void syscall_sleep(u32 ms);
 void syscall_wait_for_event();
 
 #endif

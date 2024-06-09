@@ -287,6 +287,12 @@ u32 syscall_get_screen_size_x() { return SCREEN_X; }
 u32 syscall_get_screen_size_y() { return SCREEN_Y; }
 
 void syscall_scheduler_next() { task_manager_schedule(); }
+void syscall_sleep(u32 ms) {
+    Task* task = task_manager_get_current_task();
+    task->state = TASK_STATE_SLEEPING;
+    task->sleep_timestamp = pit_get_tics() + ms;
+    task_manager_schedule();
+}
 void syscall_wait_for_event() {
     Task* task = task_manager_get_current_task();
     task->state = TASK_STATE_WAIT_FOR_EVENT;
@@ -325,6 +331,7 @@ void syscalls_init() {
     syscall_handlers[SYSCALL_GET_SCREEN_SIZE_Y] = syscall_get_screen_size_y;
 
     syscall_handlers[SYSCALL_SCHEDULER_NEXT] = syscall_scheduler_next;
+    syscall_handlers[SYSCALL_SLEEP] = syscall_sleep;
     syscall_handlers[SYSCALL_WAIT_FOR_EVENT] = syscall_wait_for_event;
 
     set_isr_function(0x80, handle_syscall_interrupt);
