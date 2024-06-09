@@ -87,11 +87,12 @@ static u32 syscall_read(u32 file_id, u8* buffer, u32 len) {
     } else {
         assert(file_id >= 10);
         u32 file_index = file_id - 10;
-        assert(task->files[file_index].addr);
+        assert(task->files[file_index].file.addr);
 
-        memcpy(buffer,
-               task->files[file_index].addr + task->files[file_index].offset,
-               len);
+        memcpy(
+            buffer,
+            task->files[file_index].file.addr + task->files[file_index].offset,
+            len);
         return len;
     }
 }
@@ -114,9 +115,9 @@ static u32 syscall_write(u32 file_id, u8* buffer, u32 len) {
 
     assert(file_id >= 10);
     u32 file_index = file_id - 10;
-    assert(task->files[file_index].addr);
+    assert(task->files[file_index].file.addr);
 
-    memcpy(task->files[file_id].addr + task->files[file_id].offset, buffer,
+    memcpy(task->files[file_id].file.addr + task->files[file_id].offset, buffer,
            len);
     return len;
 }
@@ -162,6 +163,7 @@ static void syscall_draw_fb(u32 width, u32 height) {
               (u32*)currently_mapped_fb_addr);
     gfx_display_backbuffer();
 
+#if (defined(DEBUG) && 0)
     u32 time = pit_get_tics();
     u32 dt = time - last_tick;
     frames++;
@@ -170,6 +172,7 @@ static void syscall_draw_fb(u32 width, u32 height) {
                   (u64)dt, (u64)(1000.f / (float)dt), (u64)time,
                   (u64)(frames / seconds));
     last_tick = time;
+#endif
 }
 static void syscall_request_screen() {
     Task* task = task_manager_get_current_task();
@@ -197,7 +200,7 @@ u32 syscall_file_open(char* file_name) {
 
     i32 file_index = -1;
     for (u32 i = 0; i < TASK_MAX_FILES; i++) {
-        if (task->files[i].addr == 0) {
+        if (task->files[i].file.addr == 0) {
             file_index = i;
             break;
         }
@@ -209,11 +212,33 @@ u32 syscall_file_open(char* file_name) {
         return 0;
     }
 
-    task->files[file_index].addr = file.addr;
+    task->files[file_index].file = file;
     task->files[file_index].offset = 0;
-    task->files[file_index].size = file.size;
     return file_index + 10;
 }
+u32 syscall_file_open_index(u32 fs_file_index) {
+    Task* task = task_manager_get_current_task();
+
+    i32 file_index = -1;
+    for (u32 i = 0; i < TASK_MAX_FILES; i++) {
+        if (task->files[i].file.addr == 0) {
+            file_index = i;
+            break;
+        }
+    }
+    assert(file_index >= 0);
+
+    FilePtr file = mifs_file_by_index(fs_file_index);
+    if (file.addr == 0) {
+        return 0;
+    }
+
+    task->files[file_index].file = file;
+    task->files[file_index].offset = 0;
+
+    return file_index + 10;
+}
+
 void syscall_file_close(u32 file_id) {
     if (file_id == 0) return;
 
@@ -221,7 +246,7 @@ void syscall_file_close(u32 file_id) {
     u32 file_index = file_id - 10;
 
     Task* task = task_manager_get_current_task();
-    task->files[file_index].addr = 0;
+    task->files[file_index].file.addr = 0;
 }
 u32 syscall_get_file_offset(u32 file_id) {
     if (file_id == 0) return 0;
@@ -229,7 +254,7 @@ u32 syscall_get_file_offset(u32 file_id) {
     u32 file_index = file_id - 10;
 
     Task* task = task_manager_get_current_task();
-    assert(task->files[file_index].addr);
+    assert(task->files[file_index].file.addr);
 
     return task->files[file_index].offset;
 }
@@ -238,7 +263,7 @@ void syscall_set_file_offset(u32 file_id, u32 offset) {
     u32 file_index = file_id - 10;
 
     Task* task = task_manager_get_current_task();
-    assert(task->files[file_index].addr);
+    assert(task->files[file_index].file.addr);
 
     task->files[file_index].offset = offset;
 }
@@ -248,9 +273,20 @@ u32 syscall_get_file_size(u32 file_id) {
     u32 file_index = file_id - 10;
 
     Task* task = task_manager_get_current_task();
-    assert(task->files[file_index].addr);
+    assert(task->files[file_index].file.addr);
 
-    return task->files[file_index].size;
+    return task->files[file_index].file.size;
+}
+u32 syscall_get_file_count() { return mifs_get_file_count(); }
+void syscall_get_file_name(u32 file_id, char* buffer, u32 buffer_length) {
+    if (file_id == 0) return;
+    assert(file_id >= 10);
+    u32 file_index = file_id - 10;
+
+    Task* task = task_manager_get_current_task();
+    assert(task->files[file_index].file.addr);
+
+    strncpy(buffer, task->files[file_index].file.name, buffer_length);
 }
 
 void* syscall_get_heap_start() {
@@ -321,6 +357,9 @@ void syscalls_init() {
     syscall_handlers[SYSCALL_GET_FILE_OFFSET] = syscall_get_file_offset;
     syscall_handlers[SYSCALL_SET_FILE_OFFSET] = syscall_set_file_offset;
     syscall_handlers[SYSCALL_GET_FILE_SIZE] = syscall_get_file_size;
+    syscall_handlers[SYSCALL_GET_FILE_COUNT] = syscall_get_file_count;
+    syscall_handlers[SYSCALL_GET_FILE_NAME] = syscall_get_file_name;
+    syscall_handlers[SYSCALL_FILE_OPEN_INDEX] = syscall_file_open_index;
 
     syscall_handlers[SYSCALL_GET_HEAP_START] = syscall_get_heap_start;
     syscall_handlers[SYSCALL_GET_HEAP_END] = syscall_get_heap_end;

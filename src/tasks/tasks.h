@@ -1,6 +1,7 @@
 #ifndef TASKS_H_
 #define TASKS_H_
 
+#include "disk/mifs.h"
 #include "idt/idt.h"
 #include "memory/shmem.h"
 #include "util/types.h"
@@ -17,9 +18,8 @@ typedef enum {
 } TaskState;
 
 typedef struct {
-    u8* addr;
+    FilePtr file;
     u32 offset;
-    u32 size;
 } TaskOpenFile;
 
 typedef struct {

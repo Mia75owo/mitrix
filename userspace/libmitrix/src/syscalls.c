@@ -82,6 +82,19 @@ u32 syscall_get_file_size(u32 file_id) {
                  : "a"(SYSCALL_GET_FILE_SIZE), "b"(file_id));
     return ret;
 }
+u32 syscall_get_file_count() {
+    u32 ret;
+    asm volatile("int $0x80" : "=a"(ret) : "a"(SYSCALL_GET_FILE_COUNT));
+    return ret;
+}
+void syscall_get_file_name(u32 file_id, char* buffer, u32 buffer_length) {
+    asm volatile("int $0x80" ::"a"(SYSCALL_GET_FILE_NAME), "b"(file_id),
+                 "c"(buffer), "d"(buffer_length));
+}
+u32 syscall_file_open_index(u32 fs_file_index) {
+    asm volatile("int $0x80" ::"a"(SYSCALL_FILE_OPEN_INDEX),
+                 "b"(fs_file_index));
+}
 
 void* syscall_get_heap_start() {
     u32 ret;

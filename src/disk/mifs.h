@@ -31,5 +31,6 @@ typedef struct {
 void mifs_init(u8* start, u8* end);
 FilePtr mifs_file(char* file_name);
 FilePtr mifs_file_by_index(u32 index);
+u32 mifs_get_file_count();
 
 #endif

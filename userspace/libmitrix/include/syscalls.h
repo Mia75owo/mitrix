@@ -23,6 +23,9 @@ void syscall_file_close(u32 file_id);
 u32 syscall_get_file_offset(u32 file_id);
 void syscall_set_file_offset(u32 file_id, u32 offset);
 u32 syscall_get_file_size(u32 file_id);
+u32 syscall_get_file_count();
+void syscall_get_file_name(u32 file_id, char* buffer, u32 buffer_length);
+u32 syscall_file_open_index(u32 fs_file_index);
 
 void* syscall_get_heap_start();
 void* syscall_get_heap_end();

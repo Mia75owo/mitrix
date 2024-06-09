@@ -53,3 +53,16 @@ FilePtr mifs_file_by_index(u32 index) {
 
     return (FilePtr){NULL, 0, NULL};
 }
+
+u32 mifs_get_file_count() {
+    u8* ptr = (u8*)fs.first_file;
+
+    u32 i;
+    for (i = 0; ptr < (u8*)fs.end; i++) {
+        MIFS_File* file = (MIFS_File*)ptr;
+        ptr += sizeof(MIFS_File);
+        ptr += file->size;
+    }
+
+    return i;
+}
