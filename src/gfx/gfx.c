@@ -133,12 +133,14 @@ void gfx_doublebuffering(bool enable) {
 
 void gfx_logo() {
     CHECK_INITIALIZED();
+
+    u32 offset = (SCREEN_X - 800) / 2;
     for (u32 i = 0; i < 800; i++) {
         for (u32 j = 0; j < 208; j++) {
             if (logo[j * 800 + i] == 0xFF) {
-                screen[j * SCREEN_X + i] = 0xFF000000;
+                screen[j * SCREEN_X + i + offset] = 0xFF000000;
             } else {
-                screen[j * SCREEN_X + i] = 0xFFFFFFFF;
+                screen[j * SCREEN_X + i + offset] = 0xFFFFFFFF;
             }
         }
     }

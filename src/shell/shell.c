@@ -149,7 +149,7 @@ void shell_execute_command(const char* command) {
             kmalloc_print_info();
         } break;
         case CMD_TICS: {
-            klog("\n%n", (u64)pit_get_tics());
+            klog("%n\n", (u64)pit_get_tics());
         } break;
         case CMD_DEBUGGFX: {
             gfx_debug(GFX_DEBUG_FONT_FILL);
@@ -166,6 +166,7 @@ void shell_execute_command(const char* command) {
         } break;
         case CMD_LOGO: {
             gfx_logo();
+            gfx_display_backbuffer();
             sleep(1000);
         } break;
         case CMD_LS: {
@@ -200,7 +201,7 @@ void shell_execute_command(const char* command) {
             FilePtr file = mifs_file(file_name_buffer);
 
             if (file.addr == 0) {
-                klog("\n%0CFile '%s' not found!", file_name_buffer);
+                klog("%0CFile '%s' not found!\n", file_name_buffer);
             } else {
                 klog("\n");
 
@@ -216,7 +217,7 @@ void shell_execute_command(const char* command) {
             FilePtr file = mifs_file(file_name_buffer);
 
             if (file.addr == 0) {
-                klog("\n%0CFile '%s' not found!", file_name_buffer);
+                klog("%0CFile '%s' not found!\n", file_name_buffer);
             } else {
                 Task* new_task = create_user_task(file_name_buffer);
                 (void)new_task;

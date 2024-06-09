@@ -18,8 +18,9 @@ void klog(char* format, ...) {
     va_end(va);
 }
 
-// TODO: rewrite to GFX
 void kpanic(const char* format, ...) {
+    gfx_doublebuffering(false);
+
     tty_clear();
     gfx_fill(0xffff0000);
     tty_set_color(0x40);
