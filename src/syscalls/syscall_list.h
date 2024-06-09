@@ -6,37 +6,34 @@
 #define SYSCALL_STDERR_FILE 2
 
 // clang-format off
-#define SYSCALL_EXIT              0x0
-#define SYSCALL_PRINT             0x1
-#define SYSCALL_PRINT_CHAR        0x2
-#define SYSCALL_GET_SYSTIME       0x3
+#define SYSCALL_EXIT              00
+#define SYSCALL_PRINT             01
+#define SYSCALL_PRINT_CHAR        02
+#define SYSCALL_GET_SYSTIME       03
+#define SYSCALL_READ              04
+#define SYSCALL_WRITE             05
 
-#define SYSCALL_CREATE_FB         0x4
-#define SYSCALL_DRAW_FB           0x5
-#define SYSCALL_REQUEST_SCREEN    0x6
+#define SYSCALL_CREATE_FB         10
+#define SYSCALL_DRAW_FB           11
+#define SYSCALL_REQUEST_SCREEN    12
+#define SYSCALL_GET_SCREEN_SIZE_X 13
+#define SYSCALL_GET_SCREEN_SIZE_Y 14
 
-#define SYSCALL_CREATE_EVENTS_BUF 0x7
+#define SYSCALL_FILE_OPEN         20
+#define SYSCALL_FILE_CLOSE        21
+#define SYSCALL_GET_FILE_OFFSET   22
+#define SYSCALL_SET_FILE_OFFSET   23
+#define SYSCALL_GET_FILE_SIZE     24
 
-#define SYSCALL_FILE_OPEN         0x8
-#define SYSCALL_FILE_CLOSE        0x9
+#define SYSCALL_GET_HEAP_START    30
+#define SYSCALL_GET_HEAP_END      31
+#define SYSCALL_SET_HEAP_SIZE     32
 
-#define SYSCALL_READ              0xA
-#define SYSCALL_WRITE             0xB
+#define SYSCALL_SCHEDULER_NEXT    40
+#define SYSCALL_SLEEP             41
+#define SYSCALL_WAIT_FOR_EVENT    42
 
-#define SYSCALL_GET_HEAP_START    0xC
-#define SYSCALL_GET_HEAP_END      0xD
-#define SYSCALL_SET_HEAP_SIZE     0xE
-
-#define SYSCALL_GET_FILE_OFFSET   0xF
-#define SYSCALL_SET_FILE_OFFSET   0x10
-#define SYSCALL_GET_FILE_SIZE     0x11
-
-#define SYSCALL_GET_SCREEN_SIZE_X 0x12
-#define SYSCALL_GET_SCREEN_SIZE_Y 0x13
-
-#define SYSCALL_SCHEDULER_NEXT    0x14
-#define SYSCALL_SLEEP             0x15
-#define SYSCALL_WAIT_FOR_EVENT    0x16
+#define SYSCALL_CREATE_EVENTS_BUF 50
 // clang-format on
 
 #endif

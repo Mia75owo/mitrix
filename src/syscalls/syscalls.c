@@ -120,6 +120,7 @@ static u32 syscall_write(u32 file_id, u8* buffer, u32 len) {
            len);
     return len;
 }
+
 static u32* syscall_create_fb(u32 width, u32 height, bool double_buffering) {
     u32 task_id = task_manager_get_current_task_id();
 
@@ -137,7 +138,6 @@ static u32* syscall_create_fb(u32 width, u32 height, bool double_buffering) {
 u32 last_tick = 0xFFFFFFFF;
 u32 frames = 0;
 u32 seconds = 0;
-
 static void syscall_draw_fb(u32 width, u32 height) {
     Task* task = task_manager_get_current_task();
     i32 object_id = task->shmem_fb_obj;
@@ -189,26 +189,8 @@ static void syscall_request_screen() {
     Task* gui_task = task_manager_get_task(1);
     gui_task->state = TASK_STATE_IDLE;
 }
-EventBuffer* syscall_create_events_buf() {
-    Task* task = task_manager_get_current_task();
-    u32 task_id = task_manager_get_current_task_id();
-
-    if (task->shmem_events_obj != -1) {
-        shmem_unmap(task_id, task->shmem_events_obj);
-        shmem_destroy(task->shmem_events_obj);
-    }
-
-    u32 object_id = shmem_create(sizeof(EventBuffer), task_id);
-    task->shmem_events_obj = task_id;
-
-    void* kernel_vaddr = shmem_map(object_id, 0);
-    assert(kernel_vaddr);
-    events_add_receiver(kernel_vaddr, task);
-
-    void* user_vaddr = shmem_map(object_id, task_id);
-    assert(user_vaddr);
-    return user_vaddr;
-}
+u32 syscall_get_screen_size_x() { return SCREEN_X; }
+u32 syscall_get_screen_size_y() { return SCREEN_Y; }
 
 u32 syscall_file_open(char* file_name) {
     Task* task = task_manager_get_current_task();
@@ -241,18 +223,6 @@ void syscall_file_close(u32 file_id) {
     Task* task = task_manager_get_current_task();
     task->files[file_index].addr = 0;
 }
-void* syscall_get_heap_start() {
-    Task* task = task_manager_get_current_task();
-    return (void*)task->heap_start;
-}
-void* syscall_get_heap_end() {
-    Task* task = task_manager_get_current_task();
-    return (void*)task->heap_end;
-}
-void syscall_set_heap_size(u32 size) {
-    Task* task = task_manager_get_current_task();
-    userheap_set_size(task, size);
-}
 u32 syscall_get_file_offset(u32 file_id) {
     if (file_id == 0) return 0;
     assert(file_id >= 10);
@@ -283,8 +253,18 @@ u32 syscall_get_file_size(u32 file_id) {
     return task->files[file_index].size;
 }
 
-u32 syscall_get_screen_size_x() { return SCREEN_X; }
-u32 syscall_get_screen_size_y() { return SCREEN_Y; }
+void* syscall_get_heap_start() {
+    Task* task = task_manager_get_current_task();
+    return (void*)task->heap_start;
+}
+void* syscall_get_heap_end() {
+    Task* task = task_manager_get_current_task();
+    return (void*)task->heap_end;
+}
+void syscall_set_heap_size(u32 size) {
+    Task* task = task_manager_get_current_task();
+    userheap_set_size(task, size);
+}
 
 void syscall_scheduler_next() { task_manager_schedule(); }
 void syscall_sleep(u32 ms) {
@@ -299,6 +279,27 @@ void syscall_wait_for_event() {
     task_manager_schedule();
 }
 
+EventBuffer* syscall_create_events_buf() {
+    Task* task = task_manager_get_current_task();
+    u32 task_id = task_manager_get_current_task_id();
+
+    if (task->shmem_events_obj != -1) {
+        shmem_unmap(task_id, task->shmem_events_obj);
+        shmem_destroy(task->shmem_events_obj);
+    }
+
+    u32 object_id = shmem_create(sizeof(EventBuffer), task_id);
+    task->shmem_events_obj = task_id;
+
+    void* kernel_vaddr = shmem_map(object_id, 0);
+    assert(kernel_vaddr);
+    events_add_receiver(kernel_vaddr, task);
+
+    void* user_vaddr = shmem_map(object_id, task_id);
+    assert(user_vaddr);
+    return user_vaddr;
+}
+
 void syscalls_init() {
     memset(syscall_handlers, 0, sizeof(syscall_handlers));
 
@@ -306,33 +307,30 @@ void syscalls_init() {
     syscall_handlers[SYSCALL_PRINT] = syscall_print;
     syscall_handlers[SYSCALL_PRINT_CHAR] = syscall_print_char;
     syscall_handlers[SYSCALL_GET_SYSTIME] = syscall_get_systime;
+    syscall_handlers[SYSCALL_READ] = syscall_read;
+    syscall_handlers[SYSCALL_WRITE] = syscall_write;
 
     syscall_handlers[SYSCALL_CREATE_FB] = syscall_create_fb;
     syscall_handlers[SYSCALL_DRAW_FB] = syscall_draw_fb;
     syscall_handlers[SYSCALL_REQUEST_SCREEN] = syscall_request_screen;
-
-    syscall_handlers[SYSCALL_CREATE_EVENTS_BUF] = syscall_create_events_buf;
+    syscall_handlers[SYSCALL_GET_SCREEN_SIZE_X] = syscall_get_screen_size_x;
+    syscall_handlers[SYSCALL_GET_SCREEN_SIZE_Y] = syscall_get_screen_size_y;
 
     syscall_handlers[SYSCALL_FILE_OPEN] = syscall_file_open;
     syscall_handlers[SYSCALL_FILE_CLOSE] = syscall_file_close;
-
-    syscall_handlers[SYSCALL_READ] = syscall_read;
-    syscall_handlers[SYSCALL_WRITE] = syscall_write;
+    syscall_handlers[SYSCALL_GET_FILE_OFFSET] = syscall_get_file_offset;
+    syscall_handlers[SYSCALL_SET_FILE_OFFSET] = syscall_set_file_offset;
+    syscall_handlers[SYSCALL_GET_FILE_SIZE] = syscall_get_file_size;
 
     syscall_handlers[SYSCALL_GET_HEAP_START] = syscall_get_heap_start;
     syscall_handlers[SYSCALL_GET_HEAP_END] = syscall_get_heap_end;
     syscall_handlers[SYSCALL_SET_HEAP_SIZE] = syscall_set_heap_size;
 
-    syscall_handlers[SYSCALL_GET_FILE_OFFSET] = syscall_get_file_offset;
-    syscall_handlers[SYSCALL_SET_FILE_OFFSET] = syscall_set_file_offset;
-    syscall_handlers[SYSCALL_GET_FILE_SIZE] = syscall_get_file_size;
-
-    syscall_handlers[SYSCALL_GET_SCREEN_SIZE_X] = syscall_get_screen_size_x;
-    syscall_handlers[SYSCALL_GET_SCREEN_SIZE_Y] = syscall_get_screen_size_y;
-
     syscall_handlers[SYSCALL_SCHEDULER_NEXT] = syscall_scheduler_next;
     syscall_handlers[SYSCALL_SLEEP] = syscall_sleep;
     syscall_handlers[SYSCALL_WAIT_FOR_EVENT] = syscall_wait_for_event;
+
+    syscall_handlers[SYSCALL_CREATE_EVENTS_BUF] = syscall_create_events_buf;
 
     set_isr_function(0x80, handle_syscall_interrupt);
 }
