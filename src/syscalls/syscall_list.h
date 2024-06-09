@@ -33,6 +33,8 @@
 
 #define SYSCALL_GET_SCREEN_SIZE_X 0x12
 #define SYSCALL_GET_SCREEN_SIZE_Y 0x13
+
+#define SYSCALL_SCHEDULER_NEXT    0x14
 // clang-format on
 
 #endif

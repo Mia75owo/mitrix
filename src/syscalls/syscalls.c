@@ -286,6 +286,10 @@ u32 syscall_get_file_size(u32 file_id) {
 u32 syscall_get_screen_size_x() { return SCREEN_X; }
 u32 syscall_get_screen_size_y() { return SCREEN_Y; }
 
+void syscall_scheduler_next() {
+    task_manager_schedule();
+}
+
 void syscalls_init() {
     memset(syscall_handlers, 0, sizeof(syscall_handlers));
 
@@ -316,6 +320,8 @@ void syscalls_init() {
 
     syscall_handlers[SYSCALL_GET_SCREEN_SIZE_X] = syscall_get_screen_size_x;
     syscall_handlers[SYSCALL_GET_SCREEN_SIZE_Y] = syscall_get_screen_size_y;
+
+    syscall_handlers[SYSCALL_SCHEDULER_NEXT] = syscall_scheduler_next;
 
     set_isr_function(0x80, handle_syscall_interrupt);
 }

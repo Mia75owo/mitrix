@@ -158,3 +158,9 @@ u32 syscall_get_screen_size_y() {
     asm volatile("int $0x80" : "=a"(ret) : "a"(syscall));
     return ret;
 }
+void syscall_scheduler_next() {
+    u32 ret;
+    u32 syscall = SYSCALL_SCHEDULER_NEXT;
+
+    asm volatile("int $0x80" : "=a"(ret) : "a"(syscall));
+}
