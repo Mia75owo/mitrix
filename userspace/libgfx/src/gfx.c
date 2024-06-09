@@ -33,9 +33,7 @@ void gfx_box(u32 x, u32 y, u32 width, u32 height, u32 border, Color color) {
     gfx_rect(x + width - border, y, border, height, color);
 }
 
-void gfx_load_font(u32* buffer) {
-    font = buffer;
-}
+void gfx_load_font(u32* buffer) { font = buffer; }
 
 void gfx_char(u32 x, u32 y, unsigned char c, Color fg, Color bg) {
     u32 local_offset_x = (c % 16);
@@ -53,5 +51,11 @@ void gfx_char(u32 x, u32 y, unsigned char c, Color fg, Color bg) {
                 screen[(j + y) * gfx.width + (i + x)] = fg;
             }
         }
+    }
+}
+
+void gfx_write(u32 x, u32 y, const char* str, Color fg, Color bg) {
+    for (u32 i = 0; *str != '\0'; i++) {
+        gfx_char(x + i * 16, y, *str++, fg, bg);
     }
 }
