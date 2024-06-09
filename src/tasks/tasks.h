@@ -34,10 +34,8 @@ typedef struct {
     u8* raw_elf;
 
     SharedMemPool shmem_pool;
-    i32 shmem_fb_obj;
+    i32 fb_handle_id;
     i32 shmem_events_obj;
-
-    bool double_buffering;
 
     TaskOpenFile files[TASK_MAX_FILES];
     u32 heap_start;

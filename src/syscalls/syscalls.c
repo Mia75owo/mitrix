@@ -2,6 +2,7 @@
 
 #include "disk/mifs.h"
 #include "events/events.h"
+#include "gfx/fb_manager.h"
 #include "gfx/gfx.h"
 #include "gfx/gui.h"
 #include "gfx/tty.h"
@@ -14,9 +15,6 @@
 #include "util/debug.h"
 #include "util/mem.h"
 
-static volatile i32 currently_mapped_fb = -1;
-static volatile u8* currently_mapped_fb_addr = 0;
-static i32 currently_drawing_task = -1;
 void* syscall_handlers[SYSCALLS_COUNT];
 
 static void handle_syscall_interrupt(CPUState* frame) {
@@ -52,13 +50,14 @@ static void syscall_exit() {
     u32 task_id = task_manager_get_current_task_id();
     shmem_destroy_owned_by(task_id);
 
-    if (currently_drawing_task == (i32)task_id) {
-        currently_drawing_task = -1;
-        currently_mapped_fb = -1;
+    if (fb_manager_get_current_handle_id() == task->fb_handle_id) {
         // Enable GUI render loop
         Task* gui_task = task_manager_get_task(1);
         gui_task->state = TASK_STATE_RUNNING;
         gui_trigger_entire_redraw();
+    }
+    if (task->fb_handle_id != -1) {
+        fb_manager_remove(task->fb_handle_id);
     }
 
     // Free userheap
@@ -144,16 +143,14 @@ static void syscall_exec_blocking(char* file_name) {
 }
 
 static u32* syscall_create_fb(u32 width, u32 height, bool double_buffering) {
+    Task* task = task_manager_get_current_task();
     u32 task_id = task_manager_get_current_task_id();
 
-    // TODO: make the size dynamic
     u32 object_id = shmem_create(width * height * sizeof(u32), task_id);
     u8* addr = shmem_map(object_id, task_id);
     assert(addr);
 
-    Task* task = task_manager_get_task(task_id);
-    task->shmem_fb_obj = object_id;
-    task->double_buffering = double_buffering;
+    task->fb_handle_id = fb_manager_add(object_id, addr, double_buffering);
 
     return (u32*)addr;
 }
@@ -162,27 +159,15 @@ u32 frames = 0;
 u32 seconds = 0;
 static void syscall_draw_fb(u32 width, u32 height) {
     Task* task = task_manager_get_current_task();
-    i32 object_id = task->shmem_fb_obj;
-    if (object_id == -1) {
-        return;
-    }
-    if (currently_mapped_fb != object_id) {
-        if (currently_mapped_fb != -1) {
-            shmem_unmap(currently_mapped_fb, 0);
-        }
-        currently_mapped_fb = object_id;
-        currently_mapped_fb_addr = shmem_map(object_id, 0);
-    }
 
-    if (!task->double_buffering) {
-        gfx_doublebuffering(false);
-    }
+    u8* addr = fb_manager_map(task->fb_handle_id);
 
     // Enable interrupts during this copying, to not block timer interrupts
     asm volatile("sti");
     gfx_clone((SCREEN_X - width) / 2, (SCREEN_Y - height) / 2, width, height,
-              (u32*)currently_mapped_fb_addr);
+              (u32*)addr);
     gfx_display_backbuffer();
+
 
 #if (defined(DEBUG) && 0)
     u32 time = pit_get_tics();
@@ -196,19 +181,6 @@ static void syscall_draw_fb(u32 width, u32 height) {
 #endif
 }
 static void syscall_request_screen() {
-    Task* task = task_manager_get_current_task();
-    u32 task_id = task_manager_get_current_task_id();
-
-    i32 object_id = task->shmem_fb_obj;
-    if (object_id == -1) {
-        return;
-    }
-    if (currently_drawing_task != -1) {
-        return;
-    }
-
-    currently_drawing_task = task_id;
-
     // Pause GUI render loop
     Task* gui_task = task_manager_get_task(1);
     gui_task->state = TASK_STATE_IDLE;

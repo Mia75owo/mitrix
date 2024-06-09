@@ -2,6 +2,7 @@
 #include "events/events.h"
 #include "fpu/fpu.h"
 #include "gdt/gdt.h"
+#include "gfx/fb_manager.h"
 #include "gfx/gfx.h"
 #include "gfx/gui.h"
 #include "gfx/tty.h"
@@ -73,6 +74,7 @@ __attribute__((noreturn)) void kernel_main(u32 magic,
     kinit(syscalls_init(), "Syscalls");
     kinit(shmem_init(), "SharedMem");
     kinit(events_init(), "Events");
+    kinit(fb_manager_init(), "FB Manager");
 
     /*debug_tests();*/
 

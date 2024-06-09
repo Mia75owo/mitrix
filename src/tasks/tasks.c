@@ -72,9 +72,8 @@ static void task_create(Task* this, void entrypoint(), bool kernel_task,
         this->shmem_pool.vaddr_start = USER_SHARED_MEM;
         userheap_init(this);
     }
-    this->shmem_fb_obj = -1;
+    this->fb_handle_id = -1;
     this->shmem_events_obj = -1;
-    this->double_buffering = false;
     this->sleep_timestamp = 0;
     this->pending_events = false;
     this->owner_task = -1;

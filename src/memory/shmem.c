@@ -137,10 +137,11 @@ void shmem_unmap(u32 id, u32 task_id) {
     for (u32 i = 0; i < MAX_SHARED_MEM_HANDLES; i++) {
         if (pool->handles[i].shared_mem_object_index == id) {
             handle = &pool->handles[i];
+            pool_index = i;
             break;
         }
     }
-
+    assert(pool_index != -1);
     assert(handle);
 
     bool unmap_from_kernel = task_id == 0;
