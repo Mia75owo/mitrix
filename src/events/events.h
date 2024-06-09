@@ -3,6 +3,7 @@
 
 #include "keyboard/keyboard.h"
 #include "mouse/mouse.h"
+#include "tasks/tasks.h"
 #include "util/types.h"
 
 #define MAX_EVENT_RECEIVERS 16
@@ -17,6 +18,7 @@ _Static_assert(sizeof(Event) == 3, "Event union size mismatch");
 
 typedef struct {
     u32* buf;
+    Task* task;
 } EventReceiver;
 
 typedef struct {
@@ -27,7 +29,7 @@ typedef struct {
 
 void events_init();
 
-void events_add_receiver(u32* buf);
+void events_add_receiver(u32* buf, Task* task);
 void events_remove_receiver(u32* buf);
 
 void events_key_event(KeyEvent evt);

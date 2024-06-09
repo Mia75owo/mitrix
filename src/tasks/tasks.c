@@ -76,6 +76,7 @@ static void task_create(Task* this, void entrypoint(), bool kernel_task,
     this->shmem_events_obj = -1;
     this->double_buffering = false;
     this->sleep_timestamp = 0;
+    this->pending_events = false;
     memset(this->files, 0, sizeof(this->files));
 }
 

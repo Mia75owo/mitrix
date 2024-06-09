@@ -13,6 +13,7 @@ typedef enum {
     TASK_STATE_IDLE,
     TASK_STATE_RUNNING,
     TASK_STATE_SLEEPING,
+    TASK_STATE_WAIT_FOR_EVENT,
 } TaskState;
 
 typedef struct {
@@ -42,6 +43,7 @@ typedef struct {
     u32 heap_end;
 
     u32 sleep_timestamp;
+    bool pending_events;
 
     u8* stack;
 } Task;

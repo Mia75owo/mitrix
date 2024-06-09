@@ -203,7 +203,7 @@ EventBuffer* syscall_create_events_buf() {
 
     void* kernel_vaddr = shmem_map(object_id, 0);
     assert(kernel_vaddr);
-    events_add_receiver(kernel_vaddr);
+    events_add_receiver(kernel_vaddr, task);
 
     void* user_vaddr = shmem_map(object_id, task_id);
     assert(user_vaddr);
@@ -286,7 +286,10 @@ u32 syscall_get_file_size(u32 file_id) {
 u32 syscall_get_screen_size_x() { return SCREEN_X; }
 u32 syscall_get_screen_size_y() { return SCREEN_Y; }
 
-void syscall_scheduler_next() {
+void syscall_scheduler_next() { task_manager_schedule(); }
+void syscall_wait_for_event() {
+    Task* task = task_manager_get_current_task();
+    task->state = TASK_STATE_WAIT_FOR_EVENT;
     task_manager_schedule();
 }
 
@@ -322,6 +325,7 @@ void syscalls_init() {
     syscall_handlers[SYSCALL_GET_SCREEN_SIZE_Y] = syscall_get_screen_size_y;
 
     syscall_handlers[SYSCALL_SCHEDULER_NEXT] = syscall_scheduler_next;
+    syscall_handlers[SYSCALL_WAIT_FOR_EVENT] = syscall_wait_for_event;
 
     set_isr_function(0x80, handle_syscall_interrupt);
 }

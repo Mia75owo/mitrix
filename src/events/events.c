@@ -29,6 +29,8 @@ void events_key_event(KeyEvent evt) {
         // Key Event flag
         evt.reserved = 1;
         buf->events[buf->write_index] = (Event)evt;
+
+        receivers[i].task->pending_events = true;
     }
 }
 void events_mouse_event(MouseEvent evt) {
@@ -44,14 +46,17 @@ void events_mouse_event(MouseEvent evt) {
         // Key Event flag
         evt.reserved = 0;
         buf->events[buf->write_index] = (Event)evt;
+
+        receivers[i].task->pending_events = true;
     }
 }
 
-void events_add_receiver(u32* buf) {
+void events_add_receiver(u32* buf, Task* task) {
     i32 slot = get_free_slot();
     assert(slot >= 0);
 
     receivers[slot].buf = buf;
+    receivers[slot].task = task;
 }
 void events_remove_receiver(u32* buf) {
     for (u32 i = 0; i < MAX_EVENT_RECEIVERS; i++) {

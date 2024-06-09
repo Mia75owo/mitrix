@@ -2,6 +2,7 @@
 
 #include "memory/memory.h"
 #include "pit/pit.h"
+#include "tasks/tasks.h"
 #include "util/debug.h"
 #include "util/mem.h"
 
@@ -37,10 +38,21 @@ static u32 tasks_choose_next() {
             index = 0;
         }
 
+        // Skip unused slots
+        if (tasks[index].state == TASK_STATE_DEAD) {
+            continue;
+        }
+
         // Wake up task from sleeping
         if (tasks[index].state == TASK_STATE_SLEEPING &&
             tasks[index].sleep_timestamp <= pit_get_tics()) {
             tasks[index].state = TASK_STATE_RUNNING;
+        }
+        // Wake up task for event
+        if (tasks[index].state == TASK_STATE_WAIT_FOR_EVENT &&
+            tasks[index].pending_events) {
+            tasks[index].state = TASK_STATE_RUNNING;
+            tasks[index].pending_events = false;
         }
 
         if (tasks[index].state == TASK_STATE_RUNNING) {
@@ -87,7 +99,7 @@ void task_manager_kill_current_task() {
     num_tasks--;
 }
 bool task_manager_current_task_alive() {
-    return tasks[current_task].state == TASK_STATE_RUNNING;
+    return tasks[current_task].state != TASK_STATE_DEAD;
 }
 
 Task* task_manager_get_task(u32 task_id) {
