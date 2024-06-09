@@ -12,6 +12,7 @@ typedef enum {
     TASK_STATE_DEAD,
     TASK_STATE_IDLE,
     TASK_STATE_RUNNING,
+    TASK_STATE_SLEEPING,
 } TaskState;
 
 typedef struct {
@@ -39,6 +40,8 @@ typedef struct {
     TaskOpenFile files[TASK_MAX_FILES];
     u32 heap_start;
     u32 heap_end;
+
+    u32 sleep_timestamp;
 
     u8* stack;
 } Task;

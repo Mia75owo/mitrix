@@ -1,6 +1,7 @@
 #include "task_manager.h"
 
 #include "memory/memory.h"
+#include "pit/pit.h"
 #include "util/debug.h"
 #include "util/mem.h"
 
@@ -34,6 +35,12 @@ static u32 tasks_choose_next() {
         index++;
         if (index >= TASKS_COUNT) {
             index = 0;
+        }
+
+        // Wake up task from sleeping
+        if (tasks[index].state == TASK_STATE_SLEEPING &&
+            tasks[index].sleep_timestamp <= pit_get_tics()) {
+            tasks[index].state = TASK_STATE_RUNNING;
         }
 
         if (tasks[index].state == TASK_STATE_RUNNING) {
