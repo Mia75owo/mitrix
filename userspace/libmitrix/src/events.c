@@ -1,6 +1,6 @@
 #include "events.h"
 
-static EventBuffer* buf;
+static volatile EventBuffer* buf;
 
 void events_init(EventBuffer* buffer) {
     buf = buffer;
@@ -16,7 +16,7 @@ Event events_pull() {
     }
 
     buf->read_index++;
-    if (buf->read_index >= MAX_EVENTS - 1) {
+    if (buf->read_index >= MAX_EVENTS) {
         buf->read_index = 0;
     }
     return buf->events[buf->read_index];
