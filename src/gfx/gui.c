@@ -1,5 +1,6 @@
 #include "gui.h"
 
+#include "gfx/fb_manager.h"
 #include "gfx/gfx.h"
 #include "gfx/tty.h"
 #include "gfx/vtty.h"
@@ -7,6 +8,7 @@
 #include "memory/memory.h"
 #include "pit/pit.h"
 #include "shell/shell.h"
+#include "tasks/task_manager.h"
 #include "util/debug.h"
 #include "util/mem.h"
 #include "util/sys.h"
@@ -41,7 +43,8 @@ void gui_redraw() {
     }
     vtty_render_last_line(tty_redraw_last_from());
 
-    gfx_rect(0, VTTY_HEIGHT * 16, SCREEN_X, SCREEN_Y - VTTY_HEIGHT * 16, 0xFF000000);
+    gfx_rect(0, VTTY_HEIGHT * 16, SCREEN_X, SCREEN_Y - VTTY_HEIGHT * 16,
+             0xFF000000);
 
     u32 cursor_pos = 0;
     if (gui.getting_user_input) {
@@ -85,6 +88,27 @@ void gui_key_event(KeyEvent evt) {
     if (gui.getting_user_input) {
         gui_user_input_key_event(evt);
         return;
+    }
+
+    // Switch between buffers
+    if (evt.special) {
+        if (evt.c >= KEYCODE_F1 && evt.c <= KEYCODE_F12) {
+            u32 taskid = evt.c - KEYCODE_F1;
+            Task* task = task_manager_get_task(taskid);
+
+            if (task->state == TASK_STATE_DEAD) {
+                return;
+            }
+            fb_manager_pause_all();
+
+            // User task
+            if (task->raw_elf != 0) {
+                fb_manager_map(task->fb_handle_id);
+            } else {
+                fb_manager_map(0);
+            }
+            task->state = TASK_STATE_RUNNING;
+        }
     }
 
     if (evt.alt) {

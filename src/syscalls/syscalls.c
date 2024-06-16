@@ -150,7 +150,7 @@ static u32* syscall_create_fb(u32 width, u32 height, bool double_buffering) {
     u8* addr = shmem_map(object_id, task_id);
     assert(addr);
 
-    task->fb_handle_id = fb_manager_add(object_id, addr, double_buffering);
+    task->fb_handle_id = fb_manager_add(object_id, addr, double_buffering, task);
 
     return (u32*)addr;
 }
