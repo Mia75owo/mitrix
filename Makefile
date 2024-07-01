@@ -102,7 +102,7 @@ $(OUT)/mitrix.iso: $(OUT)/$(OS) $(OUT)/$(RAMDISK)
 # compile_commands.json #
 #########################
 
-gen_cc_json: clean
+gen_cc_json: clean # Genereate compile_commands.json for LSP
 	bear -- $(MAKE) $(OUT)/$(OS)
 	$(MAKE) --no-print-directory -C userspace gen_cc_json
 

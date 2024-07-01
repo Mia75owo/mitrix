@@ -16,9 +16,9 @@ libgfx.a: $(OBJ)
 	@$(CC) -c $< -o $@ $(CFLAGS)
 	@$(call PRETTYCC,"$<")
 
-gen_cc_json: clean
+gen_cc_json: clean # Genereate compile_commands.json for LSP
 	bear -- make all
 
-clean:
+clean: # Clean generated files
 	@rm -rf *.o libgfx.a
 	@$(call PRETTYRM,"*.o libgfx.a")

@@ -41,7 +41,7 @@ all:
 	$(MAKE) --no-print-directory -C doomgeneric
 	@cp doomgeneric/*.elf bin/
 
-gen_cc_json:
+gen_cc_json: # Genereate compile_commands.json for LSP
 	$(MAKE) --no-print-directory -C libmitrix gen_cc_json
 	$(MAKE) --no-print-directory -C libc gen_cc_json
 	$(MAKE) --no-print-directory -C libgfx gen_cc_json
@@ -50,7 +50,7 @@ gen_cc_json:
 	$(MAKE) --no-print-directory -C flappy gen_cc_json
 	$(MAKE) --no-print-directory -C doomgeneric gen_cc_json
 
-clean:
+clean: # Clean generated files
 	@rm -rf bin/*.elf
 	$(call PRETTYRM,"bin/*.elf")
 	$(MAKE) --no-print-directory -C libmitrix clean

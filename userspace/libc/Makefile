@@ -24,10 +24,10 @@ include ../../util.mk
 .DEFAULT_GOAL := all
 all: libc.a
 
-gen_cc_json: clean
+gen_cc_json: clean # Genereate compile_commands.json for LSP
 	bear -- make all
 
-clean:
+clean: # Clean generated files
 	@$(RM) $(OBJS) $(TESTS_OBJS) libc.a
 	@$(call PRETTYRM,"$(OBJS) $(TESTS_OBJS) libc.a")
 
