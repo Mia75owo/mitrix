@@ -53,6 +53,9 @@ static void syscall_exit() {
     if (task->shmem_events_obj != -1) {
         void* events_vaddr = shmem_get_vaddr(task->shmem_events_obj, 0);
         events_remove_receiver(events_vaddr);
+
+        shmem_unmap(task->shmem_events_obj, 0);
+        shmem_destroy(task->shmem_events_obj);
     }
 
     shmem_destroy_owned_by(task_id);
