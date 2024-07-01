@@ -30,7 +30,9 @@ void handler_page_fault(CPUState* frame) {
     klog("%04ERROR: Exception (Page Fault)!\n");
 
     ErrorHandlerPageFault err;
-    *((u32*)&err) = frame->error;
+
+    union { ErrorHandlerPageFault err; u32 val; } tmp = { .val = frame->error };
+    err = tmp.err;
 
     if (!err.present) {
         klog("%40non-present page\n");
@@ -74,7 +76,8 @@ void handler_general_protection_fault(CPUState* frame) {
     klog("%04ERROR: Exception (General Protection Fault)!\n");
 
     ErrorHandlerGeneralProtectionFault err;
-    *((u32*)&err) = frame->error;
+    union { ErrorHandlerGeneralProtectionFault err; u32 val; } tmp = { .val = frame->error };
+    err = tmp.err;
 
     if (frame->error) {
         if (err.external) {
