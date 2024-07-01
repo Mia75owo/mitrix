@@ -9,12 +9,9 @@
 #include "util/sys.h"
 
 static SharedMemObject shared_mem_objects[MAX_SHARED_MEM_OBJS];
-static SharedMemPool kernel_shpool;
 
 void shmem_init() {
     memset(&shared_mem_objects, 0, sizeof(shared_mem_objects));
-    memset(&kernel_shpool, 0, sizeof(kernel_shpool));
-    kernel_shpool.vaddr_start = KERNEL_SHARED_MEM;
 }
 
 static i32 find_available_obj_slot() {
@@ -88,11 +85,12 @@ void* shmem_map(u32 object_id, u32 task_id) {
 
     SharedMemObject* obj = &shared_mem_objects[object_id];
 
+    Task* task = task_manager_get_task(task_id);
     SharedMemPool* pool;
-    if (task_id == 0) {
-        pool = &kernel_shpool;
+    if (task->is_kernel_task) {
+        // All kernel tasks share the same pool
+        pool = &task_manager_get_task(0)->shmem_pool;
     } else {
-        Task* task = task_manager_get_task(task_id);
         pool = &task->shmem_pool;
     }
 
@@ -122,11 +120,12 @@ void* shmem_map(u32 object_id, u32 task_id) {
 void shmem_unmap(u32 id, u32 task_id) {
     SharedMemObject* obj = &shared_mem_objects[id];
 
+    Task* task = task_manager_get_task(task_id);
     SharedMemPool* pool;
-    if (task_id == 0) {
-        pool = &kernel_shpool;
+    if (task->is_kernel_task) {
+        // All kernel tasks share the same pool
+        pool = &task_manager_get_task(0)->shmem_pool;
     } else {
-        Task* task = task_manager_get_task(task_id);
         pool = &task->shmem_pool;
     }
 

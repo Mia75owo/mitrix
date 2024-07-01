@@ -69,7 +69,6 @@ __attribute__((noreturn)) void kernel_main(u32 magic,
 
     kinit(gfx_init(gfx_data), "GFX");
     gfx_fill(0x111111);
-    // gfx_debug(GFX_DEBUG_FONT_FILL);
 
     kinit(syscalls_init(), "Syscalls");
     kinit(shmem_init(), "SharedMem");

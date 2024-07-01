@@ -66,6 +66,8 @@ static void task_create(Task* this, void entrypoint(), bool kernel_task,
     this->kesp0 = (u32)kesp0;
     this->kesp = (u32)kesp;
 
+    this->is_kernel_task = kernel_task;
+
     if (kernel_task) {
         this->shmem_pool.vaddr_start = KERNEL_SHARED_MEM;
     } else {

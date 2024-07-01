@@ -18,6 +18,7 @@ void task_manager_init() {
 
     tasks[current_task].state = TASK_STATE_RUNNING;
     tasks[current_task].page_dir = memory_get_current_page_dir();
+    tasks[0].shmem_pool.vaddr_start = KERNEL_SHARED_MEM;
 }
 
 static i32 get_free_task_slot() {

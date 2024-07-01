@@ -46,6 +46,8 @@ typedef struct {
 
     i32 owner_task;
 
+    bool is_kernel_task;
+
     u8* stack;
 } Task;
 

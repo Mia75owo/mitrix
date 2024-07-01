@@ -100,7 +100,7 @@ u32 memory_unmap_page(u32 virt_addr) {
 
     u32 pd_entry = page_dir[PD_INDEX(virt_addr)];
     assert_msg(pd_entry & PTE_PRESENT,
-               "Tried to free page from a non presetn page table!");
+               "Tried to free page from a non present page table!");
 
     u32* pt = REC_PAGETABLE(PD_INDEX(virt_addr));
 
