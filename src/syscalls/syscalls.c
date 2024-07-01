@@ -48,6 +48,13 @@ static void handle_syscall_interrupt(CPUState* frame) {
 static void syscall_exit() {
     Task* task = task_manager_get_current_task();
     u32 task_id = task_manager_get_current_task_id();
+
+    // Remove event receiver
+    if (task->shmem_events_obj != -1) {
+        void* events_vaddr = shmem_get_vaddr(task->shmem_events_obj, 0);
+        events_remove_receiver(events_vaddr);
+    }
+
     shmem_destroy_owned_by(task_id);
 
     if (fb_manager_get_current_handle_id() == task->fb_handle_id) {
@@ -318,7 +325,7 @@ EventBuffer* syscall_create_events_buf() {
     }
 
     u32 object_id = shmem_create(sizeof(EventBuffer), task_id);
-    task->shmem_events_obj = task_id;
+    task->shmem_events_obj = object_id;
 
     void* kernel_vaddr = shmem_map(object_id, 0);
     assert(kernel_vaddr);

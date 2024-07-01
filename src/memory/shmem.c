@@ -169,3 +169,26 @@ void shmem_destroy_owned_by(u32 task_id) {
         }
     }
 }
+
+void* shmem_get_vaddr(u32 object_id, u32 task_id) {
+    Task* task = task_manager_get_task(task_id);
+    SharedMemPool* pool;
+    if (task->is_kernel_task) {
+        // All kernel tasks share the same pool
+        pool = &task_manager_get_task(0)->shmem_pool;
+    } else {
+        pool = &task->shmem_pool;
+    }
+    assert(pool);
+
+    SharedMemHandle* handle = NULL;
+    for (u32 i = 0; i < MAX_SHARED_MEM_HANDLES; i++) {
+        if (pool->handles[i].shared_mem_object_index == object_id) {
+            handle = &pool->handles[i];
+            break;
+        }
+    }
+    assert(handle);
+
+    return (void*)handle->vaddr;
+}
