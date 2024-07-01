@@ -4,10 +4,10 @@ EXE = fib.elf
 all: $(EXE)
 
 $(EXE): $(OBJ)
-	$(LD) -o $(EXE) $(OBJ) $(LD_flags)
+	$(LD) -o $(EXE) $(OBJ) $(LDFLAGS)
 
 %.o: %.c
-	$(CC) -c $< -o $@ $(CC_flags)
+	$(CC) -c $< -o $@ $(CFLAGS)
 
 gen_cc_json: clean
 	bear -- make all

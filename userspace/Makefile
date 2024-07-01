@@ -1,29 +1,25 @@
-PROVIDED_CC?=i686-elf-gcc
-PROVIDED_AS?=nasm
-PROVIDED_AR?=i686-elf-ar
+CC?=~/opt/cross/bin/i686-elf-gcc
+LD?=~/opt/cross/bin/i686-elf-gcc
+AR?=~/opt/cross/bin/i686-elf-ar
+AS?=nasm
 
-CC=$(PROVIDED_CC)
-AS=$(PROVIDED_AS)
-LD=$(PROVIDED_CC)
-AR=$(PROVIDED_AR)
+CFLAGS =
+CFLAGS += -std=gnu11
+CFLAGS += -ffreestanding
+CFLAGS += -fno-builtin
+CFLAGS += -nostdlib
+CFLAGS += -Wall
+CFLAGS += -Wextra
+CFLAGS += -I../libmitrix/include
+CFLAGS += -I../libc/include
 
-CC_flags =
-CC_flags += -std=gnu11
-CC_flags += -ffreestanding
-CC_flags += -fno-builtin
-CC_flags += -nostdlib
-CC_flags += -Wall
-CC_flags += -Wextra
-CC_flags += -I../libmitrix/include
-CC_flags += -I../libc/include
+ASFLAGS = -f elf32
 
-AS_flags=-f elf32
-
-LD_flags = 
-LD_flags += -ffreestanding
-LD_flags += -fno-builtin
-LD_flags += -nostdlib
-LD_flags += -L../libmitrix -l:libmitrix.a -L../libc -l:libc.a -static-libgcc -lgcc
+LDFLAGS = 
+LDFLAGS += -ffreestanding
+LDFLAGS += -fno-builtin
+LDFLAGS += -nostdlib
+LDFLAGS += -L../libmitrix -l:libmitrix.a -L../libc -l:libc.a -static-libgcc -lgcc
 
 export
 

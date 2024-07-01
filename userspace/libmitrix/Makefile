@@ -1,13 +1,13 @@
 OBJ = $(patsubst %.c, %.o, $(wildcard src/*.c))
 
-CC_flags =
-CC_flags += -O3
-CC_flags += -ffreestanding
-CC_flags += -fno-builtin
-CC_flags += -nostdlib
-CC_flags += -Wall
-CC_flags += -Wextra
-CC_flags += -I include
+CFLAGS =
+CFLAGS += -O3
+CFLAGS += -ffreestanding
+CFLAGS += -fno-builtin
+CFLAGS += -nostdlib
+CFLAGS += -Wall
+CFLAGS += -Wextra
+CFLAGS += -I include
 
 all: libmitrix.a
 
@@ -15,7 +15,7 @@ libmitrix.a: $(OBJ)
 	$(AR) rcs $@ $^
 
 %.o: %.c
-	$(CC) -c $< -o $@ $(CC_flags)
+	$(CC) -c $< -o $@ $(CFLAGS)
 
 gen_cc_json: clean
 	bear -- make all

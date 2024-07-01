@@ -7,3 +7,5 @@ result
 **/*.a
 **/*.o
 **/*.elf
+toolchain/binutils*
+toolchain/gcc*

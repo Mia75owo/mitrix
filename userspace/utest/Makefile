@@ -1,17 +1,17 @@
 OBJ = $(patsubst %.c, %.o, $(wildcard *.c))
 EXE = utest.elf
 
-CC_flags += -I../libgfx/include
-CC_flags += -O3
-LD_flags += -L../libgfx -l:libgfx.a
+CFLAGS += -I../libgfx/include
+CFLAGS += -O3
+LDFLAGS += -L../libgfx -l:libgfx.a
 
 all: $(EXE)
 
 $(EXE): $(OBJ)
-	$(LD) -o $(EXE) $(OBJ) $(LD_flags)
+	$(LD) -o $(EXE) $(OBJ) $(LDFLAGS)
 
 %.o: %.c
-	$(CC) -c $< -o $@ $(CC_flags)
+	$(CC) -c $< -o $@ $(CFLAGS)
 
 gen_cc_json: clean
 	bear -- make all

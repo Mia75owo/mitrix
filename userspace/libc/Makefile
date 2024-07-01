@@ -1,6 +1,6 @@
-# You can override the CC_flags and C compiler externally,
+# You can override the CFLAGS and C compiler externally,
 # e.g. make PLATFORM=cortex-m3
-CC_flags += -Wall -I include -O3
+CFLAGS += -Wall -I include -O3
 
 # With this, the makefile should work on Windows also.
 ifdef windir
@@ -17,7 +17,7 @@ TESTS_OBJS = $(TESTS_CSRC:.c=)
 
 # Some of the files uses "templates", i.e. common pieces
 # of code included from multiple files.
-CC_flags += -Isrc/templates
+CFLAGS += -Isrc/templates
 
 all: libc.a
 
@@ -35,7 +35,7 @@ run_tests: $(TESTS_OBJS)
 	$(foreach f,$^,$f)
 
 tests/%: tests/%.c tests/tests_glue.c libc.a
-	$(CC) $(CC_flags) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^
 
 %.o: %.c
-	$(CC) $(CC_flags) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
