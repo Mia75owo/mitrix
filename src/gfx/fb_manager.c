@@ -1,5 +1,6 @@
 #include "fb_manager.h"
 
+#include "events/events.h"
 #include "gfx/gfx.h"
 #include "memory/shmem.h"
 #include "tasks/task_manager.h"
@@ -64,6 +65,8 @@ u8* fb_manager_map(u32 handle_id) {
     current_handle = handle_id;
 
     handle.fb_object_addr = shmem_map(handle.fb_object_id, 0);
+
+    events_focus_task(handles[handle_id].task);
 
     gfx_doublebuffering(handle.double_buffering);
     return handle.fb_object_addr;

@@ -57,6 +57,9 @@ static void syscall_exit() {
         shmem_unmap(task->shmem_events_obj, 0);
         shmem_destroy(task->shmem_events_obj);
     }
+    if (events_get_focused_task() == task) {
+        events_focus_task(NULL);
+    }
 
     shmem_destroy_owned_by(task_id);
 
@@ -332,7 +335,7 @@ EventBuffer* syscall_create_events_buf() {
 
     void* kernel_vaddr = shmem_map(object_id, 0);
     assert(kernel_vaddr);
-    events_add_receiver(kernel_vaddr, task);
+    events_add_receiver(kernel_vaddr, task, false);
 
     void* user_vaddr = shmem_map(object_id, task_id);
     assert(user_vaddr);

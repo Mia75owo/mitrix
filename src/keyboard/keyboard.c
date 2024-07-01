@@ -94,8 +94,11 @@ void keyboard_handler(CPUState* frame) {
     event.extended = extended;
     event.raw = scan_code;
 
+    Task* focused_task = events_get_focused_task();
+    if (focused_task == NULL || focused_task->is_kernel_task) {
+        gui_key_event(event);
+    }
     events_key_event(event);
-    gui_key_event(event);
 }
 
 // clang-format off

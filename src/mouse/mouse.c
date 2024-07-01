@@ -61,6 +61,9 @@ void mouse_handler(CPUState* frame) {
     evt.button_left = (packets[1] & (1 << 0)) > 0;
     evt.button_right = (packets[1] & (1 << 1)) > 0;
 
+    Task* focused_task = events_get_focused_task();
+    if (focused_task == NULL || focused_task->is_kernel_task) {
+        gui_mouse_event(evt);
+    }
     events_mouse_event(evt);
-    gui_mouse_event(evt);
 }

@@ -19,6 +19,7 @@ _Static_assert(sizeof(Event) == 3, "Event union size mismatch");
 typedef struct {
     u32* buf;
     Task* task;
+    bool always_listening;
 } EventReceiver;
 
 typedef struct {
@@ -29,10 +30,13 @@ typedef struct {
 
 void events_init();
 
-void events_add_receiver(u32* buf, Task* task);
+void events_add_receiver(u32* buf, Task* task, bool always_listening);
 void events_remove_receiver(u32* buf);
 
 void events_key_event(KeyEvent evt);
 void events_mouse_event(MouseEvent evt);
+
+void events_focus_task(Task* task);
+Task* events_get_focused_task();
 
 #endif
