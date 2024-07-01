@@ -23,36 +23,40 @@ LDFLAGS += -L../libmitrix -l:libmitrix.a -L../libc -l:libc.a -static-libgcc -lgc
 
 export
 
-all:
-	mkdir -p bin
-	$(MAKE) -C libmitrix
-	$(MAKE) -C libc
-	$(MAKE) -C libgfx
+include ../util.mk
 
-	$(MAKE) -C utest
-	cp utest/*.elf bin/
-	$(MAKE) -C fib
-	cp fib/*.elf bin/
-	$(MAKE) -C flappy
-	cp flappy/*.elf bin/
-	$(MAKE) -C doomgeneric
-	cp doomgeneric/*.elf bin/
+.DEFAULT_GOAL := all
+all:
+	@mkdir -p bin
+	$(MAKE) --no-print-directory -C libmitrix
+	$(MAKE) --no-print-directory -C libc
+	$(MAKE) --no-print-directory -C libgfx
+
+	$(MAKE) --no-print-directory -C utest
+	@cp utest/*.elf bin/
+	$(MAKE) --no-print-directory -C fib
+	@cp fib/*.elf bin/
+	$(MAKE) --no-print-directory -C flappy
+	@cp flappy/*.elf bin/
+	$(MAKE) --no-print-directory -C doomgeneric
+	@cp doomgeneric/*.elf bin/
 
 gen_cc_json:
-	$(MAKE) -C libmitrix gen_cc_json
-	$(MAKE) -C libc gen_cc_json
-	$(MAKE) -C libgfx gen_cc_json
-	$(MAKE) -C utest gen_cc_json
-	$(MAKE) -C fib gen_cc_json
-	$(MAKE) -C flappy gen_cc_json
-	$(MAKE) -C doomgeneric gen_cc_json
+	$(MAKE) --no-print-directory -C libmitrix gen_cc_json
+	$(MAKE) --no-print-directory -C libc gen_cc_json
+	$(MAKE) --no-print-directory -C libgfx gen_cc_json
+	$(MAKE) --no-print-directory -C utest gen_cc_json
+	$(MAKE) --no-print-directory -C fib gen_cc_json
+	$(MAKE) --no-print-directory -C flappy gen_cc_json
+	$(MAKE) --no-print-directory -C doomgeneric gen_cc_json
 
 clean:
-	rm -f bin/*.elf
-	$(MAKE) -C libmitrix clean
-	$(MAKE) -C libc clean
-	$(MAKE) -C libgfx clean
-	$(MAKE) -C utest clean
-	$(MAKE) -C fib clean
-	$(MAKE) -C flappy clean
-	$(MAKE) -C doomgeneric clean
+	@rm -rf bin/*.elf
+	$(call PRETTYRM,"bin/*.elf")
+	$(MAKE) --no-print-directory -C libmitrix clean
+	$(MAKE) --no-print-directory -C libc clean
+	$(MAKE) --no-print-directory -C libgfx clean
+	$(MAKE) --no-print-directory -C utest clean
+	$(MAKE) --no-print-directory -C fib clean
+	$(MAKE) --no-print-directory -C flappy clean
+	$(MAKE) --no-print-directory -C doomgeneric clean

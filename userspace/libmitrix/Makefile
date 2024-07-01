@@ -9,16 +9,22 @@ CFLAGS += -Wall
 CFLAGS += -Wextra
 CFLAGS += -I include
 
+include ../../util.mk
+
+.DEFAULT_GOAL := all
 all: libmitrix.a
 
 libmitrix.a: $(OBJ)
-	$(AR) rcs $@ $^
+	@$(AR) rcs $@ $^
+	@$(call PRETTYAR,"$@")
 
 %.o: %.c
-	$(CC) -c $< -o $@ $(CFLAGS)
+	@$(CC) -c $< -o $@ $(CFLAGS)
+	@$(call PRETTYCC,"$<")
 
 gen_cc_json: clean
 	bear -- make all
 
 clean:
-	rm -f *.o libmitrix.a
+	@rm -rf *.o libmitrix.a
+	@$(call PRETTYRM,"*.o libmitrix.a")

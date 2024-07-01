@@ -1,6 +1,6 @@
 # You can override the CFLAGS and C compiler externally,
 # e.g. make PLATFORM=cortex-m3
-CFLAGS += -Wall -I include -O3
+CFLAGS += -Wno-all -Wno-extra -I include -O3
 
 # With this, the makefile should work on Windows also.
 ifdef windir
@@ -19,23 +19,31 @@ TESTS_OBJS = $(TESTS_CSRC:.c=)
 # of code included from multiple files.
 CFLAGS += -Isrc/templates
 
+include ../../util.mk
+
+.DEFAULT_GOAL := all
 all: libc.a
 
 gen_cc_json: clean
 	bear -- make all
 
 clean:
-	$(RM) $(OBJS) $(TESTS_OBJS) libc.a
+	@$(RM) $(OBJS) $(TESTS_OBJS) libc.a
+	@$(call PRETTYRM,"$(OBJS) $(TESTS_OBJS) libc.a")
 
 libc.a: $(OBJS)
-	$(RM) $@
-	$(AR) ru $@ $^
+	@$(RM) $@
+	@$(call PRETTYRM,"$@")
+	@$(AR) ru $@ $^
+	@$(call PRETTYAR,"$@")
 
 run_tests: $(TESTS_OBJS)
 	$(foreach f,$^,$f)
 
 tests/%: tests/%.c tests/tests_glue.c libc.a
-	$(CC) $(CFLAGS) -o $@ $^
+	@$(CC) $(CFLAGS) -o $@ $^
+	@$(call PRETTYCC,"$^")
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+	@$(CC) $(CFLAGS) -c -o $@ $<
+	@$(call PRETTYCC,"$<")

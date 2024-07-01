@@ -24,17 +24,22 @@ ASFLAGS += -g
 
 NATIVE_CC=gcc
 
-.PHONY: always clean
+include util.mk
+
+.PHONY: always clean userspace
 always:
 	mkdir -p $(OUT)
 
 all: $(OUT)/mitrix.iso
 
-clean:
-	rm -rf $(OUT)/*
-	rm -rf mitrix/boot/kernel
-	rm -rf mitrix/boot/$(RAMDISK)
-	make -C userspace clean
+clean: # Clean generated files
+	@rm -rf $(OUT)/*
+	@$(call PRETTYRM,"$(OUT)/*")
+	@rm -rf mitrix/boot/kernel
+	@$(call PRETTYRM,"mitrix/boot/kernel")
+	@rm -rf mitrix/boot/$(RAMDISK)
+	@$(call PRETTYRM,"mitrix/boot/$(RAMDISK)")
+	$(MAKE) --no-print-directory -C userspace clean
 
 
 ################
@@ -50,8 +55,9 @@ $(COBJ): Makefile
 -include $(CDEPS)
 
 $(OUT)/%.o: $(SRC)/%.c
-	mkdir -p $(@D)
-	$(CC) $(CFLAGS) -MMD -c $< -o $@
+	@mkdir -p $(@D)
+	@$(CC) $(CFLAGS) -MMD -c $< -o $@
+	@$(call PRETTYCC,"$<")
 
 # ASM files
 ASMFILES = $(SRC)/boot.asm
@@ -62,8 +68,9 @@ $(ASMOBJ): Makefile
 -include $(ASMDEPS)
 
 $(OUT)/%.o: $(SRC)/%.asm
-	mkdir -p $(@D)
-	$(AS) $(ASFLAGS) -MD $(@:%.o=%.d) $< -o $@
+	@mkdir -p $(@D)
+	@$(AS) $(ASFLAGS) -MD $(@:%.o=%.d) $< -o $@
+	@$(call PRETTYAS,"$<")
 
 ###########
 # Ramdisk #
@@ -79,7 +86,8 @@ $(OUT)/$(RAMDISK): $(OUT)/tool_mifs userspace ramdisk/
 
 OS=OS.flp
 $(OUT)/$(OS): $(COBJ) $(ASMOBJ)
-	$(CC) -T $(SRC)/linker.ld -o $@ $^ -ffreestanding -nostdlib -lgcc
+	@$(CC) -T $(SRC)/linker.ld -o $@ $^ -ffreestanding -nostdlib -lgcc
+	@$(call PRETTYLD,"$<")
 
 ############
 # ISO file #
@@ -95,8 +103,8 @@ $(OUT)/mitrix.iso: $(OUT)/$(OS) $(OUT)/$(RAMDISK)
 #########################
 
 gen_cc_json: clean
-	bear -- make $(OUT)/$(OS)
-	make -C userspace gen_cc_json
+	bear -- $(MAKE) $(OUT)/$(OS)
+	$(MAKE) --no-print-directory -C userspace gen_cc_json
 
 #########
 # tools #
@@ -109,8 +117,8 @@ $(OUT)/tool_mifs: tools/mifs.c
 # userspace code #
 ##################
 
-userspace:
-	make -C userspace
+userspace: # Compile userspace programs
+	$(MAKE) --no-print-directory -C userspace
 	cp userspace/bin/* ramdisk/
 
 ###################
@@ -118,11 +126,8 @@ userspace:
 ###################
 
 VM=qemu-system-i386
-run: $(OUT)/mitrix.iso
+run: $(OUT)/mitrix.iso # Compile and start the OS in QEMU
 	$(VM) -enable-kvm -serial stdio -cdrom $< -boot d
-
-bochs: $(OUT)/mitrix.iso
-	bochs -f bochsrc.txt
 
 
 

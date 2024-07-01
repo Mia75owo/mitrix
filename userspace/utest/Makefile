@@ -5,16 +5,22 @@ CFLAGS += -I../libgfx/include
 CFLAGS += -O3
 LDFLAGS += -L../libgfx -l:libgfx.a
 
+include ../../util.mk
+
+.DEFAULT_GOAL := all
 all: $(EXE)
 
 $(EXE): $(OBJ)
-	$(LD) -o $(EXE) $(OBJ) $(LDFLAGS)
+	@$(LD) -o $(EXE) $(OBJ) $(LDFLAGS)
+	@$(call PRETTYLD,"$@")
 
 %.o: %.c
-	$(CC) -c $< -o $@ $(CFLAGS)
+	@$(CC) -c $< -o $@ $(CFLAGS)
+	@$(call PRETTYCC,"$<")
 
 gen_cc_json: clean
 	bear -- make all
 
 clean:
-	rm -f *.o $(EXE)
+	@rm -rf *.o $(EXE)
+	@$(call PRETTYRM,"*.o $(EXE)")
