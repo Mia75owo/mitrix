@@ -24,7 +24,7 @@ ASFLAGS += -g
 
 NATIVE_CC=gcc
 
-.PHONY: always clean toolchain_verify
+.PHONY: always clean
 always:
 	mkdir -p $(OUT)
 
@@ -46,7 +46,7 @@ CFILES = $(wildcard $(SRC)/**/*.c)
 COBJ = $(CFILES:$(SRC)/%.c=$(OUT)/%.o)
 CDEPS = $(COBJ:%.o=%.d)
 
-$(COBJ): Makefile toolchain_verify
+$(COBJ): Makefile
 -include $(CDEPS)
 
 $(OUT)/%.o: $(SRC)/%.c
@@ -109,7 +109,7 @@ $(OUT)/tool_mifs: tools/mifs.c
 # userspace code #
 ##################
 
-userspace: always toolchain_verify
+userspace:
 	make -C userspace
 	cp userspace/bin/* ramdisk/
 
@@ -119,18 +119,13 @@ userspace: always toolchain_verify
 
 VM=qemu-system-i386
 run: $(OUT)/mitrix.iso
-	$(VM) -enable-kvm -serial stdio $<
+	$(VM) -enable-kvm -serial stdio -cdrom $< -boot d
 
 bochs: $(OUT)/mitrix.iso
 	bochs -f bochsrc.txt
 
-#############
-# toolchain #
-#############
 
-TOOLCHAIN_GCC_VERSION := $(shell ~/opt/cross/bin/i686-elf-gcc --version 2>/dev/null)
-toolchain_verify:
-ifndef TOOLCHAIN_GCC_VERSION
-	@echo -e "\033[0;31mToolchain not found! Use 'toolchain/build_tools.sh' to compile the toolchain!\033[0m"
-	@exit 1
-endif
+
+# Error if toolchain was not found
+TOOLCHAIN_NOT_FOUND := $(shell $(CC) --version 2>/dev/null)
+$(if $(TOOLCHAIN_NOT_FOUND),,$(error Toolchain not found! Use 'toolchain/build_tools.sh' to compile the toolchain))
