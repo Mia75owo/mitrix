@@ -138,7 +138,7 @@ void gfx_logo() {
     for (u32 i = 0; i < 800; i++) {
         for (u32 j = 0; j < 208; j++) {
             if (logo[j * 800 + i] == 0xFF) {
-                screen[j * SCREEN_X + i + offset] = 0xFF000000;
+                // screen[j * SCREEN_X + i + offset] = 0xFF000000;
             } else {
                 screen[j * SCREEN_X + i + offset] = 0xFFFFFFFF;
             }

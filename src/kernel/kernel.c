@@ -75,11 +75,10 @@ __attribute__((noreturn)) void kernel_main(u32 magic,
     kinit(events_init(), "Events");
     kinit(fb_manager_init(), "FB Manager");
 
-    /*debug_tests();*/
-
     klog("\n");
     klog("%00 %10 %20 %30 %40 %50 %60 %70 %80 %90 %A0 %B0 %C0 %D0 %E0 %F0 \n");
     klog("hi :D\n");
+    klog("%0FUse 'help' for a list of available commands\n");
 
     memory_set_boot_info(boot_info);
 
