@@ -1,5 +1,10 @@
 # Mitrix - My own little OS :)
 
+⚠️
+This OS is not meant to be used and it's only purpose
+is to be a fun project for me to work on and learn from.
+⚠️
+
 Mitrix is a x86 Operating System with a monolithic kernel.
 It supports:
 - A very basic filesystem called MIFS
@@ -75,5 +80,5 @@ make gen_cc_json
 - [ ] Rework tasking with multiple framebuffers
 - [ ] Add Window Manager
 - [ ] Maybe port to x86_64
-- [ ] Port sh
+- [ ] Move to musl-libc
 - [ ] Port binutils + gcc
