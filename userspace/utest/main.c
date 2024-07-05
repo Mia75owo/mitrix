@@ -54,8 +54,6 @@ int _start() {
 
     events_init(events_buf);
 
-    syscall_request_screen();
-
     static i32 pos = 0;
 
     gfx_fill(0xFFFF0000);
@@ -134,8 +132,6 @@ int _start() {
             move_cube(&cubes[i]);
         }
     }
-
-    syscall_request_screen();
 
     while(true) {
         gfx_fill(0xFF000000);

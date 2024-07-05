@@ -39,8 +39,6 @@ int _start() {
     EventBuffer* event_buffer = syscall_create_events_buf();
     events_init(event_buffer);
 
-    syscall_request_screen();
-
     for (u32 i = 0; i < PIPES_COUNT; i++) {
         pipes[i].x = 800 + i * 300;
         pipes[i].y = 600.f / 2.f + rand_range(-170, 170);

@@ -42,7 +42,6 @@ void DG_Init() {
     event_buffer = syscall_create_events_buf();
 
     events_init(event_buffer);
-    syscall_request_screen();
 }
 
 void DG_DrawFrame() {

@@ -2,7 +2,6 @@
 #include "events/events.h"
 #include "fpu/fpu.h"
 #include "gdt/gdt.h"
-#include "gfx/fb_manager.h"
 #include "gfx/gfx.h"
 #include "gfx/gui.h"
 #include "gfx/tty.h"
@@ -73,7 +72,6 @@ __attribute__((noreturn)) void kernel_main(u32 magic,
     kinit(syscalls_init(), "Syscalls");
     kinit(shmem_init(), "SharedMem");
     kinit(events_init(), "Events");
-    kinit(fb_manager_init(), "FB Manager");
 
     klog("\n");
     klog("%00 %10 %20 %30 %40 %50 %60 %70 %80 %90 %A0 %B0 %C0 %D0 %E0 %F0 \n");

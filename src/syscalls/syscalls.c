@@ -2,7 +2,6 @@
 
 #include "disk/mifs.h"
 #include "events/events.h"
-#include "gfx/fb_manager.h"
 #include "gfx/gfx.h"
 #include "gfx/gui.h"
 #include "gfx/tty.h"
@@ -62,16 +61,6 @@ static void syscall_exit() {
     }
 
     shmem_destroy_owned_by(task_id);
-
-    if (fb_manager_get_current_handle_id() == task->fb_handle_id) {
-        // Enable GUI render loop
-        Task* gui_task = task_manager_get_task(1);
-        gui_task->state = TASK_STATE_RUNNING;
-        gui_trigger_entire_redraw();
-    }
-    if (task->fb_handle_id != -1) {
-        fb_manager_remove(task->fb_handle_id);
-    }
 
     // Free userheap
     userheap_set_size(task, 0);
@@ -163,40 +152,10 @@ static u32* syscall_create_fb(u32 width, u32 height, bool double_buffering) {
     u8* addr = shmem_map(object_id, task_id);
     assert(addr);
 
-    task->fb_handle_id = fb_manager_add(object_id, addr, double_buffering, task);
-
     return (u32*)addr;
 }
-u32 last_tick = 0xFFFFFFFF;
-u32 frames = 0;
-u32 seconds = 0;
+
 static void syscall_draw_fb(u32 width, u32 height) {
-    Task* task = task_manager_get_current_task();
-
-    u8* addr = fb_manager_map(task->fb_handle_id);
-
-    // Enable interrupts during this copying, to not block timer interrupts
-    asm volatile("sti");
-    gfx_clone((SCREEN_X - width) / 2, (SCREEN_Y - height) / 2, width, height,
-              (u32*)addr);
-    gfx_display_backbuffer();
-
-
-#if (defined(DEBUG) && 0)
-    u32 time = pit_get_tics();
-    u32 dt = time - last_tick;
-    frames++;
-    seconds = (time / 1000) + 1;
-    serial_printf("DRAW time: %n -> (fps %n) -> (tick %n) -> (average %n)\n",
-                  (u64)dt, (u64)(1000.f / (float)dt), (u64)time,
-                  (u64)(frames / seconds));
-    last_tick = time;
-#endif
-}
-static void syscall_request_screen() {
-    // Pause GUI render loop
-    Task* gui_task = task_manager_get_task(1);
-    gui_task->state = TASK_STATE_IDLE;
 }
 u32 syscall_get_screen_size_x() { return SCREEN_X; }
 u32 syscall_get_screen_size_y() { return SCREEN_Y; }
@@ -356,7 +315,6 @@ void syscalls_init() {
 
     syscall_handlers[SYSCALL_CREATE_FB] = syscall_create_fb;
     syscall_handlers[SYSCALL_DRAW_FB] = syscall_draw_fb;
-    syscall_handlers[SYSCALL_REQUEST_SCREEN] = syscall_request_screen;
     syscall_handlers[SYSCALL_GET_SCREEN_SIZE_X] = syscall_get_screen_size_x;
     syscall_handlers[SYSCALL_GET_SCREEN_SIZE_Y] = syscall_get_screen_size_y;
 
