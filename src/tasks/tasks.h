@@ -44,7 +44,7 @@ typedef struct {
     u32 sleep_timestamp;
     bool pending_events;
 
-    i32 owner_task;
+    TaskHandle owner_task;
 
     bool is_kernel_task;
 

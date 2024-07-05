@@ -8,7 +8,7 @@
 static Task tasks[NUM_TASKS];
 static u32 current_task;
 
-void traskmgr_init() {
+void taskmgr_init() {
     memset(tasks, 0, sizeof(tasks));
     current_task = 0;
 
@@ -66,22 +66,28 @@ TaskHandle taskmgr_handle_from_pointer(Task* ptr) {
     return handle;
 }
 
-// Kinda self explanatory...
+// Task getters
 
 TaskHandle taskmgr_get_current_task() { return current_task; }
+
+TaskHandle taskmgr_get_kernel_task() { return 0; }
 
 // Task management functions
 
 void taskmgr_kill_task(TaskHandle handle) {
-    assert(handle > 0 && handle < NUM_TASKS);
+    assert(handle >= 0 && handle < NUM_TASKS);
     task_kill(&tasks[handle]);
 }
 void taskmgr_set_state(TaskHandle handle, TaskState state) {
-    assert(handle > 0 && handle < NUM_TASKS);
+    assert(handle >= 0 && handle < NUM_TASKS);
     tasks[handle].state = state;
 }
 void taskmgr_focus_task(TaskHandle handle) {
-    assert(handle > 0 && handle < NUM_TASKS);
+    assert(handle >= 0 && handle < NUM_TASKS);
+}
+void taskmgr_enable_task(TaskHandle handle) {
+    assert(handle >= 0 && handle < NUM_TASKS);
+    tasks[handle].state = TASK_STATE_RUNNING;
 }
 
 // Switch to next task
@@ -118,6 +124,12 @@ static u32 tasks_choose_next() {
     }
 
     return 0;
+}
+
+// Info getters
+
+bool taskmgr_is_current_task_alive() {
+    return tasks[current_task].state != TASK_STATE_DEAD;
 }
 
 void taskmgr_schedule() {

@@ -3,7 +3,7 @@
 #include "memory/kmalloc.h"
 #include "memory/memory.h"
 #include "memory/pmm.h"
-#include "tasks/task_manager.h"
+#include "tasks/taskmgr.h"
 #include "util/debug.h"
 #include "util/mem.h"
 #include "util/sys.h"
@@ -23,13 +23,13 @@ static i32 find_available_obj_slot() {
     return -1;
 }
 
-u32 shmem_create(u32 size, u32 owner_task_index) {
+u32 shmem_create(u32 size, TaskHandle task_handle) {
     i32 slot = find_available_obj_slot();
     assert(slot >= 0);
 
     SharedMemObject* obj = &shared_mem_objects[slot];
 
-    obj->owner_task_index = owner_task_index;
+    obj->task_handle = task_handle;
 
     u32 pages = CEIL_DIV(size, 0x1000);
     obj->num_pages = pages;
@@ -80,16 +80,16 @@ static void remove_from_pool(SharedMemPool* pool, u32 handle_index) {
     pool->num_handles--;
 }
 
-void* shmem_map(u32 object_id, u32 task_id) {
+void* shmem_map(u32 object_id, TaskHandle task_handle) {
     cli_push();
 
     SharedMemObject* obj = &shared_mem_objects[object_id];
 
-    Task* task = task_manager_get_task(task_id);
+    Task* task = taskmgr_handle_to_pointer(task_handle);
     SharedMemPool* pool;
     if (task->is_kernel_task) {
         // All kernel tasks share the same pool
-        pool = &task_manager_get_task(0)->shmem_pool;
+        pool = &taskmgr_handle_to_pointer(taskmgr_get_kernel_task())->shmem_pool;
     } else {
         pool = &task->shmem_pool;
     }
@@ -97,9 +97,9 @@ void* shmem_map(u32 object_id, u32 task_id) {
     SharedMemHandle* handle = insert_into_pool(pool, object_id);
     assert(handle);
 
-    bool map_to_kernel = task_id == 0;
+    bool map_to_kernel = task->is_kernel_task;
     u32* prev_pd = memory_get_current_page_dir();
-    u32* new_pd = task_manager_get_task(task_id)->page_dir;
+    u32* new_pd = task->page_dir;
     memory_change_page_dir(new_pd);
 
     for (u32 i = 0; i < obj->num_pages; i++) {
@@ -117,14 +117,14 @@ void* shmem_map(u32 object_id, u32 task_id) {
     return (void*)handle->vaddr;
 }
 
-void shmem_unmap(u32 id, u32 task_id) {
+void shmem_unmap(u32 id, TaskHandle task_handle) {
     SharedMemObject* obj = &shared_mem_objects[id];
 
-    Task* task = task_manager_get_task(task_id);
+    Task* task = taskmgr_handle_to_pointer(task_handle);
     SharedMemPool* pool;
     if (task->is_kernel_task) {
         // All kernel tasks share the same pool
-        pool = &task_manager_get_task(0)->shmem_pool;
+        pool = &taskmgr_handle_to_pointer(taskmgr_get_kernel_task())->shmem_pool;
     } else {
         pool = &task->shmem_pool;
     }
@@ -143,11 +143,11 @@ void shmem_unmap(u32 id, u32 task_id) {
     assert(pool_index != -1);
     assert(handle);
 
-    bool unmap_from_kernel = task_id == 0;
+    bool unmap_from_kernel = task->is_kernel_task;
     u32* prev_pd = NULL;
     if (!unmap_from_kernel) {
         prev_pd = memory_get_current_page_dir();
-        u32* new_pd = task_manager_get_task(task_id)->page_dir;
+        u32* new_pd = task->page_dir;
         memory_change_page_dir(new_pd);
     }
 
@@ -162,20 +162,20 @@ void shmem_unmap(u32 id, u32 task_id) {
     remove_from_pool(pool, pool_index);
 }
 
-void shmem_destroy_owned_by(u32 task_id) {
+void shmem_destroy_owned_by(TaskHandle task_handle) {
     for (u32 i = 0; i < MAX_SHARED_MEM_OBJS; i++) {
-        if (shared_mem_objects[i].owner_task_index == task_id) {
+        if (shared_mem_objects[i].task_handle == task_handle) {
             shmem_destroy(i);
         }
     }
 }
 
-void* shmem_get_vaddr(u32 object_id, u32 task_id) {
-    Task* task = task_manager_get_task(task_id);
+void* shmem_get_vaddr(u32 object_id, TaskHandle task_handle) {
+    Task* task = taskmgr_handle_to_pointer(task_handle);
     SharedMemPool* pool;
     if (task->is_kernel_task) {
         // All kernel tasks share the same pool
-        pool = &task_manager_get_task(0)->shmem_pool;
+        pool = &taskmgr_handle_to_pointer(taskmgr_get_kernel_task())->shmem_pool;
     } else {
         pool = &task->shmem_pool;
     }

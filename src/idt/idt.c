@@ -1,7 +1,7 @@
 #include "idt.h"
 
 #include "idt/handlers.h"
-#include "tasks/task_manager.h"
+#include "tasks/taskmgr.h"
 #include "util/debug.h"
 #include "util/mem.h"
 #include "util/port.h"
@@ -107,7 +107,7 @@ void handle_interrupt(CPUState* frame) {
     }
     isr(frame);
 
-    if (!task_manager_current_task_alive()) {
+    if (!taskmgr_is_current_task_alive()) {
         asm volatile("sti");
         while(1);
     }

@@ -14,7 +14,7 @@
 #include "pit/pit.h"
 #include "serial/serial.h"
 #include "syscalls/syscalls.h"
-#include "tasks/task_manager.h"
+#include "tasks/taskmgr.h"
 #include "util/debug.h"
 #include "util/mem.h"
 #include "util/sys.h"
@@ -44,7 +44,7 @@ __attribute__((noreturn)) void kernel_main(u32 magic,
     kinit(keyboard_init(), "Keyboard");
     kinit(mouse_init(), "Mouse");
     kinit(pit_init(1000), "PIT");
-    kinit(task_manager_init(), "Task manager");
+    kinit(taskmgr_init(), "Task manager");
     kinit(disk_init(boot_info), "Ramdisk");
 
     gfx_info gfx_data = {
@@ -82,13 +82,12 @@ __attribute__((noreturn)) void kernel_main(u32 magic,
 
     gui_init(gfx_data.width, gfx_data.height);
 
-    Task* gui_task = create_kernel_task(gui_loop);
-    gui_task->state = TASK_STATE_RUNNING;
+    TaskHandle gui_task = taskmgr_create_kernel_task(gui_loop);
+    taskmgr_enable_task(gui_task);
 
     // Set the kernel task to idle as it will just spin_halt()
     // wasting CPU time
-    Task* kernel_task = task_manager_get_task(0);
-    kernel_task->state = TASK_STATE_IDLE;
+    taskmgr_set_state(taskmgr_get_kernel_task(), TASK_STATE_IDLE);
 
     // create_user_task("doom.elf");
 

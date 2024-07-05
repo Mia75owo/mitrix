@@ -9,7 +9,7 @@
 #include "pit/pit.h"
 #include "serial/serial.h"
 #include "syscalls/syscall_list.h"
-#include "tasks/task_manager.h"
+#include "tasks/taskmgr.h"
 #include "userheap/userheap.h"
 #include "util/debug.h"
 #include "util/mem.h"
@@ -45,8 +45,8 @@ static void handle_syscall_interrupt(CPUState* frame) {
 }
 
 static void syscall_exit() {
-    Task* task = task_manager_get_current_task();
-    u32 task_id = task_manager_get_current_task_id();
+    TaskHandle task_handle = taskmgr_get_current_task();
+    Task* task = taskmgr_handle_to_pointer(task_handle);
 
     // Remove event receiver
     if (task->shmem_events_obj != -1) {
@@ -60,27 +60,28 @@ static void syscall_exit() {
         events_focus_task(NULL);
     }
 
-    shmem_destroy_owned_by(task_id);
+    shmem_destroy_owned_by(task_handle);
 
     // Free userheap
     userheap_set_size(task, 0);
 
     // Unblock owner task
     if (task->owner_task != -1) {
-        Task* owner = task_manager_get_task(task->owner_task);
+        Task* owner = taskmgr_handle_to_pointer(task->owner_task);
         if (owner->state == TASK_STATE_BLOCKED_BY_EXEC) {
             owner->state = TASK_STATE_RUNNING;
         }
     }
 
-    task_manager_kill_current_task();
+    taskmgr_kill_task(taskmgr_get_current_task());
     gfx_doublebuffering(true);
 }
 static void syscall_print(const char* string) { klog("%s", string); }
 static void syscall_print_char(const char c) { klog("%c", c); }
 static u32 syscall_get_systime() { return pit_get_tics(); }
 static u32 syscall_read(u32 file_id, u8* buffer, u32 len) {
-    Task* task = task_manager_get_current_task();
+    TaskHandle task_handle = taskmgr_get_current_task();
+    Task* task = taskmgr_handle_to_pointer(task_handle);
 
     if (file_id == SYSCALL_STDIN_FILE) {
         asm volatile("sti");
@@ -106,7 +107,8 @@ static u32 syscall_read(u32 file_id, u8* buffer, u32 len) {
     }
 }
 static u32 syscall_write(u32 file_id, u8* buffer, u32 len) {
-    Task* task = task_manager_get_current_task();
+    TaskHandle task_handle = taskmgr_get_current_task();
+    Task* task = taskmgr_handle_to_pointer(task_handle);
 
     if (file_id == SYSCALL_STDOUT_FILE) {
         tty_putbuf((char*)buffer, len, 0x03);
@@ -131,25 +133,30 @@ static u32 syscall_write(u32 file_id, u8* buffer, u32 len) {
     return len;
 }
 static void syscall_exec(char* file_name) {
-    Task* child = create_user_task(file_name);
-    child->owner_task = task_manager_get_current_task_id();
+    TaskHandle child_handle = taskmgr_create_user_task(file_name);
+    Task* child = taskmgr_handle_to_pointer(child_handle);
+
+    child->owner_task = taskmgr_get_current_task();
 }
 static void syscall_exec_blocking(char* file_name) {
-    Task* task = task_manager_get_current_task();
+    TaskHandle task_handle = taskmgr_get_current_task();
+    Task* task = taskmgr_handle_to_pointer(task_handle);
 
-    Task* child = create_user_task(file_name);
-    child->owner_task = task_manager_get_current_task_id();
+    TaskHandle child_handle = taskmgr_create_user_task(file_name);
+    Task* child = taskmgr_handle_to_pointer(child_handle);
+
+    child->owner_task = taskmgr_get_current_task();
 
     task->state = TASK_STATE_BLOCKED_BY_EXEC;
-    task_manager_schedule();
+    taskmgr_schedule();
 }
 
 static u32* syscall_create_fb(u32 width, u32 height, bool double_buffering) {
-    Task* task = task_manager_get_current_task();
-    u32 task_id = task_manager_get_current_task_id();
+    TaskHandle task_handle = taskmgr_get_current_task();
+    Task* task = taskmgr_handle_to_pointer(task_handle);
 
-    u32 object_id = shmem_create(width * height * sizeof(u32), task_id);
-    u8* addr = shmem_map(object_id, task_id);
+    u32 object_id = shmem_create(width * height * sizeof(u32), task_handle);
+    u8* addr = shmem_map(object_id, task_handle);
     assert(addr);
 
     return (u32*)addr;
@@ -161,7 +168,8 @@ u32 syscall_get_screen_size_x() { return SCREEN_X; }
 u32 syscall_get_screen_size_y() { return SCREEN_Y; }
 
 u32 syscall_file_open(char* file_name) {
-    Task* task = task_manager_get_current_task();
+    TaskHandle task_handle = taskmgr_get_current_task();
+    Task* task = taskmgr_handle_to_pointer(task_handle);
 
     i32 file_index = -1;
     for (u32 i = 0; i < TASK_MAX_FILES; i++) {
@@ -182,7 +190,8 @@ u32 syscall_file_open(char* file_name) {
     return file_index + 10;
 }
 u32 syscall_file_open_index(u32 fs_file_index) {
-    Task* task = task_manager_get_current_task();
+    TaskHandle task_handle = taskmgr_get_current_task();
+    Task* task = taskmgr_handle_to_pointer(task_handle);
 
     i32 file_index = -1;
     for (u32 i = 0; i < TASK_MAX_FILES; i++) {
@@ -205,98 +214,118 @@ u32 syscall_file_open_index(u32 fs_file_index) {
 }
 
 void syscall_file_close(u32 file_id) {
+    TaskHandle task_handle = taskmgr_get_current_task();
+    Task* task = taskmgr_handle_to_pointer(task_handle);
+
     if (file_id == 0) return;
 
     assert(file_id >= 10);
     u32 file_index = file_id - 10;
 
-    Task* task = task_manager_get_current_task();
     task->files[file_index].file.addr = 0;
 }
 u32 syscall_get_file_offset(u32 file_id) {
+    TaskHandle task_handle = taskmgr_get_current_task();
+    Task* task = taskmgr_handle_to_pointer(task_handle);
+
     if (file_id == 0) return 0;
     assert(file_id >= 10);
     u32 file_index = file_id - 10;
 
-    Task* task = task_manager_get_current_task();
     assert(task->files[file_index].file.addr);
 
     return task->files[file_index].offset;
 }
 void syscall_set_file_offset(u32 file_id, u32 offset) {
+    TaskHandle task_handle = taskmgr_get_current_task();
+    Task* task = taskmgr_handle_to_pointer(task_handle);
+
     assert(file_id >= 10);
     u32 file_index = file_id - 10;
 
-    Task* task = task_manager_get_current_task();
     assert(task->files[file_index].file.addr);
 
     task->files[file_index].offset = offset;
 }
 u32 syscall_get_file_size(u32 file_id) {
+    TaskHandle task_handle = taskmgr_get_current_task();
+    Task* task = taskmgr_handle_to_pointer(task_handle);
+
     if (file_id == 0) return 0;
     assert(file_id >= 10);
     u32 file_index = file_id - 10;
 
-    Task* task = task_manager_get_current_task();
     assert(task->files[file_index].file.addr);
 
     return task->files[file_index].file.size;
 }
 u32 syscall_get_file_count() { return mifs_get_file_count(); }
 void syscall_get_file_name(u32 file_id, char* buffer, u32 buffer_length) {
+    TaskHandle task_handle = taskmgr_get_current_task();
+    Task* task = taskmgr_handle_to_pointer(task_handle);
+
     if (file_id == 0) return;
     assert(file_id >= 10);
     u32 file_index = file_id - 10;
 
-    Task* task = task_manager_get_current_task();
     assert(task->files[file_index].file.addr);
 
     strncpy(buffer, task->files[file_index].file.name, buffer_length);
 }
 
 void* syscall_get_heap_start() {
-    Task* task = task_manager_get_current_task();
+    TaskHandle task_handle = taskmgr_get_current_task();
+    Task* task = taskmgr_handle_to_pointer(task_handle);
+
     return (void*)task->heap_start;
 }
 void* syscall_get_heap_end() {
-    Task* task = task_manager_get_current_task();
+    TaskHandle task_handle = taskmgr_get_current_task();
+    Task* task = taskmgr_handle_to_pointer(task_handle);
+
     return (void*)task->heap_end;
 }
 void syscall_set_heap_size(u32 size) {
-    Task* task = task_manager_get_current_task();
+    TaskHandle task_handle = taskmgr_get_current_task();
+    Task* task = taskmgr_handle_to_pointer(task_handle);
+
     userheap_set_size(task, size);
 }
 
-void syscall_scheduler_next() { task_manager_schedule(); }
+void syscall_scheduler_next() { taskmgr_schedule(); }
 void syscall_sleep(u32 ms) {
-    Task* task = task_manager_get_current_task();
+    TaskHandle task_handle = taskmgr_get_current_task();
+    Task* task = taskmgr_handle_to_pointer(task_handle);
+
     task->state = TASK_STATE_SLEEPING;
     task->sleep_timestamp = pit_get_tics() + ms;
-    task_manager_schedule();
+    taskmgr_schedule();
 }
 void syscall_wait_for_event() {
-    Task* task = task_manager_get_current_task();
+    TaskHandle task_handle = taskmgr_get_current_task();
+    Task* task = taskmgr_handle_to_pointer(task_handle);
+
     task->state = TASK_STATE_WAIT_FOR_EVENT;
-    task_manager_schedule();
+    taskmgr_schedule();
 }
 
 EventBuffer* syscall_create_events_buf() {
-    Task* task = task_manager_get_current_task();
-    u32 task_id = task_manager_get_current_task_id();
+    TaskHandle task_handle = taskmgr_get_current_task();
+    Task* task = taskmgr_handle_to_pointer(task_handle);
 
     if (task->shmem_events_obj != -1) {
-        shmem_unmap(task_id, task->shmem_events_obj);
+        shmem_unmap(task_handle, task->shmem_events_obj);
         shmem_destroy(task->shmem_events_obj);
     }
 
-    u32 object_id = shmem_create(sizeof(EventBuffer), task_id);
+    u32 object_id = shmem_create(sizeof(EventBuffer), task_handle);
     task->shmem_events_obj = object_id;
 
     void* kernel_vaddr = shmem_map(object_id, 0);
     assert(kernel_vaddr);
     events_add_receiver(kernel_vaddr, task, false);
 
-    void* user_vaddr = shmem_map(object_id, task_id);
+    void* user_vaddr = shmem_map(object_id, task_handle);
     assert(user_vaddr);
     return user_vaddr;
 }
