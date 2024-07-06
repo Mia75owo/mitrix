@@ -58,7 +58,7 @@ int _start() {
 
     gfx_fill(0xFFFF0000);
     gfx_rect(pos, 0, 100, 100, 0xFF00FF00);
-    syscall_draw_fb(800, 600);
+    syscall_draw_fb();
 
     while (true) {
         if (!events_has_event()) continue;
@@ -81,7 +81,7 @@ int _start() {
         gfx_fill(0xFFFF0000);
         gfx_rect(pos, 0, 100, 100, 0xFF00FF00);
     
-        syscall_draw_fb(800, 600);
+        syscall_draw_fb();
     }
 
     syscall_set_heap_size(0x1000 * 2);
@@ -139,13 +139,14 @@ int _start() {
             gfx_rect(cubes[i].x, cubes[i].y, CUBE_SIZE, CUBE_SIZE, 0xFFFF0000);
             move_cube(&cubes[i]);
         }
-        syscall_draw_fb(800, 600);
+        syscall_draw_fb();
     }
     */
 
     EventBuffer* events_buf = syscall_create_events_buf();
     events_init(events_buf);
 
+    /*
     while (true) {
         if (!events_has_event()) continue;
 
@@ -158,7 +159,9 @@ int _start() {
             printf("MouseEvent: (lmb: %i) (rmb: %i) (delta_x: %i) (delta_y: %i)\n", evt.button_left, evt.button_right, evt.delta_x, evt.delta_y);
         }
     }
+    */
 
+    syscall_exit();
     syscall_exit();
 
     return 0;

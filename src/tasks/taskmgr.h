@@ -27,4 +27,9 @@ void taskmgr_enable_task(TaskHandle handle);
 
 void taskmgr_schedule();
 
+void taskmgr_add_render_task(TaskHandle handle);
+void taskmgr_remove_render_task(TaskHandle handle);
+void taskmgr_render_windows();
+bool taskmgr_has_windows();
+
 #endif

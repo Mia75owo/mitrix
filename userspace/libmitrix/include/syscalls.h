@@ -15,7 +15,7 @@ void syscall_exec(char* file_name);
 void syscall_exec_blocking(char* file_name);
 
 u32* syscall_create_fb(u32 width, u32 height);
-void syscall_draw_fb(u32 width, u32 height);
+void syscall_draw_fb();
 u32 syscall_get_screen_size_x();
 u32 syscall_get_screen_size_y();
 

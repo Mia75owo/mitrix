@@ -15,6 +15,7 @@
 #include "serial/serial.h"
 #include "syscalls/syscalls.h"
 #include "tasks/taskmgr.h"
+#include "tasks/tasks.h"
 #include "util/debug.h"
 #include "util/mem.h"
 #include "util/sys.h"
@@ -89,7 +90,8 @@ __attribute__((noreturn)) void kernel_main(u32 magic,
     // wasting CPU time
     taskmgr_set_state(taskmgr_get_kernel_task(), TASK_STATE_IDLE);
 
-    // create_user_task("doom.elf");
+    // TaskHandle doom = taskmgr_create_user_task("doom.elf");
+    // taskmgr_enable_task(doom);
 
     asm volatile("sti");
     spin_halt();
@@ -100,8 +102,18 @@ __attribute__((noreturn)) void gui_loop() {
     while (true) {
         u64 tics = pit_get_tics();
 
-        if (tics - last_draw > 100) {
+        bool should_render_windows = taskmgr_has_windows();
+
+        if (should_render_windows) {
+            taskmgr_render_windows();
+        } else if (tics - last_draw > 100) {
             gui_redraw();
         }
+
+
+        TaskHandle task_handle = taskmgr_get_current_task();
+        Task* task = taskmgr_handle_to_pointer(task_handle);
+        task->state = TASK_STATE_SLEEPING;
+        task->sleep_timestamp = pit_get_tics() + 16;
     }
 }

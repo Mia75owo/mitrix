@@ -16,6 +16,7 @@ typedef enum {
     TASK_STATE_SLEEPING,
     TASK_STATE_WAIT_FOR_EVENT,
     TASK_STATE_BLOCKED_BY_EXEC,
+    TASK_STATE_WAIT_FOR_DRAW,
 } TaskState;
 
 typedef struct {
@@ -39,8 +40,12 @@ typedef struct {
 
     // Shared memory, framebuffer and events
     SharedMemPool shmem_pool;
+
     i32 fb_handle_id;
     void* fb_addr;
+    u32 fb_width;
+    u32 fb_height;
+    bool should_redraw;
 
     i32 events_handle_id;
     void* events_addr;

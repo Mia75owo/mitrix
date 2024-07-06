@@ -128,13 +128,13 @@ int _start() {
                      0xFF00FF00);
         }
 
-        syscall_draw_fb(800, 600);
+        syscall_draw_fb();
     }
 
 exit:;
 
     gfx_fill(0xFFFF0000);
-    syscall_draw_fb(800, 600);
+    syscall_draw_fb();
 
     u32 time = syscall_get_systime();
     while (syscall_get_systime() < time + 1000)

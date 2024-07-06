@@ -42,9 +42,7 @@ u32* syscall_create_fb(u32 width, u32 height) {
                  : "a"(SYSCALL_CREATE_FB), "b"(width), "c"(height));
     return (u32*)ret;
 }
-void syscall_draw_fb(u32 width, u32 height) {
-    asm volatile("int $0x80" ::"a"(SYSCALL_DRAW_FB), "b"(width), "c"(height));
-}
+void syscall_draw_fb() { asm volatile("int $0x80" ::"a"(SYSCALL_DRAW_FB)); }
 u32 syscall_get_screen_size_x() {
     u32 ret;
     asm volatile("int $0x80" : "=a"(ret) : "a"(SYSCALL_GET_SCREEN_SIZE_X));

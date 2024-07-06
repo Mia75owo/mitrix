@@ -1,15 +1,19 @@
 #include "taskmgr.h"
 
+#include "gfx/gfx.h"
 #include "memory/memory.h"
 #include "pit/pit.h"
 #include "util/debug.h"
 #include "util/mem.h"
+#include "util/sys.h"
 
 static Task tasks[NUM_TASKS];
 static u32 current_task;
+static Task* tasks_to_draw[NUM_TASKS];
 
 void taskmgr_init() {
     memset(tasks, 0, sizeof(tasks));
+    memset(tasks_to_draw, 0, sizeof(tasks));
     current_task = 0;
 
     tasks[current_task].state = TASK_STATE_RUNNING;
@@ -34,7 +38,6 @@ TaskHandle taskmgr_create_kernel_task(void entrypoint()) {
         return -1;
     }
     task_kernel_create(&tasks[slot], entrypoint);
-    tasks[slot].state = TASK_STATE_RUNNING;
     return slot;
 }
 TaskHandle taskmgr_create_user_task(char* elf_file_name) {
@@ -43,7 +46,6 @@ TaskHandle taskmgr_create_user_task(char* elf_file_name) {
         return -1;
     }
     task_user_create(&tasks[slot], elf_file_name);
-    tasks[slot].state = TASK_STATE_RUNNING;
     return slot;
 }
 
@@ -123,7 +125,7 @@ static u32 tasks_choose_next() {
         }
     }
 
-    return 0;
+    return 1;
 }
 
 // Info getters
@@ -142,4 +144,56 @@ void taskmgr_schedule() {
     current_task = index;
 
     task_switch(old, new);
+}
+
+void taskmgr_add_render_task(TaskHandle handle) {
+    Task* task = taskmgr_handle_to_pointer(handle);
+
+    for (u32 i = 0; i < NUM_TASKS; i++) {
+        if (tasks_to_draw[i] == NULL) {
+            tasks_to_draw[i] = task;
+            return;
+        }
+    }
+}
+void taskmgr_remove_render_task(TaskHandle handle) {
+    Task* task = taskmgr_handle_to_pointer(handle);
+
+    for (u32 i = 0; i < NUM_TASKS; i++) {
+        if (tasks_to_draw[i] == task) {
+            tasks_to_draw[i] = NULL;
+            return;
+        }
+    }
+}
+
+void taskmgr_render_windows() {
+    bool double_buffering = gfx_get_doublebuffering();
+    gfx_doublebuffering(false);
+
+    for (u32 i = 0; i < NUM_TASKS; i++) {
+        if (tasks_to_draw[i] == NULL) continue;
+        if (!tasks_to_draw[i]->should_redraw) continue;
+
+        u32 width = tasks_to_draw[i]->fb_width;
+        u32 height = tasks_to_draw[i]->fb_height;
+        u32 x = (SCREEN_X - width) / 2;
+        u32 y = (SCREEN_Y - height) / 2;
+
+        gfx_clone(x, y, width, height, tasks_to_draw[i]->fb_addr);
+
+        if (tasks_to_draw[i]->state == TASK_STATE_WAIT_FOR_DRAW) {
+            tasks_to_draw[i]->state = TASK_STATE_RUNNING;
+        }
+        tasks_to_draw[i]->should_redraw = false;
+    }
+
+    gfx_doublebuffering(double_buffering);
+}
+
+bool taskmgr_has_windows() {
+    for (u32 i = 0; i < NUM_TASKS; i++) {
+        if (tasks_to_draw[i] != NULL) return true;
+    }
+    return false;
 }

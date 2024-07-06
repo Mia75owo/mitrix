@@ -46,7 +46,7 @@ void DG_Init() {
 
 void DG_DrawFrame() {
     DG_ScreenBuffer = frame_buffer;
-    syscall_draw_fb(DOOMGENERIC_RESX, DOOMGENERIC_RESY);
+    syscall_draw_fb();
 }
 void DG_SleepMs(uint32_t ms) {
     u32 start = syscall_get_systime();

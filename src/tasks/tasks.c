@@ -75,6 +75,11 @@ static void task_create(Task* this, void entrypoint(), bool kernel_task,
         userheap_init(this);
     }
     this->fb_handle_id = -1;
+    this->fb_width = 0;
+    this->fb_height = 0;
+    this->fb_addr = NULL;
+    this->should_redraw = false;
+
     this->events_handle_id = -1;
     this->sleep_timestamp = 0;
     this->pending_events = false;

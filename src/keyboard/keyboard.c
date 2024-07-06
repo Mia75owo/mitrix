@@ -1,6 +1,7 @@
 #include "keyboard.h"
 
 #include "gfx/gui.h"
+#include "util/debug.h"
 #include "util/port.h"
 #include "util/types.h"
 #include "events/events.h"

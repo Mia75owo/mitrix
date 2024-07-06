@@ -131,6 +131,10 @@ void gfx_doublebuffering(bool enable) {
     double_buffering = enable;
 }
 
+bool gfx_get_doublebuffering() {
+    return double_buffering;
+}
+
 void gfx_logo() {
     CHECK_INITIALIZED();
 

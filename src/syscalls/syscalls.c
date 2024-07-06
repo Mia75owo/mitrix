@@ -10,6 +10,7 @@
 #include "serial/serial.h"
 #include "syscalls/syscall_list.h"
 #include "tasks/taskmgr.h"
+#include "tasks/tasks.h"
 #include "userheap/userheap.h"
 #include "util/debug.h"
 #include "util/mem.h"
@@ -53,9 +54,7 @@ static void syscall_exit() {
         events_remove_receiver(task->events_addr);
         shmem_unmap(task->events_handle_id, 0);
         shmem_destroy(task->events_handle_id);
-    }
-    if (events_get_focused_task() == task) {
-        events_focus_task(NULL);
+        taskmgr_remove_render_task(task_handle);
     }
 
     shmem_destroy_owned_by(task_handle);
@@ -71,8 +70,7 @@ static void syscall_exit() {
         }
     }
 
-    taskmgr_kill_task(taskmgr_get_current_task());
-    gfx_doublebuffering(true);
+    taskmgr_kill_task(task_handle);
 }
 static void syscall_print(const char* string) { klog("%s", string); }
 static void syscall_print_char(const char c) { klog("%c", c); }
@@ -161,13 +159,37 @@ static u32* syscall_create_fb(u32 width, u32 height) {
     }
 
     u32 object_id = shmem_create(width * height * sizeof(u32), task_handle);
-    u8* addr = shmem_map(object_id, task_handle);
-    assert(addr);
 
-    return (u32*)addr;
+    void* kernel_vaddr = shmem_map(object_id, 0);
+    assert(kernel_vaddr);
+    task->fb_addr = kernel_vaddr;
+
+    void* user_vaddr = shmem_map(object_id, task_handle);
+    assert(user_vaddr);
+
+    task->fb_handle_id = object_id;
+    task->fb_width = width;
+    task->fb_height = height;
+
+    taskmgr_add_render_task(task_handle);
+    events_focus_task(task);
+
+    return (u32*)user_vaddr;
 }
 
-static void syscall_draw_fb(u32 width, u32 height) {}
+static void syscall_draw_fb() {
+    TaskHandle task_handle = taskmgr_get_current_task();
+    Task* task = taskmgr_handle_to_pointer(task_handle);
+
+    if (task->fb_handle_id == -1) {
+        return;
+    }
+
+    task->state = TASK_STATE_WAIT_FOR_DRAW;
+    task->should_redraw = true;
+
+    taskmgr_schedule();
+}
 u32 syscall_get_screen_size_x() { return SCREEN_X; }
 u32 syscall_get_screen_size_y() { return SCREEN_Y; }
 
