@@ -38,7 +38,7 @@ static inline void move_cube(Cube* cube) {
 }
 
 int _start() {
-    u32* addr = syscall_create_fb(800, 600, false);
+    u32* addr = syscall_create_fb(800, 600);
     printf("fb_addr: %x\n", addr);
     GfxInfo gfx_info;
     gfx_info.width = 800;

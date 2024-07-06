@@ -75,7 +75,7 @@ static void task_create(Task* this, void entrypoint(), bool kernel_task,
         userheap_init(this);
     }
     this->fb_handle_id = -1;
-    this->shmem_events_obj = -1;
+    this->events_handle_id = -1;
     this->sleep_timestamp = 0;
     this->pending_events = false;
     this->owner_task = -1;

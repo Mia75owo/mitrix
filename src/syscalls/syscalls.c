@@ -49,12 +49,10 @@ static void syscall_exit() {
     Task* task = taskmgr_handle_to_pointer(task_handle);
 
     // Remove event receiver
-    if (task->shmem_events_obj != -1) {
-        void* events_vaddr = shmem_get_vaddr(task->shmem_events_obj, 0);
-        events_remove_receiver(events_vaddr);
-
-        shmem_unmap(task->shmem_events_obj, 0);
-        shmem_destroy(task->shmem_events_obj);
+    if (task->events_handle_id != -1) {
+        events_remove_receiver(task->events_addr);
+        shmem_unmap(task->events_handle_id, 0);
+        shmem_destroy(task->events_handle_id);
     }
     if (events_get_focused_task() == task) {
         events_focus_task(NULL);
@@ -135,6 +133,7 @@ static u32 syscall_write(u32 file_id, u8* buffer, u32 len) {
 static void syscall_exec(char* file_name) {
     TaskHandle child_handle = taskmgr_create_user_task(file_name);
     Task* child = taskmgr_handle_to_pointer(child_handle);
+    taskmgr_enable_task(child_handle);
 
     child->owner_task = taskmgr_get_current_task();
 }
@@ -144,6 +143,7 @@ static void syscall_exec_blocking(char* file_name) {
 
     TaskHandle child_handle = taskmgr_create_user_task(file_name);
     Task* child = taskmgr_handle_to_pointer(child_handle);
+    taskmgr_enable_task(child_handle);
 
     child->owner_task = taskmgr_get_current_task();
 
@@ -151,9 +151,14 @@ static void syscall_exec_blocking(char* file_name) {
     taskmgr_schedule();
 }
 
-static u32* syscall_create_fb(u32 width, u32 height, bool double_buffering) {
+static u32* syscall_create_fb(u32 width, u32 height) {
     TaskHandle task_handle = taskmgr_get_current_task();
     Task* task = taskmgr_handle_to_pointer(task_handle);
+
+    if (task->fb_handle_id != -1) {
+        klog("WARNING: calling create_fb multiple times!\n");
+        return shmem_get_vaddr(task->fb_handle_id, task_handle);
+    }
 
     u32 object_id = shmem_create(width * height * sizeof(u32), task_handle);
     u8* addr = shmem_map(object_id, task_handle);
@@ -162,8 +167,7 @@ static u32* syscall_create_fb(u32 width, u32 height, bool double_buffering) {
     return (u32*)addr;
 }
 
-static void syscall_draw_fb(u32 width, u32 height) {
-}
+static void syscall_draw_fb(u32 width, u32 height) {}
 u32 syscall_get_screen_size_x() { return SCREEN_X; }
 u32 syscall_get_screen_size_y() { return SCREEN_Y; }
 
@@ -313,17 +317,17 @@ EventBuffer* syscall_create_events_buf() {
     TaskHandle task_handle = taskmgr_get_current_task();
     Task* task = taskmgr_handle_to_pointer(task_handle);
 
-    if (task->shmem_events_obj != -1) {
-        shmem_unmap(task_handle, task->shmem_events_obj);
-        shmem_destroy(task->shmem_events_obj);
+    if (task->events_handle_id != -1) {
+        return shmem_get_vaddr(task->events_handle_id, task_handle);
     }
 
     u32 object_id = shmem_create(sizeof(EventBuffer), task_handle);
-    task->shmem_events_obj = object_id;
+    task->events_handle_id = object_id;
 
     void* kernel_vaddr = shmem_map(object_id, 0);
     assert(kernel_vaddr);
     events_add_receiver(kernel_vaddr, task, false);
+    task->events_addr = kernel_vaddr;
 
     void* user_vaddr = shmem_map(object_id, task_handle);
     assert(user_vaddr);

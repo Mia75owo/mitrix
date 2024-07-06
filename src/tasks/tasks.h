@@ -30,22 +30,28 @@ typedef struct {
 
     CPUState* cpustate;
 
+    // Scheduling stuff
     TaskState state;
-    u8* raw_elf;
-
-    SharedMemPool shmem_pool;
-    i32 fb_handle_id;
-    i32 shmem_events_obj;
-
-    TaskOpenFile files[TASK_MAX_FILES];
-    u32 heap_start;
-    u32 heap_end;
-
     u32 sleep_timestamp;
     bool pending_events;
 
-    TaskHandle owner_task;
+    u8* raw_elf;
 
+    // Shared memory, framebuffer and events
+    SharedMemPool shmem_pool;
+    i32 fb_handle_id;
+    void* fb_addr;
+
+    i32 events_handle_id;
+    void* events_addr;
+
+    u32 heap_start;
+    u32 heap_end;
+
+    // File system
+    TaskOpenFile files[TASK_MAX_FILES];
+
+    TaskHandle owner_task;
     bool is_kernel_task;
 
     u8* stack;

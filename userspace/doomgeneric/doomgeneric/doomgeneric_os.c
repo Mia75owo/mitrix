@@ -38,7 +38,7 @@ int _start() {
 }
 
 void DG_Init() {
-    frame_buffer = syscall_create_fb(DOOMGENERIC_RESX, DOOMGENERIC_RESY, false);
+    frame_buffer = syscall_create_fb(DOOMGENERIC_RESX, DOOMGENERIC_RESY);
     event_buffer = syscall_create_events_buf();
 
     events_init(event_buffer);
