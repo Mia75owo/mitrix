@@ -7,16 +7,18 @@
 
 #define NUM_PAGE_DIRS 256
 static u32 page_dirs[NUM_PAGE_DIRS][1024] __attribute__((aligned(4096)));
-static u8 page_dir_used[NUM_PAGE_DIRS];
+static bool page_dir_used[NUM_PAGE_DIRS];
 
 u32 memory_num_vpages;
 
 static struct multiboot_info* boot_info = 0;
 
+static void sync_page_dirs();
+
 void memory_init(u32 mem_high, u32 physical_alloc_start) {
     memory_num_vpages = 0;
 
-    initial_page_dir[0] = 0;
+    initial_page_dir[0] = false;
     invalidate(0);
 
     initial_page_dir[1023] =
@@ -43,7 +45,8 @@ void memory_change_page_dir(u32* pd) {
     pd = (u32*)(((u32)pd) - KERNEL_START);
     asm volatile(
         "mov %0, %%eax\n"
-        "mov %%eax, %%cr3\n" ::"m"(pd));
+        "mov %%eax, %%cr3\n" ::"m"(pd)
+        : "eax");
 }
 
 void memory_map_page(u32 virt_addr, u32 phys_addr, u32 flags) {
@@ -144,7 +147,7 @@ u32 memory_unmap_page(u32 virt_addr) {
     return pte;
 }
 
-void sync_page_dirs() {
+static void sync_page_dirs() {
     for (u32 i = 0; i < NUM_PAGE_DIRS; i++) {
         if (page_dir_used[i]) {
             u32* page_dir = page_dirs[i];
@@ -158,27 +161,27 @@ void sync_page_dirs() {
 
 u32* memory_alloc_page_dir() {
     for (u32 i = 0; i < NUM_PAGE_DIRS; i++) {
-        if (!page_dir_used[i]) {
-            page_dir_used[i] = true;
+        if (page_dir_used[i]) continue;
 
-            u32* page_dir = page_dirs[i];
-            memset(page_dir, 0, 0x1000);
+        page_dir_used[i] = true;
 
-            // user page tables
-            for (u32 i = 0; i < 768; i++) {
-                page_dir[i] = 0;
-            }
+        u32* page_dir = page_dirs[i];
+        memset(page_dir, 0, 0x1000);
 
-            // kernel
-            for (u32 i = 768; i < 1023; i++) {
-                page_dir[i] = initial_page_dir[i] & ~PTE_OWNER;
-            }
-
-            // resursive mapping
-            page_dir[1023] =
-                (((u32)page_dir) - KERNEL_START) | PTE_PRESENT | PTE_READ_WRITE;
-            return page_dir;
+        // user page tables
+        for (u32 i = 0; i < 768; i++) {
+            page_dir[i] = 0;
         }
+
+        // kernel
+        for (u32 i = 768; i < 1023; i++) {
+            page_dir[i] = initial_page_dir[i] & ~PTE_OWNER;
+        }
+
+        // resursive mapping
+        page_dir[1023] =
+            (((u32)page_dir) - KERNEL_START) | PTE_PRESENT | PTE_READ_WRITE;
+        return page_dir;
     }
 
     assert_msg(false, "No page dirs left!");
@@ -215,7 +218,7 @@ void memory_free_page_dir(u32* page_dir) {
         pd[i] = 0;
     }
 
-    page_dir_used[pagedir_index] = 0;
+    page_dir_used[pagedir_index] = false;
     memory_change_page_dir(prev_pagedir);
 }
 

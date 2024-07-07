@@ -90,6 +90,4 @@ bool memory_is_valid_vaddr(u32 addr);
 
 void invalidate(u32 vaddr);
 
-void sync_page_dirs();
-
 #endif
