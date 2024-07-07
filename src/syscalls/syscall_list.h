@@ -40,6 +40,7 @@
 #define SYSCALL_WAIT_FOR_EVENT    42
 
 #define SYSCALL_CREATE_EVENTS_BUF 50
+#define SYSCALL_REQUEST_FOCUS     51
 // clang-format on
 
 #endif

@@ -37,6 +37,7 @@ void syscall_set_heap_size(u32 size);
 void syscall_scheduler_next();
 void syscall_sleep(u32 ms);
 void syscall_wait_for_event();
+bool syscall_request_focus();
 
 EventBuffer* syscall_create_events_buf();
 

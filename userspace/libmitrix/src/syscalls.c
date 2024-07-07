@@ -133,3 +133,8 @@ EventBuffer* syscall_create_events_buf() {
     asm volatile("int $0x80" : "=a"(ret) : "a"(SYSCALL_CREATE_EVENTS_BUF));
     return (void*)ret;
 }
+bool syscall_request_focus() {
+    u32 ret;
+    asm volatile("int $0x80" : "=a"(ret) : "a"(SYSCALL_REQUEST_FOCUS));
+    return (bool)ret;
+}

@@ -193,7 +193,7 @@ static u32* syscall_create_fb(u32 width, u32 height) {
     task->fb_height = height;
 
     taskmgr_add_render_task(task_handle);
-    events_focus_task(task);
+    taskmgr_focus_task(task_handle);
 
     return (u32*)user_vaddr;
 }
@@ -376,6 +376,11 @@ EventBuffer* syscall_create_events_buf() {
     assert(user_vaddr);
     return user_vaddr;
 }
+bool syscall_request_focus() {
+    TaskHandle task_handle = taskmgr_get_current_task();
+    taskmgr_focus_task(task_handle);
+    return true;
+}
 
 void syscalls_init() {
     memset(syscall_handlers, 0, sizeof(syscall_handlers));
@@ -414,6 +419,7 @@ void syscalls_init() {
     syscall_handlers[SYSCALL_WAIT_FOR_EVENT] = syscall_wait_for_event;
 
     syscall_handlers[SYSCALL_CREATE_EVENTS_BUF] = syscall_create_events_buf;
+    syscall_handlers[SYSCALL_REQUEST_FOCUS] = syscall_request_focus;
 
     set_isr_function(0x80, handle_syscall_interrupt);
 }

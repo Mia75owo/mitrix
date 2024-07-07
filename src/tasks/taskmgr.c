@@ -1,5 +1,6 @@
 #include "taskmgr.h"
 
+#include "events/events.h"
 #include "gfx/gfx.h"
 #include "memory/memory.h"
 #include "pit/pit.h"
@@ -86,6 +87,8 @@ void taskmgr_set_state(TaskHandle handle, TaskState state) {
 }
 void taskmgr_focus_task(TaskHandle handle) {
     assert(handle >= 0 && handle < NUM_TASKS);
+    Task* task = taskmgr_handle_to_pointer(handle);
+    events_focus_task(task);
 }
 void taskmgr_enable_task(TaskHandle handle) {
     assert(handle >= 0 && handle < NUM_TASKS);
