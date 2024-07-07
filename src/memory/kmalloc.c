@@ -130,7 +130,7 @@ u8* kmalloc(u32 size) {
 
         return (u8*)(KERNEL_MALLOC + found_index * 4096);
     } else {
-        u32 chunk_count = size / 4096;
+        u32 chunk_count = CEIL_DIV(size, 4096);
 
         u32 found_length = 0;
         i32 found_index = -1;
