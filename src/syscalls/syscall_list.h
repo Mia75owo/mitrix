@@ -6,14 +6,16 @@
 #define SYSCALL_STDERR_FILE 2
 
 // clang-format off
-#define SYSCALL_EXIT              00
-#define SYSCALL_PRINT             01
-#define SYSCALL_PRINT_CHAR        02
-#define SYSCALL_GET_SYSTIME       03
-#define SYSCALL_READ              04
-#define SYSCALL_WRITE             05
-#define SYSCALL_EXEC              06
-#define SYSCALL_EXEC_BLOCKING     07
+#define SYSCALL_EXIT               0
+#define SYSCALL_PRINT              1
+#define SYSCALL_PRINT_CHAR         2
+#define SYSCALL_GET_SYSTIME        3
+#define SYSCALL_READ               4
+#define SYSCALL_WRITE              5
+#define SYSCALL_EXEC               6
+#define SYSCALL_EXEC_BLOCKING      7
+#define SYSCALL_EXEC_DETACHED      8
+#define SYSCALL_OWNER_TASK_DEPTH   9
 
 #define SYSCALL_CREATE_FB         10
 #define SYSCALL_DRAW_FB           11

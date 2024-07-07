@@ -91,6 +91,17 @@ void taskmgr_enable_task(TaskHandle handle) {
     assert(handle >= 0 && handle < NUM_TASKS);
     tasks[handle].state = TASK_STATE_RUNNING;
 }
+void taskmgr_kill_children(TaskHandle handle) {
+    assert(handle >= 0 && handle < NUM_TASKS);
+
+    for (u32 i = 1; i < NUM_TASKS; i++) {
+        Task* task = taskmgr_handle_to_pointer(i);
+        if (task->owner_task == handle) {
+            taskmgr_kill_children(i);
+            taskmgr_kill_task(i);
+        }
+    }
+}
 
 // Switch to next task
 

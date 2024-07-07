@@ -24,6 +24,7 @@ void taskmgr_kill_task(TaskHandle handle);
 void taskmgr_set_state(TaskHandle handle, TaskState state);
 void taskmgr_focus_task(TaskHandle handle);
 void taskmgr_enable_task(TaskHandle handle);
+void taskmgr_kill_children(TaskHandle handle);
 
 void taskmgr_schedule();
 

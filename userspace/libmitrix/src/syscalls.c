@@ -34,6 +34,14 @@ void syscall_exec(char* file_name) {
 void syscall_exec_blocking(char* file_name) {
     asm volatile("int $0x80" ::"a"(SYSCALL_EXEC_BLOCKING), "b"(file_name));
 }
+void syscall_exec_detached(char* file_name) {
+    asm volatile("int $0x80" ::"a"(SYSCALL_EXEC_DETACHED), "b"(file_name));
+}
+u32 syscall_owner_task_depth() {
+    u32 ret;
+    asm volatile("int $0x80" : "=a"(ret) : "a"(SYSCALL_OWNER_TASK_DEPTH));
+    return ret;
+}
 
 u32* syscall_create_fb(u32 width, u32 height) {
     u32 ret;

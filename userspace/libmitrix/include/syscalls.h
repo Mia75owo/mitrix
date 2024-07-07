@@ -13,6 +13,8 @@ u32 syscall_read(u32 file_id, u8* buf, u32 len);
 u32 syscall_write(u32 file_id, u8* buf, u32 len);
 void syscall_exec(char* file_name);
 void syscall_exec_blocking(char* file_name);
+void syscall_exec_detached(char* file_name);
+u32 syscall_owner_task_depth();
 
 u32* syscall_create_fb(u32 width, u32 height);
 void syscall_draw_fb();

@@ -69,6 +69,7 @@ static void syscall_exit() {
             owner->state = TASK_STATE_RUNNING;
         }
     }
+    taskmgr_kill_children(task_handle);
 
     taskmgr_kill_task(task_handle);
 }
@@ -147,6 +148,26 @@ static void syscall_exec_blocking(char* file_name) {
 
     task->state = TASK_STATE_BLOCKED_BY_EXEC;
     taskmgr_schedule();
+}
+static void syscall_exec_detached(char* file_name) {
+    TaskHandle child_handle = taskmgr_create_user_task(file_name);
+    taskmgr_enable_task(child_handle);
+}
+static u32 syscall_owner_task_depth() {
+    TaskHandle task_handle = taskmgr_get_current_task();
+    Task* task = taskmgr_handle_to_pointer(task_handle);
+
+    u32 depth = 0;
+
+    TaskHandle owner_task_handle = task->owner_task;
+    while (owner_task_handle != -1) {
+        Task* owner_task = taskmgr_handle_to_pointer(owner_task_handle);
+        owner_task_handle = owner_task->owner_task;
+
+        depth++;
+    }
+
+    return depth;
 }
 
 static u32* syscall_create_fb(u32 width, u32 height) {
@@ -367,6 +388,8 @@ void syscalls_init() {
     syscall_handlers[SYSCALL_WRITE] = syscall_write;
     syscall_handlers[SYSCALL_EXEC] = syscall_exec;
     syscall_handlers[SYSCALL_EXEC_BLOCKING] = syscall_exec_blocking;
+    syscall_handlers[SYSCALL_EXEC_DETACHED] = syscall_exec_detached;
+    syscall_handlers[SYSCALL_OWNER_TASK_DEPTH] = syscall_owner_task_depth;
 
     syscall_handlers[SYSCALL_CREATE_FB] = syscall_create_fb;
     syscall_handlers[SYSCALL_DRAW_FB] = syscall_draw_fb;
