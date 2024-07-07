@@ -30,6 +30,8 @@ typedef enum {
     CMD_DEBUGGFX2,
     CMD_DEBUGINT,
 
+    CMD_TEST,
+
     CMD_LOGO,
     CMD_LS,
     CMD_CAT,

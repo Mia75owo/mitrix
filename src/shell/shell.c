@@ -7,6 +7,7 @@
 #include "memory/memory.h"
 #include "pit/pit.h"
 #include "tasks/taskmgr.h"
+#include "tests/tests.h"
 #include "util/debug.h"
 #include "util/mem.h"
 #include "util/sys.h"
@@ -53,6 +54,10 @@ void shell_init() {
     shell_add_command("debugint",
                       "DEBUG trigger the DEBUG interrupt",
                       CMD_DEBUGINT);
+
+    shell_add_command("test",
+                      "Run tests",
+                      CMD_TEST);
 
     shell_add_command("logo",
                       "Display the MITRIX logo",
@@ -164,6 +169,11 @@ void shell_execute_command(const char* command) {
         case CMD_DEBUGINT: {
             asm volatile("int $1");
         } break;
+        case CMD_TEST: {
+            debug_tests();
+            TaskHandle task_handle = taskmgr_create_user_task("utest.elf");
+            taskmgr_enable_task(task_handle);
+        } break;
         case CMD_LOGO: {
             gfx_logo();
             gfx_display_backbuffer();
@@ -178,14 +188,12 @@ void shell_execute_command(const char* command) {
                 file = mifs_file_by_index(i);
                 if (file.addr == 0) break;
 
-#define SIZE_BUF_LEN 8
-
-                static char size_buffer[SIZE_BUF_LEN];
-                itoa(size_buffer, file.size, SIZE_BUF_LEN, 10);
+                static char size_buffer[8];
+                itoa(size_buffer, file.size, sizeof(size_buffer), 10);
                 u32 size_len = strlen(size_buffer);
 
                 klog("%0FSIZE:%0C%s", size_buffer);
-                for (u32 i = 0; i < SIZE_BUF_LEN - size_len; i++) klog(" ");
+                for (u32 i = 0; i < sizeof(size_buffer) - size_len; i++) klog(" ");
 
                 klog("%0F| NAME:%0A%s\n", file.name);
 
@@ -219,7 +227,8 @@ void shell_execute_command(const char* command) {
             if (file.addr == 0) {
                 klog("%0CFile '%s' not found!\n", file_name_buffer);
             } else {
-                TaskHandle new_task = taskmgr_create_user_task(file_name_buffer);
+                TaskHandle new_task =
+                    taskmgr_create_user_task(file_name_buffer);
                 taskmgr_enable_task(new_task);
             }
         } break;

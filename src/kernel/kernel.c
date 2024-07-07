@@ -24,6 +24,7 @@
 extern void gdt_load();
 extern void idt_load();
 
+// Evil macro >:)
 #define kinit(call, name)                            \
     klog("%0F[ %0BINFO %0F] %07Loading %s\n", name); \
     (call);                                          \
@@ -89,9 +90,6 @@ __attribute__((noreturn)) void kernel_main(u32 magic,
     // Set the kernel task to idle as it will just spin_halt()
     // wasting CPU time
     taskmgr_set_state(taskmgr_get_kernel_task(), TASK_STATE_IDLE);
-
-    // TaskHandle doom = taskmgr_create_user_task("doom.elf");
-    // taskmgr_enable_task(doom);
 
     asm volatile("sti");
     spin_halt();

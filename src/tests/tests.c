@@ -12,8 +12,8 @@ void debug_tests() {
 
     // ================================================================
     // MEMCMP
-    static u8 buf1[10] = {0,1,2,3,4,5,6,7,8,9};
-    static u8 buf2[10] = {0,1,2,3,4,5,6,7,8,9};
+    u8 buf1[10] = {0,1,2,3,4,5,6,7,8,9};
+    u8 buf2[10] = {0,1,2,3,4,5,6,7,8,9};
     assert_msg(memcmp(buf1, buf2, 10) == 1, "TEST: memcmp true");
     buf1[9]--;
     assert_msg(memcmp(buf1, buf2, 10) == 0, "TEST: memcmp false 1");
@@ -49,16 +49,16 @@ void debug_tests() {
     // ================================================================
     // MEMSET
 
-    static u8 buf4[8] = {9,9,9,9,9,9,9,9};
-    static u8 buf3[8] = {0,0,0,0,0,0,0,0};
+    u8 buf4[8] = {9,9,9,9,9,9,9,9};
+    u8 buf3[8] = {0,0,0,0,0,0,0,0};
 
     memset(buf3, 9, 8);
     assert_msg(memcmp(buf3, buf4, 8) == true, "TEST: memset");
 
     // ================================================================
     // MEMCPY
-    static u8 buf5[8] = {1,2,3,4,5,6,7,8};
-    static u8 buf6[8] = {0,0,0,0,0,0,0,0};
+    u8 buf5[8] = {1,2,3,4,5,6,7,8};
+    u8 buf6[8] = {0,0,0,0,0,0,0,0};
 
     memcpy(buf5, buf6, 8);
     assert_msg(memcmp(buf5, buf6, 8) == true, "TEST: memcpy");
@@ -66,8 +66,8 @@ void debug_tests() {
     // ================================================================
     // MEMREV
 
-    static u8 buf7[8] = {8,7,6,5,4,3,2,1};
-    static u8 buf8[8] = {1,2,3,4,5,6,7,8};
+    u8 buf7[8] = {8,7,6,5,4,3,2,1};
+    u8 buf8[8] = {1,2,3,4,5,6,7,8};
 
     memrev(buf8, 8);
     assert_msg(memcmp(buf7, buf8, 8) == true, "TEST: memrev");
